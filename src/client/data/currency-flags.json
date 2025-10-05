@@ -1,0 +1,84 @@
+{
+  "data": [
+    {
+      "CurrencyCode": "USD",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/usd.png"
+    },
+    {
+      "CurrencyCode": "EUR",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/eur.png"
+    },
+    {
+      "CurrencyCode": "GBP",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/gbp.png"
+    },
+    {
+      "CurrencyCode": "JPY",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/jpy.png"
+    },
+    {
+      "CurrencyCode": "AUD",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/aud.png"
+    },
+    {
+      "CurrencyCode": "CAD",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/cad.png"
+    },
+    {
+      "CurrencyCode": "CHF",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/chf.png"
+    },
+    {
+      "CurrencyCode": "CNY",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/cny.png"
+    },
+    {
+      "CurrencyCode": "SEK",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/sek.png"
+    },
+    {
+      "CurrencyCode": "NZD",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/nzd.png"
+    },
+    {
+      "CurrencyCode": "MXN",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/mxn.png"
+    },
+    {
+      "CurrencyCode": "SGD",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/sgd.png"
+    },
+    {
+      "CurrencyCode": "HKD",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/hkd.png"
+    },
+    {
+      "CurrencyCode": "NOK",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/nok.png"
+    },
+    {
+      "CurrencyCode": "KRW",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/krw.png"
+    },
+    {
+      "CurrencyCode": "TRY",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/try.png"
+    },
+    {
+      "CurrencyCode": "RUB",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/rub.png"
+    },
+    {
+      "CurrencyCode": "INR",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/inr.png"
+    },
+    {
+      "CurrencyCode": "BRL",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/brl.png"
+    },
+    {
+      "CurrencyCode": "ZAR",
+      "FlagPng": "https://wise.com/public-resources/assets/flags/rectangle/zar.png"
+    }
+  ]
+}

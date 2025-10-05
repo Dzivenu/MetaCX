@@ -1,0 +1,230 @@
+{
+  "admin": [
+    {
+      "name": "Dashboard",
+      "description": "Main overview",
+      "icon": "IconDashboard",
+      "link": "/admin/dashboard",
+      "side": "admin"
+    },
+    {
+      "name": "Rates",
+      "description": "Exchange rates",
+      "icon": "IconCurrencyDollar",
+      "link": "/admin/rates",
+      "side": "admin"
+    },
+    {
+      "name": "Customers",
+      "description": "Customer management",
+      "icon": "IconUsers",
+      "link": "/admin/customers",
+      "side": "admin"
+    },
+    {
+      "name": "Reports",
+      "description": "System reports",
+      "icon": "IconFileText",
+      "link": "/admin/reports",
+      "side": "admin"
+    },
+    {
+      "name": "Sessions",
+      "description": "User sessions",
+      "icon": "IconClock",
+      "link": "/admin/sessions",
+      "side": "admin"
+    },
+    {
+      "name": "Analytics",
+      "description": "Data analytics",
+      "icon": "IconChartBar",
+      "link": "/admin/analytics",
+      "side": "admin"
+    },
+    {
+      "name": "Repositories",
+      "description": "Data repositories",
+      "icon": "IconDatabase",
+      "link": "/admin/repositories",
+      "side": "admin"
+    },
+    {
+      "name": "Currencies",
+      "description": "Currency management",
+      "icon": "IconCoins",
+      "link": "/admin/currencies",
+      "side": "admin"
+    },
+    {
+      "name": "Currency Flow",
+      "description": "Flow tracking",
+      "icon": "IconTrendingUp",
+      "link": "/admin/currency-flow",
+      "side": "admin"
+    },
+    {
+      "name": "Competitors",
+      "description": "Competitor analysis",
+      "icon": "IconBuilding",
+      "link": "/admin/competitors",
+      "side": "admin"
+    },
+    {
+      "name": "Records",
+      "description": "Transaction records",
+      "icon": "IconFileAnalytics",
+      "link": "/admin/records",
+      "side": "admin"
+    },
+    {
+      "name": "Activities",
+      "description": "System activities",
+      "icon": "IconActivity",
+      "link": "/admin/activities",
+      "side": "admin"
+    },
+    {
+      "name": "Tools",
+      "description": "Admin tools",
+      "icon": "IconTool",
+      "link": "/admin/tools",
+      "side": "admin"
+    },
+    {
+      "name": "Compliance",
+      "description": "Compliance management",
+      "icon": "IconShield",
+      "link": "/admin/compliance",
+      "side": "admin"
+    },
+    {
+      "name": "FINTRAC",
+      "description": "FINTRAC reporting",
+      "icon": "IconReportMoney",
+      "link": "/admin/fintrac",
+      "side": "admin"
+    },
+    {
+      "name": "QBO",
+      "description": "QuickBooks Online",
+      "icon": "IconBuildingBank",
+      "link": "/admin/qbo",
+      "side": "admin"
+    },
+    {
+      "name": "Blacklists",
+      "description": "Blocked users",
+      "icon": "IconUserX",
+      "link": "/admin/blacklists",
+      "side": "admin"
+    },
+    {
+      "name": "Users",
+      "description": "User management",
+      "icon": "IconUsers",
+      "link": "/admin/users",
+      "side": "admin"
+    },
+    {
+      "name": "Settings",
+      "description": "System settings",
+      "icon": "IconSettings",
+      "link": "/admin/settings",
+      "side": "admin"
+    }
+  ],
+  "portal": [
+    {
+      "name": "Dashboard",
+      "description": "Main overview",
+      "icon": "IconDashboard",
+      "link": "/portal/dashboard",
+      "side": "portal"
+    },
+    {
+      "name": "Create Order",
+      "description": "Create new order",
+      "icon": "IconShoppingCart",
+      "link": "/portal/orders/create",
+      "side": "portal"
+    },
+    {
+      "name": "Orders",
+      "description": "Order management",
+      "icon": "IconShoppingCart",
+      "link": "/portal/orders",
+      "side": "portal"
+    },
+    {
+      "name": "Transfers",
+      "description": "Money transfers",
+      "icon": "IconTransfer",
+      "link": "/portal/transfers",
+      "side": "portal"
+    },
+    {
+      "name": "Expenses",
+      "description": "Expense tracking",
+      "icon": "IconReceipt",
+      "link": "/portal/expenses",
+      "side": "portal"
+    },
+    {
+      "name": "Float",
+      "description": "Float management",
+      "icon": "IconCoins",
+      "link": "/portal/float",
+      "side": "portal"
+    },
+    {
+      "name": "Customers",
+      "description": "Customer management",
+      "icon": "IconUsers",
+      "link": "/portal/customers",
+      "side": "portal"
+    },
+    {
+      "name": "Swap Bills",
+      "description": "Bill swapping",
+      "icon": "IconArrowsExchange",
+      "link": "/portal/swap",
+      "side": "portal"
+    },
+    {
+      "name": "Audit",
+      "description": "Audit trail",
+      "icon": "IconEye",
+      "link": "/portal/audit",
+      "side": "portal"
+    },
+    {
+      "name": "Tools",
+      "description": "Portal tools",
+      "icon": "IconTool",
+      "link": "/portal/tools",
+      "side": "portal"
+    },
+    {
+      "name": "Competitors",
+      "description": "Competitor analysis",
+      "icon": "IconBuilding",
+      "link": "/portal/competitors",
+      "side": "portal"
+    },
+    {
+      "name": "Our Rates",
+      "description": "Current rates",
+      "icon": "IconCurrencyDollar",
+      "link": "/portal/rates",
+      "side": "portal"
+    },
+    {
+      "name": "Sessions",
+      "description": "User sessions",
+      "icon": "IconClock",
+      "link": "/portal/sessions",
+      "side": "portal"
+    }
+  ]
+}

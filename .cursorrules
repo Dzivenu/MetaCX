@@ -1,0 +1,279 @@
+# AI Development Rules - Project Template
+
+## Tech Stack
+
+- React ^19.0.0 (no forwardRef, useMemo, useCallback unless necessary)
+- TypeScript ^5 only (no JavaScript)
+- Next.js 15.1.8
+- Tailwind CSS ^4.1.8 + DaisyUI
+- React Hook Form ^7.56.4 for all forms
+- React Query ^5.76.1 (@tanstack/react-query) for data fetching
+- Redux Toolkit ^2.6.1 for state management
+- Hono ^4.6.11 for APIs (RPC pattern) with Zod OpenAPI ^0.19.8
+- Drizzle ORM ^0.36.4 with PostgreSQL
+- Zod ^3.24.2 for validation
+- Yarn 1.22.21+ (never npm)
+- OpenTelemetry for observability
+- Playwright for End-to-End testing
+
+## Versioning & Development Strategy
+
+### Version System
+
+- Start at version **0.0.1**
+- Each major roadmap milestone = **+0.1** version increment
+- **10 roadmaps total** to reach version **1.0.0**
+- Current development: **Version 0.0.1** (Authentication Foundation)
+- Goals must be **basic and achievable** for each roadmap
+- Each roadmap focuses on **one core feature area**
+
+### Development Approach
+
+- Follow roadmap order strictly (no jumping ahead)
+- Complete all tasks in current roadmap before moving to next
+- Update MANIFEST.md roadmap status after each completion
+- Version bumps only after roadmap completion
+
+## MANIFEST.md File Structure Guidelines
+
+Every project should have a MANIFEST.md file following this structure:
+
+### Required Sections
+
+1. **Project Title & Description**
+
+   ```markdown
+   # [Project Name] - [App Type]
+
+   Brief description of what the project does and its mission
+   ```
+
+2. **UI/UX Implementation**
+
+   - Theme configuration details
+   - Current implementation status with checkboxes
+   - Component showcase descriptions
+   - Design system specifications
+
+3. **Application Flow Chart & Pages**
+
+   ```markdown
+   ## 🗺️ Application Flow Chart & Pages
+
+   ### **Core Page Structure**
+
+   - Use tree structure with emojis for categories
+   - Mark completed pages with ✅
+   - Group pages by user type/functionality
+   - Include all planned routes and sub-routes
+   ```
+
+4. **Development Roadmap (Required Format)**
+
+   ```markdown
+   ## 🛣️ Development Roadmap (Version 0.0.1 → 1.0.0)
+
+   ### **Current Version: [X.X.X]** 🚀
+
+   ### **Roadmap 1: Version 0.0.1 - [Feature Name]** ⭐ **(CURRENT)**
+
+   **Goal**: [Basic goal description]
+
+   - [ ] Task 1
+   - [ ] Task 2
+   - [ ] Task 3
+
+   ### **Roadmap 2: Version 0.0.2 - [Next Feature]**
+
+   **Goal**: [Next basic goal]
+
+   - [ ] Task 1
+   - [ ] Task 2
+   ```
+
+5. **Technical Architecture**
+
+   - Current tech stack
+   - Configuration examples
+   - Architecture decisions
+
+6. **Feature Descriptions**
+   - Current features (UI ready)
+   - Planned features
+   - Business value explanations
+
+### MANIFEST.md Writing Rules
+
+- **Use emojis** for section headers and visual hierarchy
+- **Include checkboxes** for tracking progress (✅ completed, [ ] pending)
+- **Be specific** about current implementation status
+- **Update regularly** as features are completed
+- **Version numbers** must match the roadmap system
+- **Goals must be basic** and achievable in reasonable timeframes
+- **One core focus** per roadmap (no feature mixing)
+- **Technical details** should include actual code examples
+- **Page structure** must include all planned routes
+- **Roadmap descriptions** should be brief but clear
+
+### Example Roadmap Goals (Keep Basic)
+
+- ✅ Good: "Basic user authentication and account management"
+- ❌ Too Complex: "Advanced AI-powered user authentication with biometric integration"
+- ✅ Good: "Course creation and basic learning features"
+- ❌ Too Complex: "Advanced AI-powered personalized learning with VR integration"
+
+### Updating Guidelines
+
+- Mark completed tasks with ✅
+- Update "Current Version" when roadmap completes
+- Add new sections as project grows
+- Keep technical architecture current
+- Update page flow as routes are added
+
+## File Structure Template
+
+```
+src/
+├── app/                    # Next.js app router pages (only exports from views)
+│   └── api/               # API routes
+│       └── [[...route]]/  # Hono catch-all API router
+│           ├── route.ts   # Main Hono router with OpenAPI docs
+│           └── routes/    # Individual route modules
+├── client/                # Client-side React code
+│   ├── components/        # Reusable components
+│   │   ├── ui/           # Basic UI components
+│   │   ├── icons/        # Icon components
+│   │   ├── blocks/       # Complex reusable blocks
+│   │   ├── layout/       # Layout components
+│   │   └── providers/    # Context providers
+│   ├── views/            # Page components and logic
+│   │   └── [page-name]/  # Page-specific components
+│   │       └── components/ # Page-specific sub-components
+│   ├── hooks/            # Custom hooks
+│   │   ├── data/         # Data fetching hooks
+│   │   ├── ui/           # UI-related hooks
+│   │   └── query/        # React Query hooks
+│   ├── store/            # Redux state (no API calls here)
+│   └── providers/        # Global providers
+├── server/               # Server-side logic
+│   ├── auth/             # Authentication configuration
+│   ├── db/               # Database connection and schema
+│   │   ├── migrations/   # Database migrations
+│   │   └── schema/       # Schema definitions
+│   ├── middlewares/      # Server middlewares
+│   ├── modules/          # Feature modules
+│   ├── routes/           # API route handlers
+│   └── services/         # Business logic services
+└── shared/               # Shared utilities and configurations
+    ├── lib/              # Utilities and helpers
+    │   ├── auth/         # Authentication utilities
+    │   ├── validations/  # Zod schemas and validation
+    │   └── db-types/     # Generated database types
+    ├── types/            # TypeScript type definitions
+    │   └── api/          # API-related types
+    ├── config/           # Configuration and constants
+    ├── data/             # Database communication helpers
+    │   └── db/           # Database utilities
+    ├── theme/            # Theme and styling configurations
+    └── test/             # Test files and utilities
+        └── e2e/          # End-to-end tests
+```
+
+## Naming Conventions
+
+- **Files**: kebab-case (e.g., `user-profile.tsx`)
+- **Data files**: end with `-data.ts`
+- **Hook files**: end with `-hook.ts`
+- **Functions**: descriptive names (e.g., `getUserById`)
+- **Handlers**: prefix with `handle` (e.g., `handleSubmit`)
+- **Hook functions**: prefix with `do` (e.g., `doRefreshData`)
+
+## API Development Rules
+
+- Use Hono catch-all structure: `src/app/api/[[...route]]/`
+- Define routes in `src/app/api/[[...route]]/routes/` and import in main route file
+- Use OpenAPI documentation for all endpoints
+- Keep all API logic in server modules, not in route files
+- Use Zod for validation and type safety
+
+## Component Rules
+
+- Keep components small and modular
+- Move complex logic to separate files
+- Use folder structure: `component-name/index.tsx`
+- All UI components exported from `src/client/components/ui/index.tsx`
+- All icons exported from `src/client/components/icons/index.tsx`
+- Page-specific components in `src/client/views/[page]/components/`
+
+## Data & State Rules
+
+- Use React Query for all data fetching/mutations
+- No direct API calls in hooks - use helpers from `src/shared/data/`
+- No API calls in Redux store
+- Use hooks to access Redux store
+- All utilities and helpers in `src/shared/lib/`
+- Server-side logic stays in `src/server/`
+
+## Page Structure
+
+Every `page.tsx` should only export from client views:
+
+```typescript
+"use client";
+export { default } from "@/client/views/PageName";
+```
+
+## Error Handling
+
+- Let React Query handle errors (no try/catch in data logic)
+- Use `console.error()` instead of throwing errors
+- Loading/error states should be prefixed with hook name
+
+## Database
+
+- Run type generation after schema changes
+- Import types from generated type files
+- Use migrations for schema changes
+- Keep database logic in `src/server/db/`
+
+## Styling
+
+- Use Tailwind CSS and DaisyUI
+- Check theme files before creating custom styles
+- Keep styling consistent across components
+- Use CSS variables for theming
+
+## Don't Do
+
+- No lazy imports
+- No functions inside useEffect
+- No direct Redux store access
+- No npm (use yarn)
+- No JavaScript files
+- No mixing Next.js API routes with Hono structure
+- No API routes outside `[[...route]]` pattern
+- No hardcoded URLs (use environment variables)
+- No skipping roadmap order or jumping ahead in versions
+- No complex goals in early roadmaps (keep basic)
+
+## Web3 Development
+
+- Only use `viem.js` and `wagmi.js` for all Web3-related functionality.
+
+## Testing Rules
+
+- Use Playwright for all end-to-end (E2E) tests.
+- Place E2E tests in the `src/shared/test/e2e/` directory.
+- Tests should cover critical user paths and core features.
+
+## Project Setup Checklist
+
+- [ ] Set up environment variables
+- [ ] Configure database connection
+- [ ] Set up authentication provider
+- [ ] Configure API documentation
+- [ ] Set up testing framework
+- [ ] Configure deployment pipeline
+- [ ] Set up error tracking
+- [ ] Configure analytics (if needed)
+- [ ] Create MANIFEST.md with current roadmap status

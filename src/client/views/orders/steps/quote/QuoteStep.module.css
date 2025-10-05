@@ -1,0 +1,197 @@
+/* Dark Trading Interface Styles */
+
+.tradingInterface {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 1px solid #404040;
+  border-radius: 12px;
+}
+
+.currencySection {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #404040;
+}
+
+.inboundSection {
+  border-left: 3px solid #ef4444;
+}
+
+.outboundSection {
+  border-left: 3px solid #22c55e;
+}
+
+.currencySelect {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  color: white !important;
+  font-size: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.currencySelect:focus {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2) !important;
+}
+
+.amountInput {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  color: white !important;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.amountInput:focus {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2) !important;
+}
+
+.swapButton {
+  background: rgba(249, 115, 22, 0.1) !important;
+  border: 1px solid #f97316 !important;
+  color: #f97316 !important;
+  transition: all 0.2s ease;
+}
+
+.swapButton:hover {
+  background: #f97316 !important;
+  color: white !important;
+}
+
+.spotRatesSection {
+  border-top: 1px solid #404040;
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+.warningsAlert {
+  background: rgba(234, 179, 8, 0.1) !important;
+  border: 1px solid #eab308 !important;
+  border-radius: 8px;
+}
+
+.quoteDetailsGrid {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #404040;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.quoteDetailInput {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  color: white !important;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.networkFeeButton {
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 12px 16px;
+  min-height: 48px;
+}
+
+.networkFeeButtonActive {
+  background: #f97316 !important;
+  border-color: #f97316 !important;
+  color: white !important;
+}
+
+.networkFeeButtonInactive {
+  background: transparent !important;
+  border-color: #6b7280 !important;
+  color: #9ca3af !important;
+}
+
+.networkFeeButtonInactive:hover {
+  background: rgba(107, 114, 128, 0.1) !important;
+  border-color: #9ca3af !important;
+}
+
+.saveQuoteButton {
+  background: #f97316 !important;
+  border-color: #f97316 !important;
+  color: white !important;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.saveQuoteButton:hover {
+  background: #ea580c !important;
+  border-color: #ea580c !important;
+}
+
+.refreshButton {
+  border-color: #f97316 !important;
+  color: #f97316 !important;
+  background: transparent !important;
+}
+
+.refreshButton:hover {
+  background: #f97316 !important;
+  color: white !important;
+}
+
+/* Currency Icons */
+.currencyIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btcIcon {
+  background: #f7931a;
+  color: white;
+}
+
+.cadIcon {
+  background: #ff0000;
+  color: white;
+}
+
+.usdIcon {
+  background: #0066cc;
+  color: white;
+}
+
+.ethIcon {
+  background: #627eea;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tradingInterface {
+    padding: 16px;
+  }
+
+  .currencySection {
+    padding: 16px;
+  }
+
+  .amountInput {
+    font-size: 20px;
+    padding: 16px;
+  }
+
+  .quoteDetailsGrid {
+    padding: 16px;
+  }
+}
+

@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "authorized_repo_ids" text;
