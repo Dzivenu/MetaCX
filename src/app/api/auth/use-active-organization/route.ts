@@ -4,8 +4,9 @@ import { db } from "@/server/db";
 import {
   user as userTable,
   member as memberTable,
+  organization as organizationTable,
 } from "@/server/db/schema/better-auth-schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 /**
  * GET /api/auth/use-active-organization
@@ -57,10 +58,17 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ activeOrganization: null });
       }
 
-      // Fetch organizations and return the persisted one
-      const organizations = (await auth.api.listOrganizations({
-        headers: request.headers,
-      })) as Array<{ id: string; slug: string; name?: string }>;
+      // TODO: Implement proper organization listing when organizations table is created
+      // For now, return a mock organization if one is persisted
+      const organizations = persistedOrgId
+        ? [
+            {
+              id: persistedOrgId,
+              slug: persistedOrgId,
+              name: "Default Organization",
+            },
+          ]
+        : [];
 
       const activeOrg = organizations.find((org) => org.id === persistedOrgId);
 
@@ -75,10 +83,28 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Fetch the organization details
-    const organizations = (await auth.api.listOrganizations({
-      headers: request.headers,
-    })) as Array<{ id: string; slug: string; name?: string }>;
+    // Fetch the organization details from database
+    const userMemberships = await db
+      .select({
+        organizationId: memberTable.organizationId,
+        role: memberTable.role,
+      })
+      .from(memberTable)
+      .where(eq(memberTable.userId, session.user.id));
+
+    const organizationIds = userMemberships.map((m) => m.organizationId);
+
+    const organizations =
+      organizationIds.length > 0
+        ? await db
+            .select({
+              id: organizationTable.id,
+              slug: organizationTable.slug,
+              name: organizationTable.name,
+            })
+            .from(organizationTable)
+            .where(sql`${organizationTable.id} IN ${organizationIds}`)
+        : [];
 
     // Find the active organization
     const activeOrg = organizations.find(
@@ -133,9 +159,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the organization exists and user has access
-    const organizations = await auth.api.listOrganizations({
-      headers: request.headers,
-    });
+    const userMemberships = await db
+      .select({
+        organizationId: memberTable.organizationId,
+        role: memberTable.role,
+      })
+      .from(memberTable)
+      .where(eq(memberTable.userId, session.user.id));
+
+    const organizationIds = userMemberships.map((m) => m.organizationId);
+
+    const organizations =
+      organizationIds.length > 0
+        ? await db
+            .select({
+              id: organizationTable.id,
+              slug: organizationTable.slug,
+              name: organizationTable.name,
+            })
+            .from(organizationTable)
+            .where(sql`${organizationTable.id} IN ${organizationIds}`)
+        : [];
 
     // Find the organization by ID or slug
     const targetOrg = organizations.find(
