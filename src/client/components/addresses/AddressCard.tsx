@@ -86,11 +86,6 @@ export const AddressCard: React.FC<AddressCardProps> = ({
         transition: "box-shadow 0.2s ease",
       }}
       className="address-card"
-      sx={{
-        "&:hover": {
-          boxShadow: "var(--mantine-shadow-sm)",
-        },
-      }}
     >
       {/* Header with type and primary indicator */}
       <Group justify="space-between" align="flex-start" mb="xs">

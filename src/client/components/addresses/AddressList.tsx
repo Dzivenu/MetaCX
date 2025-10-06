@@ -173,15 +173,6 @@ export const AddressList: React.FC<AddressListProps> = ({
       {/* Header */}
       <Group justify="space-between" mb="md">
         <Title order={3}>{title}</Title>
-        {/* Debug info */}
-        {console.log("AddressList render debug:", {
-          showAddButton,
-          parentId,
-          parentType,
-          shouldShowButton: showAddButton && parentId,
-          isFormOpen,
-          addresses: addresses?.length,
-        })}
         {showAddButton && parentId && (
           <Button
             variant="outline"
@@ -232,11 +223,6 @@ export const AddressList: React.FC<AddressListProps> = ({
       </Box>
 
       {/* Add/Edit Address Modal */}
-      {console.log("Modal render debug:", {
-        isFormOpen,
-        editingAddress: !!editingAddress,
-        modalTitle: editingAddress ? "Edit Address" : "Add New Address",
-      })}
       <Modal
         opened={isFormOpen}
         onClose={handleFormCancel}

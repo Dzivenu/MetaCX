@@ -413,7 +413,7 @@ export default function FloatPage() {
     );
   }
 
-  const floatCloseIsStart = activeSession?.state === "FLOAT_CLOSE_START";
+  const floatCloseIsStart = activeSession?.status === "FLOAT_CLOSE_START";
   const useableRepos = repositories.filter((repo) =>
     floatCloseIsStart ? repo.accessLogs?.length > 0 : true
   );

@@ -106,7 +106,7 @@ export const useFloatCalculations = () => {
       const a = amountA ?? 0;
       const b = amountB ?? 0;
 
-      const difference = parseFloat(parseFloat(Math.abs(a - b)).toPrecision(4));
+      const difference = parseFloat(Math.abs(a - b).toPrecision(4));
 
       return difference <= SESSION_FLOAT_OFF_BALANCE_THRESHOLD;
     };

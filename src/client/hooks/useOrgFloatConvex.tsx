@@ -39,16 +39,21 @@ interface UseOrgFloatResult {
   loading: boolean;
   error: string | null;
   refresh: () => void;
-  startFloat: (repositoryFloatData: any[]) => Promise<boolean>;
-  confirmFloat: (repositoryFloatData: any[]) => Promise<boolean>;
+  startFloat: (
+    action: "START_OPEN" | "START_CLOSE" | "CANCEL_CLOSE"
+  ) => Promise<boolean>;
+  confirmFloat: (action: "CONFIRM_OPEN" | "CONFIRM_CLOSE") => Promise<boolean>;
   updateRepositoryFloat: (
-    repositoryId: string,
-    floatData: any[]
+    floatStackId: string,
+    updates: {
+      openCount?: number;
+      closeCount?: number;
+      middayCount?: number;
+      openConfirmedDt?: number;
+      closeConfirmedDt?: number;
+    }
   ) => Promise<boolean>;
-  validateRepositoryFloat: (
-    repositoryId: string,
-    floatData: any[]
-  ) => Promise<boolean>;
+  validateRepositoryFloat: (repositoryId: string) => Promise<boolean>;
 }
 
 // Hook for org float using Convex
@@ -85,8 +90,8 @@ export function useOrgFloat(
   // Transform the data to our expected format
   const orgFloat: OrgFloat | null = floatData
     ? {
-        sessionId: floatData.sessionId,
-        sessionStatus: floatData.sessionStatus,
+        sessionId: floatData.session.id,
+        sessionStatus: floatData.session.status,
         repositories: (floatData.repositories || []).map((repo: any) => ({
           id: repo.id,
           name: repo.name,
@@ -116,7 +121,9 @@ export function useOrgFloat(
   }, []);
 
   const startFloat = useCallback(
-    async (repositoryFloatData: any[]): Promise<boolean> => {
+    async (
+      action: "START_OPEN" | "START_CLOSE" | "CANCEL_CLOSE"
+    ): Promise<boolean> => {
       try {
         setError(null);
         if (!sessionId) {
@@ -125,7 +132,7 @@ export function useOrgFloat(
 
         await startFloatMutation({
           sessionId: sessionId as Id<"org_cx_sessions">,
-          repositoryFloatData,
+          action,
         });
 
         refresh();
@@ -139,7 +146,7 @@ export function useOrgFloat(
   );
 
   const confirmFloat = useCallback(
-    async (repositoryFloatData: any[]): Promise<boolean> => {
+    async (action: "CONFIRM_OPEN" | "CONFIRM_CLOSE"): Promise<boolean> => {
       try {
         setError(null);
         if (!sessionId) {
@@ -148,7 +155,7 @@ export function useOrgFloat(
 
         await confirmFloatMutation({
           sessionId: sessionId as Id<"org_cx_sessions">,
-          repositoryFloatData,
+          action,
         });
 
         refresh();
@@ -162,17 +169,22 @@ export function useOrgFloat(
   );
 
   const updateRepositoryFloat = useCallback(
-    async (repositoryId: string, floatData: any[]): Promise<boolean> => {
+    async (
+      floatStackId: string,
+      updates: {
+        openCount?: number;
+        closeCount?: number;
+        middayCount?: number;
+        openConfirmedDt?: number;
+        closeConfirmedDt?: number;
+      }
+    ): Promise<boolean> => {
       try {
         setError(null);
-        if (!sessionId) {
-          throw new Error("Session ID is required");
-        }
 
         await updateRepositoryFloatMutation({
-          sessionId: sessionId as Id<"org_cx_sessions">,
-          repositoryId,
-          floatData,
+          floatStackId: floatStackId as Id<"org_float_stacks">,
+          updates,
         });
 
         refresh();
@@ -186,7 +198,7 @@ export function useOrgFloat(
   );
 
   const validateRepositoryFloat = useCallback(
-    async (repositoryId: string, floatData: any[]): Promise<boolean> => {
+    async (repositoryId: string): Promise<boolean> => {
       try {
         setError(null);
         if (!sessionId) {
@@ -195,8 +207,7 @@ export function useOrgFloat(
 
         await validateRepositoryFloatMutation({
           sessionId: sessionId as Id<"org_cx_sessions">,
-          repositoryId,
-          floatData,
+          repositoryId: repositoryId as Id<"org_repositories">,
         });
 
         refresh();
@@ -220,6 +231,3 @@ export function useOrgFloat(
     validateRepositoryFloat,
   };
 }
-
-
-

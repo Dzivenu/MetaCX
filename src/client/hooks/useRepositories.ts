@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { repositories, Repository } from "@/client/api/repositories";
 
-export { Repository } from "@/client/api/repositories";
+export type { Repository } from "@/client/api/repositories";
 
 interface UseRepositoriesResult {
   repositories: Repository[];

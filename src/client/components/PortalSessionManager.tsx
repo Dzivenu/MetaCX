@@ -329,7 +329,16 @@ export function PortalSessionManager() {
           <Select
             placeholder="Sort by"
             value={filters.sortBy || "createdAt"}
-            onChange={(value) => handleSortByChange(value)}
+            onChange={(value) =>
+              handleSortByChange(
+                value as
+                  | "createdAt"
+                  | "updatedAt"
+                  | "openStartDt"
+                  | "closeStartDt"
+                  | null
+              )
+            }
             data={[
               { value: "createdAt", label: "Created Date" },
               { value: "updatedAt", label: "Updated Date" },
@@ -341,7 +350,9 @@ export function PortalSessionManager() {
           <Select
             placeholder="Order"
             value={filters.sortOrder || "desc"}
-            onChange={(value) => handleSortOrderChange(value)}
+            onChange={(value) =>
+              handleSortOrderChange(value as "asc" | "desc" | null)
+            }
             data={[
               { value: "desc", label: "Newest First" },
               { value: "asc", label: "Oldest First" },
@@ -434,7 +445,8 @@ export function PortalSessionManager() {
                       <Group gap="xs" justify="flex-end">
                         {session.status?.toLowerCase() !== "closed" &&
                           session.status?.toLowerCase() !== "cancelled" &&
-                          (activeSession && activeSession.id === session.id ? (
+                          (activeSession &&
+                          (activeSession as any).id === session.id ? (
                             <Tooltip label="Leave Session">
                               <Button
                                 variant="outline"

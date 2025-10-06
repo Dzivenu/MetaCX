@@ -19,7 +19,7 @@ export interface CxSession {
   updatedAt: Date;
   status?: string | null;
   verifiedByUserId?: string | null;
-  verifiedDt?: Date | null;
+  verifiedDt?: number | null;
   openStartUserId?: string | null;
   openConfirmUserId?: string | null;
   closeStartUserId?: string | null;

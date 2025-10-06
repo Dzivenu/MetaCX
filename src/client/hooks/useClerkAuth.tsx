@@ -43,7 +43,7 @@ export function useAuth() {
   const { isSignedIn, userId, orgId, orgRole, orgSlug } = useClerkAuth();
   const { user: clerkUser, isLoaded } = useUser();
   const { organization: activeOrganization } = useOrganization();
-  const { organizationList } = useOrganizationList({
+  const { userMemberships } = useOrganizationList({
     userMemberships: {
       infinite: true,
     },
@@ -106,7 +106,7 @@ export function useAuth() {
     isAuthenticated: isSignedIn && (!!convexUser || !!clerkUser),
     // Organization data
     activeOrganization,
-    organizationList,
+    organizationList: userMemberships?.data || [],
     orgId,
     orgRole,
     orgSlug,

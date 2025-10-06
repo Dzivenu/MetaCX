@@ -95,12 +95,12 @@ export default function UsersPage() {
 
   // Get current user's role in the organization
   const currentUserRole = (members || []).find(
-    (member) => member.user?.id === currentUser?.id
+    (member: any) => member.user?.id === currentUser?.id
   )?.role;
 
   // Filter members based on search term
   const filteredMembers =
-    (members || []).filter((member) => {
+    (members || []).filter((member: any) => {
       // Skip members without user data
       if (!member.user) return false;
 
@@ -241,7 +241,7 @@ export default function UsersPage() {
         .map(([repoId, _]) => repoId);
 
       // Find the member data to get user information
-      const memberData = filteredMembers.find((m) => m.id === memberId);
+      const memberData = filteredMembers.find((m: any) => m.id === memberId);
       if (!memberData) {
         throw new Error("Cannot find member information");
       }
@@ -253,7 +253,7 @@ export default function UsersPage() {
       await updateMemberDetails({
         membershipId: membershipIdentifier,
         organizationId: activeOrganization?.id,
-        clerkOrganizationId: orgId,
+        clerkOrganizationId: orgId || undefined,
         firstName: data.firstName,
         lastName: data.lastName,
         authorizedRepoIds,
@@ -373,7 +373,7 @@ export default function UsersPage() {
               <Text size="sm" fw={500} c="dimmed">
                 User ID
               </Text>
-              <Text size="sm" family="monospace" c="dimmed">
+              <Text size="sm" ff="monospace" c="dimmed">
                 {member.user?.id || member.userId}
               </Text>
             </Box>
@@ -381,7 +381,7 @@ export default function UsersPage() {
               <Text size="sm" fw={500} c="dimmed">
                 Member ID
               </Text>
-              <Text size="sm" family="monospace" c="dimmed">
+              <Text size="sm" ff="monospace" c="dimmed">
                 {member.id}
               </Text>
             </Box>
@@ -412,7 +412,7 @@ export default function UsersPage() {
                                 {repo.name}
                               </Text>
                               <Text size="xs" c="dimmed">
-                                {repo.description || "No description"}
+                                {repo.typeOf || "Repository"}
                               </Text>
                             </Stack>
                             <Switch
@@ -502,7 +502,7 @@ export default function UsersPage() {
               <Text size="sm" fw={500} c="dimmed">
                 User ID
               </Text>
-              <Text size="sm" family="monospace" c="dimmed">
+              <Text size="sm" ff="monospace" c="dimmed">
                 {member.user?.id || member.userId}
               </Text>
             </Box>
@@ -510,7 +510,7 @@ export default function UsersPage() {
               <Text size="sm" fw={500} c="dimmed">
                 Member ID
               </Text>
-              <Text size="sm" family="monospace" c="dimmed">
+              <Text size="sm" ff="monospace" c="dimmed">
                 {member.id}
               </Text>
             </Box>
@@ -647,7 +647,7 @@ export default function UsersPage() {
 
   const pendingInvitations =
     fullOrganization?.invitations?.filter(
-      (inv) => inv.status === "pending" && inv.email
+      (inv: any) => inv.status === "pending" && inv.email
     ) || [];
 
   return (
@@ -763,7 +763,7 @@ export default function UsersPage() {
                 {
                   accessor: "member",
                   title: "Member",
-                  render: (member) => {
+                  render: (member: any) => {
                     const first =
                       member.firstName ?? member.user?.firstName ?? "";
                     const last = member.lastName ?? member.user?.lastName ?? "";
@@ -879,7 +879,7 @@ export default function UsersPage() {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {pendingInvitations.map((invitation) => (
+                  {pendingInvitations.map((invitation: any) => (
                     <Table.Tr key={invitation.id}>
                       <Table.Td>
                         <Text fw={500}>{invitation.email}</Text>

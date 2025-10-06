@@ -1,22 +1,22 @@
 "use client";
 
-import { useState } from 'react';
-import { useOrganizations, Member, Invitation } from '@/client/hooks/useOrganizations';
-import { InviteMemberModal } from './InviteMemberModal';
+import { useState } from "react";
+import {
+  useOrganizations,
+  Member,
+  Invitation,
+} from "@/client/hooks/useOrganizations";
+import { useActiveOrganization } from "@/client/hooks/useActiveOrganization";
+import { InviteMemberModal } from "./InviteMemberModal";
 
 interface MemberManagementProps {
   organizationId: string;
 }
 
 export function MemberManagement({ organizationId }: MemberManagementProps) {
-  const { 
-    activeOrganization, 
-    loading, 
-    removeMember, 
-    updateMemberRole, 
-    cancelInvitation 
-  } = useOrganizations();
-  
+  const { activeOrganization, loading: orgLoading } = useActiveOrganization();
+  const { loading, removeMember, updateMemberRole } = useOrganizations();
+
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
 
@@ -28,49 +28,60 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
     );
   }
 
-  const members = activeOrganization.members || [];
-  const invitations = activeOrganization.invitations || [];
-  const pendingInvitations = invitations.filter(inv => inv.status === 'pending');
+  const members: Member[] = activeOrganization?.members || [];
+  const invitations: Invitation[] = activeOrganization?.invitations || [];
+  const pendingInvitations = invitations.filter(
+    (inv: Invitation) => inv.status === "pending"
+  );
 
   const handleRemoveMember = async (member: Member) => {
-    if (!confirm(`Are you sure you want to remove ${member.user.name} from this organization?`)) {
+    if (
+      !confirm(
+        `Are you sure you want to remove ${member.user.name} from this organization?`
+      )
+    ) {
       return;
     }
 
     try {
       await removeMember(organizationId, member.userId);
     } catch (err) {
-      console.error('Failed to remove member:', err);
+      console.error("Failed to remove member:", err);
     }
   };
 
   const handleUpdateRole = async (memberId: string, newRole: string) => {
     try {
-      await updateMemberRole(organizationId, memberId, newRole);
+      await updateMemberRole(
+        organizationId,
+        memberId,
+        newRole as "member" | "admin" | "owner"
+      );
       setEditingMember(null);
     } catch (err) {
-      console.error('Failed to update member role:', err);
+      console.error("Failed to update member role:", err);
     }
   };
 
   const handleCancelInvitation = async (invitationId: string) => {
     try {
-      await cancelInvitation(invitationId);
+      // TODO: Implement cancelInvitation with Clerk/Convex
+      console.log("Cancel invitation:", invitationId);
     } catch (err) {
-      console.error('Failed to cancel invitation:', err);
+      console.error("Failed to cancel invitation:", err);
     }
   };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role.toLowerCase()) {
-      case 'owner':
-        return 'bg-purple-100 text-purple-800';
-      case 'admin':
-        return 'bg-blue-100 text-blue-800';
-      case 'member':
-        return 'bg-green-100 text-green-800';
+      case "owner":
+        return "bg-purple-100 text-purple-800";
+      case "admin":
+        return "bg-blue-100 text-blue-800";
+      case "member":
+        return "bg-green-100 text-green-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -78,8 +89,12 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Members & Invitations</h2>
-          <p className="text-gray-600">Manage organization members and their roles</p>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Members & Invitations
+          </h2>
+          <p className="text-gray-600">
+            Manage organization members and their roles
+          </p>
         </div>
         <button
           onClick={() => setShowInviteModal(true)}
@@ -96,7 +111,7 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
             Members ({members.length})
           </h3>
         </div>
-        
+
         <div className="divide-y divide-gray-200">
           {members.length === 0 ? (
             <div className="px-6 py-8 text-center text-gray-500">
@@ -104,7 +119,10 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
             </div>
           ) : (
             members.map((member) => (
-              <div key={member.id} className="px-6 py-4 flex items-center justify-between">
+              <div
+                key={member.id}
+                className="px-6 py-4 flex items-center justify-between"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-gray-600 font-medium">
@@ -112,17 +130,21 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{member.user.name}</p>
+                    <p className="font-medium text-gray-900">
+                      {member.user.name}
+                    </p>
                     <p className="text-sm text-gray-500">{member.user.email}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   {editingMember?.id === member.id ? (
                     <div className="flex items-center space-x-2">
                       <select
                         value={member.role}
-                        onChange={(e) => handleUpdateRole(member.id, e.target.value)}
+                        onChange={(e) =>
+                          handleUpdateRole(member.id, e.target.value)
+                        }
                         className="border border-gray-300 rounded px-2 py-1 text-sm"
                       >
                         <option value="member">Member</option>
@@ -138,28 +160,50 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
                     </div>
                   ) : (
                     <>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(member.role)}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(member.role)}`}
+                      >
                         {member.role}
                       </span>
-                      
+
                       <button
                         onClick={() => setEditingMember(member)}
                         className="text-gray-400 hover:text-gray-600"
                         title="Edit role"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
                         </svg>
                       </button>
-                      
-                      {member.role !== 'owner' && (
+
+                      {member.role !== "owner" && (
                         <button
                           onClick={() => handleRemoveMember(member)}
                           className="text-red-400 hover:text-red-600"
                           title="Remove member"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
                           </svg>
                         </button>
                       )}
@@ -180,37 +224,64 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
               Pending Invitations ({pendingInvitations.length})
             </h3>
           </div>
-          
+
           <div className="divide-y divide-gray-200">
             {pendingInvitations.map((invitation) => (
-              <div key={invitation.id} className="px-6 py-4 flex items-center justify-between">
+              <div
+                key={invitation.id}
+                className="px-6 py-4 flex items-center justify-between"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-5 h-5 text-yellow-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{invitation.email}</p>
+                    <p className="font-medium text-gray-900">
+                      {invitation.email}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      Invited by {invitation.inviter.user.name} • 
-                      Expires {new Date(invitation.expiresAt).toLocaleDateString()}
+                      Invited by {invitation.inviter.user.name} • Expires{" "}
+                      {new Date(invitation.expiresAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(invitation.role)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(invitation.role)}`}
+                  >
                     {invitation.role}
                   </span>
-                  
+
                   <button
                     onClick={() => handleCancelInvitation(invitation.id)}
                     className="text-red-400 hover:text-red-600"
                     title="Cancel invitation"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -220,12 +291,11 @@ export function MemberManagement({ organizationId }: MemberManagementProps) {
         </div>
       )}
 
-      {showInviteModal && (
-        <InviteMemberModal
-          organizationId={organizationId}
-          onClose={() => setShowInviteModal(false)}
-        />
-      )}
+      <InviteMemberModal
+        organizationId={organizationId}
+        opened={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+      />
     </div>
   );
 }

@@ -90,14 +90,14 @@ export const IdentificationForm: React.FC<Props> = ({
     },
   });
 
-  const watchedCountry = form.watch("issuingCountryCode");
+  const watchedCountry = form.values.issuingCountryCode;
 
   // Memoized data arrays to prevent infinite re-renders
   const idTypeOptions = useMemo(
     () =>
       ID_TYPES.map((x) => ({
         value: x,
-        label: x.replaceAll("_", " "),
+        label: x.replace(/_/g, " "),
       })),
     []
   );

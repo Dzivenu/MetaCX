@@ -17,6 +17,8 @@ export interface Currency {
   active?: boolean;
   createdAt: string;
   updatedAt: string;
+  amountDecimalPlaces?: number;
+  rateDecimalPlaces?: number;
   // Extended fields to support UI already in place
   rate?: number;
   tradeable?: boolean;
@@ -24,7 +26,7 @@ export interface Currency {
   denominations?: Denomination[];
 }
 
-interface Denomination {
+export interface Denomination {
   id: string;
   name?: string;
   value: number;
@@ -128,7 +130,9 @@ export function useCurrencies(): UseCurrenciesResult {
           denominations: data.denominations?.map((d: any) => ({
             value: d.value,
           })),
-          repositories: data.repositories as Id<"repositories">[] | undefined,
+          repositories: data.repositories as
+            | Id<"org_repositories">[]
+            | undefined,
           clerkOrganizationId: orgId || undefined,
         });
 

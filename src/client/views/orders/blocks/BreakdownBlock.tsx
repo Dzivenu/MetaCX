@@ -65,7 +65,7 @@ export function BreakdownBlock({
             </Badge>
           </Group>
 
-          <Table size="sm" striped>
+          <Table striped>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Denomination</Table.Th>

@@ -160,8 +160,8 @@ export const AddressForm: React.FC<AddressFormProps> = ({
     },
   });
 
-  const watchedCountryCode = form.watch("countryCode");
-  const watchedStateCode = form.watch("stateCode");
+  const watchedCountryCode = form.values.countryCode;
+  const watchedStateCode = form.values.stateCode;
 
   // Memoized data arrays to prevent infinite re-renders
   const addressTypeOptions = useMemo(
@@ -233,14 +233,6 @@ export const AddressForm: React.FC<AddressFormProps> = ({
 
   return (
     <Box component="form" onSubmit={form.onSubmit(handleFormSubmit)} mt="md">
-      {/* Debug form state */}
-      {console.log("🔍 AddressForm render - Form state:", {
-        values: form.values,
-        errors: form.errors,
-        isValid: form.isValid(),
-        isDirty: form.isDirty(),
-      })}
-
       {submitError && (
         <Alert color="red" title="Error" mb="md">
           {submitError}

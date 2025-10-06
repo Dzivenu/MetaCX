@@ -13,6 +13,7 @@ import {
   Center,
   Loader,
   Alert,
+  Stack,
 } from "@mantine/core";
 import { IconEdit, IconTrash, IconRefresh } from "@tabler/icons-react";
 
@@ -52,10 +53,9 @@ export const CurrencyList: React.FC<CurrencyListProps> = ({ onDelete }) => {
 
   if (error) {
     return (
-      <Alert
-        color="red"
-        title="Error loading currencies"
-        action={
+      <Alert color="red" title="Error loading currencies">
+        <Stack gap="sm">
+          <Text>{error}</Text>
           <Button
             variant="outline"
             color="red"
@@ -64,9 +64,7 @@ export const CurrencyList: React.FC<CurrencyListProps> = ({ onDelete }) => {
           >
             Retry
           </Button>
-        }
-      >
-        {error}
+        </Stack>
       </Alert>
     );
   }

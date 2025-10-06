@@ -206,7 +206,7 @@ export function useOrgOrders(
           fee: data.fee,
           networkFee: data.networkFee,
           status: data.status,
-          orgSessionId: data.orgSessionId as Id<"org_cx_sessions"> | undefined,
+          orgSessionId: data.orgSessionId! as Id<"org_cx_sessions">,
           userId: data.userId as Id<"users"> | undefined,
           inboundOrgRepositoryId: data.inboundOrgRepositoryId as
             | Id<"org_repositories">

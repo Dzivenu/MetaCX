@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvex } from "convex/react";
 import { useOrganization } from "@clerk/nextjs";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -24,7 +24,7 @@ export interface OrgAddress {
   stateCode: string;
   stateName: string;
   postalCode: string;
-  countryCode: string;
+  countryCode?: string;
   countryName: string;
   sublocality?: string;
   administrativeArea?: string;
@@ -136,6 +136,7 @@ export const useOrgAddresses = ({
   const [error, setError] = React.useState<string | null>(null);
 
   const orgId = organization?.id;
+  const convex = useConvex();
 
   // Debug logging
   console.log("useOrgAddresses hook:", {
@@ -166,9 +167,6 @@ export const useOrgAddresses = ({
   );
   const deleteAddressMutation = useMutation(
     api.functions.orgAddresses.deleteOrgAddress
-  );
-  const getAddressByIdMutation = useMutation(
-    api.functions.orgAddresses.getOrgAddressById
   );
 
   // Set error if no organization is selected
@@ -333,7 +331,10 @@ export const useOrgAddresses = ({
       }
 
       try {
-        const result = await getAddressByIdMutation({ addressId });
+        const result = await convex.query(
+          api.functions.orgAddresses.getOrgAddressById,
+          { addressId }
+        );
         return result as OrgAddress;
       } catch (err) {
         const errorMessage =
@@ -343,7 +344,7 @@ export const useOrgAddresses = ({
         return null;
       }
     },
-    [getAddressByIdMutation, orgId]
+    [convex, orgId]
   );
 
   // Set primary address

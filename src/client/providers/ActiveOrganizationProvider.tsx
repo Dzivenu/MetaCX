@@ -2,16 +2,22 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "@/client/hooks/useClerkAuth";
+import { Member, Invitation } from "@/client/hooks/useOrganizations";
 
 interface Organization {
   id: string;
   name: string;
   slug: string;
-  role: "owner" | "admin" | "member";
+  description?: string;
   logo?: string | null;
+  role: "owner" | "admin" | "member";
   createdAt?: string | Date;
-  metadata?: unknown;
-  // Add other organization properties as needed
+  metadata?: {
+    description?: string;
+    [key: string]: any;
+  };
+  members?: Member[];
+  invitations?: Invitation[];
 }
 
 interface ActiveOrganizationContextType {

@@ -24,7 +24,7 @@ import { CollapsibleRowTable } from "@/client/components/blocks";
 interface Currency {
   ticker: string;
   name: string;
-  typeOf: string;
+  typeOf?: string;
 }
 
 interface RepositoryDataTableProps {

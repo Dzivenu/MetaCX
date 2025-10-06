@@ -294,7 +294,7 @@ export const FloatStackRow: React.FC<FloatStackRowProps> = ({
               },
             }}
             step={currency.typeof === "Fiat" ? 0.01 : 0.00000001}
-            precision={currency.typeof === "Fiat" ? 2 : 8}
+            decimalScale={currency.typeof === "Fiat" ? 2 : 8}
           />
         </div>
 
@@ -336,7 +336,7 @@ export const FloatStackRow: React.FC<FloatStackRowProps> = ({
               },
             }}
             step={currency.typeof === "Fiat" ? 0.01 : 0.00000001}
-            precision={currency.typeof === "Fiat" ? 2 : 8}
+            decimalScale={currency.typeof === "Fiat" ? 2 : 8}
           />
         </div>
       </div>

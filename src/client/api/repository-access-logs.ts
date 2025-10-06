@@ -29,35 +29,47 @@ export interface ApiError {
   error: string;
 }
 
-import { apiGet, apiPost, apiPut, apiDelete } from '@/client/utils/api-client';
+import { apiGet, apiPost, apiPut, apiDelete } from "@/client/utils/api-client";
 
 // API functions
 const BASE_URL = "/api/repository-access-logs";
 
 export const repositoryAccessLogs = {
   // Get all repository access logs for a repository
-  list(repositoryId: number): Promise<RepositoryAccessLogListResponse> {
-    const params = new URLSearchParams({ repositoryId: repositoryId.toString() });
-    return apiGet(`${BASE_URL}?${params}`);
+  async list(repositoryId: number): Promise<RepositoryAccessLogListResponse> {
+    const params = new URLSearchParams({
+      repositoryId: repositoryId.toString(),
+    });
+    const response = await apiGet(`${BASE_URL}?${params}`);
+    return response.json();
   },
 
   // Get single repository access log by ID
-  getById(id: string): Promise<RepositoryAccessLogResponse> {
-    return apiGet(`${BASE_URL}/${id}`);
+  async getById(id: string): Promise<RepositoryAccessLogResponse> {
+    const response = await apiGet(`${BASE_URL}/${id}`);
+    return response.json();
   },
 
   // Create new repository access log
-  create(data: Partial<RepositoryAccessLog>): Promise<RepositoryAccessLogResponse> {
-    return apiPost(BASE_URL, data);
+  async create(
+    data: Partial<RepositoryAccessLog>
+  ): Promise<RepositoryAccessLogResponse> {
+    const response = await apiPost(BASE_URL, data);
+    return response.json();
   },
 
   // Update existing repository access log
-  update(id: string, data: Partial<RepositoryAccessLog>): Promise<RepositoryAccessLogResponse> {
-    return apiPut(`${BASE_URL}/${id}`, data);
+  async update(
+    id: string,
+    data: Partial<RepositoryAccessLog>
+  ): Promise<RepositoryAccessLogResponse> {
+    const response = await apiPut(`${BASE_URL}/${id}`, data);
+    return response.json();
   },
 
   // Delete repository access log
-  delete(id: string): Promise<{ message: string }> {
-    return apiDelete(`${BASE_URL}/${id}`);
+  async delete(id: string): Promise<{ message: string }> {
+    const response = await apiDelete(`${BASE_URL}/${id}`);
+    return response.json();
   },
 };

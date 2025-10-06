@@ -91,16 +91,16 @@ export const CurrencyDetails: React.FC<{ onComplete?: () => void }> = ({
       const currencyData = {
         currency: {
           ...values,
-          typeOf: selectedCurrency.type || selectedCurrency.typeof || "",
-          typeof: selectedCurrency.type || selectedCurrency.typeof || "", // Backend expects 'typeof' field
+          typeOf: selectedCurrency?.type || selectedCurrency?.typeof || "",
+          typeof: selectedCurrency?.type || selectedCurrency?.typeof || "", // Backend expects 'typeof' field
           api: 0, // Default to manual API (0 = manual, 1 = automated)
           // Auto-populate fields from selected app currency
-          network: selectedCurrency.network || "",
-          contract: selectedCurrency.contract || "",
-          chainId: selectedCurrency.chainId || "",
-          rateApi: selectedCurrency.rateApi || "",
-          rateApiIdentifier: selectedCurrency.rateApiIdentifier || "",
-          icon: selectedCurrency.icon || "",
+          network: selectedCurrency?.network || "",
+          contract: selectedCurrency?.contract || "",
+          chainId: selectedCurrency?.chainId || "",
+          rateApi: selectedCurrency?.rateApi || "",
+          rateApiIdentifier: selectedCurrency?.rateApiIdentifier || "",
+          icon: selectedCurrency?.icon || "",
         },
         denominations: denominations.map((d) => ({ value: d.value })),
         repositories: selectedRepositories,

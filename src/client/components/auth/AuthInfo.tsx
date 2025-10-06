@@ -91,7 +91,7 @@ export function AuthInfo() {
             <>
               <Group>
                 <Text fw={500}>Convex User ID:</Text>
-                <Code>{convexUser.id}</Code>
+                <Code>{convexUser._id}</Code>
               </Group>
               <Group>
                 <Text fw={500}>Synced Name:</Text>

@@ -92,10 +92,6 @@ interface OrderCreationContextValue {
     value: string | number | undefined
   ) => void;
 
-  // customer
-  customerId?: string;
-  setCustomerId: (id?: string) => void;
-
   // quote state
   quote: QuoteResult | null;
   quoteState: QuoteState;
@@ -396,11 +392,11 @@ export function OrderCreationProvider({
   );
 
   const nextStep = useCallback(() => {
-    setCurrentStep((s) => Math.min(3, (s + 1) as StepIndex));
+    setCurrentStep((s) => Math.min(3, s + 1) as StepIndex);
   }, []);
 
   const prevStep = useCallback(() => {
-    setCurrentStep((s) => Math.max(0, (s - 1) as StepIndex));
+    setCurrentStep((s) => Math.max(0, s - 1) as StepIndex);
   }, []);
 
   const generateQuote = useCallback(async (): Promise<QuoteResult | null> => {

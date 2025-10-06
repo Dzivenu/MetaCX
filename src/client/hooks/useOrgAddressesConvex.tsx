@@ -15,9 +15,11 @@ export interface OrgAddress {
   line1: string;
   line2?: string;
   city: string;
-  state: string;
+  stateCode: string;
+  stateName: string;
   postalCode: string;
   countryCode?: string;
+  countryName: string;
   primary?: boolean;
   active?: boolean;
   addressFull?: string;
@@ -31,9 +33,11 @@ export interface CreateOrgAddressData {
   line1: string;
   line2?: string;
   city: string;
-  state: string;
+  stateCode: string;
+  stateName: string;
   postalCode: string;
   countryCode?: string;
+  countryName: string;
   primary?: boolean;
   addressFull?: string;
 }
@@ -103,9 +107,11 @@ export function useOrgAddresses(
       line1: address.line1,
       line2: address.line2,
       city: address.city,
-      state: address.state,
+      stateCode: address.state || "",
+      stateName: address.state || "",
       postalCode: address.postalCode,
       countryCode: address.countryCode,
+      countryName: address.countryName || "",
       primary: address.primary || false,
       active: address.active !== false,
       addressFull: address.addressFull,
@@ -158,9 +164,11 @@ export function useOrgAddresses(
           line1: data.line1,
           line2: data.line2,
           city: data.city,
-          state: data.state,
+          stateCode: data.stateCode,
+          stateName: data.stateName,
           postalCode: data.postalCode,
-          countryCode: data.countryCode,
+          countryCode: data.countryCode || "",
+          countryName: "", // TODO: Add country name mapping
           primary: data.primary,
           addressFull: data.addressFull,
         });
@@ -173,9 +181,11 @@ export function useOrgAddresses(
           line1: data.line1,
           line2: data.line2,
           city: data.city,
-          state: data.state,
+          stateCode: data.stateCode,
+          stateName: data.stateName,
           postalCode: data.postalCode,
           countryCode: data.countryCode,
+          countryName: data.countryName,
           primary: data.primary || false,
           active: true,
           addressFull: data.addressFull,
@@ -202,25 +212,52 @@ export function useOrgAddresses(
       try {
         await updateOrgAddressMutation({
           addressId: id as Id<"org_addresses">,
-          line1: data.line1,
-          line2: data.line2,
-          city: data.city,
-          state: data.state,
-          postalCode: data.postalCode,
-          countryCode: data.countryCode,
-          primary: data.primary,
-          addressFull: data.addressFull,
-          active: data.active,
+          ...(data.line1 !== undefined && { line1: data.line1 }),
+          ...(data.line2 !== undefined && { line2: data.line2 }),
+          ...(data.city !== undefined && { city: data.city }),
+          ...(data.stateCode !== undefined && { stateCode: data.stateCode }),
+          ...(data.stateName !== undefined && { stateName: data.stateName }),
+          ...(data.postalCode !== undefined && { postalCode: data.postalCode }),
+          ...(data.countryCode !== undefined && {
+            countryCode: data.countryCode,
+          }),
+          ...(data.countryName !== undefined && {
+            countryName: data.countryName,
+          }),
+          ...(data.primary !== undefined && { primary: data.primary }),
+          ...(data.addressFull !== undefined && {
+            addressFull: data.addressFull,
+          }),
+          ...(data.active !== undefined && { active: data.active }),
         });
 
         // Return the updated address (optimistic update)
         const existingAddress = orgAddresses.find((a) => a.id === id);
         if (existingAddress) {
-          return {
+          const updatedAddress = {
             ...existingAddress,
-            ...data,
+            ...(data.line1 !== undefined && { line1: data.line1 }),
+            ...(data.line2 !== undefined && { line2: data.line2 }),
+            ...(data.city !== undefined && { city: data.city }),
+            ...(data.stateCode !== undefined && { stateCode: data.stateCode }),
+            ...(data.stateName !== undefined && { stateName: data.stateName }),
+            ...(data.postalCode !== undefined && {
+              postalCode: data.postalCode,
+            }),
+            ...(data.countryCode !== undefined && {
+              countryCode: data.countryCode,
+            }),
+            ...(data.countryName !== undefined && {
+              countryName: data.countryName,
+            }),
+            ...(data.primary !== undefined && { primary: data.primary }),
+            ...(data.active !== undefined && { active: data.active }),
+            ...(data.addressFull !== undefined && {
+              addressFull: data.addressFull,
+            }),
             updatedAt: new Date().toISOString(),
           };
+          return updatedAddress as OrgAddress;
         }
         return null;
       } catch (err) {

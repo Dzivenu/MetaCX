@@ -92,7 +92,7 @@ export function useOrgMembershipsConvex(
   // Unified members list
   const members = useMemo(() => {
     if (fullOrganization && fullOrganization.members.length > 0) {
-      return fullOrganization.members.map((member) => ({
+      return fullOrganization.members.map((member: any) => ({
         ...member,
         _dataSource: "convex" as const,
       }));

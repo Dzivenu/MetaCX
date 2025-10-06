@@ -180,7 +180,7 @@ export function DebugPanel() {
                     </Text>
 
                     {(log.props || log.state || log.error) && (
-                      <Code block size="xs" style={{ fontSize: "10px" }}>
+                      <Code block style={{ fontSize: "10px" }}>
                         {JSON.stringify(
                           {
                             ...(log.props && { props: log.props }),
@@ -204,4 +204,3 @@ export function DebugPanel() {
     </>
   );
 }
-

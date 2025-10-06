@@ -31,6 +31,7 @@ import QuotePanel from "@/client/panels/order/quote";
 import { OrderCreationProvider } from "@/client/contexts/OrderCreationContext";
 import { useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 import { QuoteForm, type QuoteFormData } from "@/client/components/forms";
 
 // Helper component for displaying quote metrics with icons
@@ -130,22 +131,37 @@ export function QuoteBlock({
     }
   };
 
-  const handleSave = async (data: QuoteFormData) => {
+  const [quoteData, setQuoteData] = useState<QuoteFormData>({
+    inboundTicker: order?.inboundTicker || "CAD",
+    inboundSum: Number(order?.inboundSum) || 0,
+    outboundTicker: order?.outboundTicker || "BTC",
+    outboundSum: Number(order?.outboundSum) || 0,
+    margin: Number(order?.margin) || 0,
+    fee: Number(order?.fee) || 0,
+    networkFee: Number(order?.networkFee) || 0,
+    finalRate: Number(order?.finalRate) || 0,
+  });
+
+  const handleQuoteChange = (data: QuoteFormData) => {
+    setQuoteData(data);
+  };
+
+  const handleSave = async () => {
+    if (!order) return;
+
     try {
       await updateOrderMutation({
-        orderId: order._id,
-        inboundSum: data.inboundSum.toString(),
-        outboundSum: data.outboundSum.toString(),
-        inboundTicker: data.inboundTicker,
-        outboundTicker: data.outboundTicker,
-        margin: (data.margin || 0).toString(),
-        fee: (data.fee || 0).toString(),
-        networkFee: (data.networkFee || 0).toString(),
+        orderId: order.id as Id<"org_orders">,
+        inboundSum: quoteData.inboundSum.toString(),
+        outboundSum: quoteData.outboundSum.toString(),
+        margin: quoteData.margin || 0,
+        fee: quoteData.fee || 0,
+        networkFee: quoteData.networkFee || 0,
       });
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to save quote:", error);
-      throw error; // Let the QuoteForm handle the error display
+      // Handle error display here if needed
     }
   };
 
@@ -160,24 +176,21 @@ export function QuoteBlock({
     // If we're editing, show the edit form instead
     if (isEditing) {
       return (
-        <QuoteForm
-          mode="edit"
-          title="Edit Quote"
-          initialData={{
-            inboundTicker: order.inboundTicker || "CAD",
-            inboundSum: Number(order.inboundSum) || 0,
-            outboundTicker: order.outboundTicker || "BTC",
-            outboundSum: Number(order.outboundSum) || 0,
-            margin: Number(order.margin) || 0,
-            fee: Number(order.fee) || 0,
-            networkFee: Number(order.networkFee) || 0,
-            finalRate: Number(order.finalRate) || 0,
-          }}
-          onSave={handleSave}
-          onCancel={handleCancel}
-          containerSize="lg"
-          cardPadding="lg"
-        />
+        <Stack>
+          <Text size="lg" fw={600}>Edit Quote</Text>
+          <QuoteForm
+            initialData={quoteData}
+            onChange={handleQuoteChange}
+          />
+          <Group justify="flex-end" mt="md">
+            <Button variant="light" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>
+              Save Quote
+            </Button>
+          </Group>
+        </Stack>
       );
     }
 
@@ -186,15 +199,12 @@ export function QuoteBlock({
     const outboundAmount = Number(order.outboundSum) || 0;
     const fxRate = Number(order.fxRate) || 0;
     const finalRate = Number(order.finalRate) || 0;
-    const finalRateWithoutFees = Number(order.finalRateWithoutFees) || 0;
     const fee = Number(order.fee) || 0;
     const networkFee = Number(order.networkFee) || 0;
     const margin = Number(order.margin) || 0;
 
     const totalFees = fee + networkFee;
     const inverseFinalRate = finalRate > 0 ? 1 / finalRate : 0;
-    const inverseFinalRateWithoutFees =
-      finalRateWithoutFees > 0 ? 1 / finalRateWithoutFees : 0;
 
     return (
       <Card withBorder p="lg">
@@ -205,7 +215,7 @@ export function QuoteBlock({
             <CurrencyDisplay
               label="Inbound"
               amount={inboundAmount}
-              ticker={order.inboundTicker}
+              ticker={order.inboundTicker || "CAD"}
               icon={<IconArrowDown size={16} />}
               color="green"
             />
@@ -219,7 +229,7 @@ export function QuoteBlock({
             <CurrencyDisplay
               label="Outbound"
               amount={outboundAmount}
-              ticker={order.outboundTicker}
+              ticker={order.outboundTicker || "BTC"}
               icon={<IconArrowUp size={16} />}
               color="orange"
             />
@@ -240,12 +250,6 @@ export function QuoteBlock({
                 label="Final Rate"
                 value={finalRate.toFixed(6)}
                 color="blue"
-              />
-              <QuoteItem
-                icon={<IconCalculator size={16} />}
-                label="Final Rate (No Fees)"
-                value={finalRateWithoutFees.toFixed(6)}
-                color="teal"
               />
               <QuoteItem
                 icon={<IconTrendingUp size={16} />}

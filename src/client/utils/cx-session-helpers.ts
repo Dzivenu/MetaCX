@@ -23,7 +23,7 @@ export const sessionHelpers = {
     if (!session.openStartDt || !session.closeStartDt) {
       return null;
     }
-    
+
     const start = new Date(session.openStartDt);
     const end = new Date(session.closeStartDt);
     return Math.round((end.getTime() - start.getTime()) / (1000 * 60));
@@ -34,43 +34,48 @@ export const sessionHelpers = {
     if (session.status) {
       return session.status;
     }
-    
+
     if (this.isSessionClosed(session)) {
       return "Closed";
     }
-    
+
     if (this.isSessionOpen(session)) {
       return "Open";
     }
-    
+
     return "Pending";
   },
 
   // Format datetime for display
   formatDateTime(date: Date | string | null): string {
     if (!date) return "N/A";
-    
+
     const d = typeof date === "string" ? new Date(date) : date;
     return d.toLocaleString();
   },
 
   // Get sessions by organization
-  filterByOrganization(sessions: CxSession[], organizationId: number): CxSession[] {
-    return sessions.filter(session => session.organizationId === organizationId);
+  filterByOrganization(
+    sessions: CxSession[],
+    organizationId: string
+  ): CxSession[] {
+    return sessions.filter(
+      (session) => session.organizationId === organizationId
+    );
   },
 
   // Get sessions by user
-  filterByUser(sessions: CxSession[], userId: number): CxSession[] {
-    return sessions.filter(session => session.userId === userId);
+  filterByUser(sessions: CxSession[], userId: string): CxSession[] {
+    return sessions.filter((session) => session.userId === userId);
   },
 
   // Get sessions within date range
   filterByDateRange(
-    sessions: CxSession[], 
-    startDate: Date, 
+    sessions: CxSession[],
+    startDate: Date,
     endDate: Date
   ): CxSession[] {
-    return sessions.filter(session => {
+    return sessions.filter((session) => {
       const sessionDate = new Date(session.createdAt);
       return sessionDate >= startDate && sessionDate <= endDate;
     });
@@ -78,17 +83,17 @@ export const sessionHelpers = {
 
   // Get open sessions
   getOpenSessions(sessions: CxSession[]): CxSession[] {
-    return sessions.filter(session => this.isSessionOpen(session));
+    return sessions.filter((session) => this.isSessionOpen(session));
   },
 
   // Get closed sessions
   getClosedSessions(sessions: CxSession[]): CxSession[] {
-    return sessions.filter(session => this.isSessionClosed(session));
+    return sessions.filter((session) => this.isSessionClosed(session));
   },
 
   // Get verified sessions
   getVerifiedSessions(sessions: CxSession[]): CxSession[] {
-    return sessions.filter(session => this.isSessionVerified(session));
+    return sessions.filter((session) => this.isSessionVerified(session));
   },
 
   // Calculate total duration for multiple sessions
@@ -101,14 +106,17 @@ export const sessionHelpers = {
 
   // Group sessions by status
   groupByStatus(sessions: CxSession[]): Record<string, CxSession[]> {
-    return sessions.reduce((groups, session) => {
-      const status = this.getStatusDisplay(session);
-      if (!groups[status]) {
-        groups[status] = [];
-      }
-      groups[status].push(session);
-      return groups;
-    }, {} as Record<string, CxSession[]>);
+    return sessions.reduce(
+      (groups, session) => {
+        const status = this.getStatusDisplay(session);
+        if (!groups[status]) {
+          groups[status] = [];
+        }
+        groups[status].push(session);
+        return groups;
+      },
+      {} as Record<string, CxSession[]>
+    );
   },
 
   // Get session statistics

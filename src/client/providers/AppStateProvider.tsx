@@ -148,7 +148,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     () => ({
       isBootstrapping,
       bootError,
-      isAuthenticated,
+      isAuthenticated: isAuthenticated ?? false,
       isAuthLoading,
       user,
       refreshSession,

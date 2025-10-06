@@ -34,8 +34,6 @@ export class ErrorBoundary extends Component<Props, State> {
         message: error.message,
         stack: error.stack,
         name: error.name,
-      },
-      errorInfo: {
         componentStack: errorInfo.componentStack,
       },
     });
@@ -126,4 +124,3 @@ export function useGlobalErrorHandlers() {
     };
   }, []);
 }
-

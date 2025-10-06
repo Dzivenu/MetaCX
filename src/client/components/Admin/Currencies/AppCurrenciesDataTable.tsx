@@ -171,7 +171,7 @@ export function AppCurrenciesDataTable({
           width: 150,
           textAlign: "right",
           render: ({ rate }) => (
-            <Text size="sm" fw={500} family="monospace">
+            <Text size="sm" fw={500} ff="monospace">
               {formatRate(rate)}
             </Text>
           ),

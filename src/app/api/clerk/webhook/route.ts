@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       }
 
       const convex = await getConvexClient();
-      await convex.mutation(api.organizations.upsertByClerkId, {
+      await convex.mutation(api.functions.organizations.upsertByClerkId, {
         clerkOrganizationId: orgId,
         slug,
         name,

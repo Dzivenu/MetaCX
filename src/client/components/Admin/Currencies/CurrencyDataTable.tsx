@@ -23,7 +23,10 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 // Using Convex-based Currency shape from useCurrenciesConvex
-import type { Currency } from "@/client/hooks/useCurrenciesConvex";
+import type {
+  Currency,
+  Denomination,
+} from "@/client/hooks/useCurrenciesConvex";
 import { notifications } from "@mantine/notifications";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -138,11 +141,7 @@ export function CurrencyDataTable({
     }
   };
 
-  const updateEditingData = (
-    currencyId: string,
-    field: string,
-    value: string | number | boolean
-  ) => {
+  const updateEditingData = (currencyId: string, field: string, value: any) => {
     setEditingData({
       ...editingData,
       [currencyId]: {

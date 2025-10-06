@@ -10,8 +10,11 @@ export interface Organization {
   slug: string;
   description?: string;
   logo?: string | null;
-  metadata?: Record<string, any>;
-  createdAt: string;
+  metadata?: {
+    description?: string;
+    [key: string]: any;
+  };
+  createdAt?: string | Date;
   members?: Member[];
   invitations?: Invitation[];
 }
@@ -215,7 +218,7 @@ export function useOrganizations() {
 
       const result = await authClient.organization.removeMember({
         organizationId,
-        userId,
+        memberIdOrEmail: userId,
       });
 
       if (result.error) {
@@ -247,7 +250,7 @@ export function useOrganizations() {
 
       const result = await authClient.organization.updateMemberRole({
         organizationId,
-        userId,
+        memberId: userId,
         role,
       });
 
@@ -274,7 +277,7 @@ export function useOrganizations() {
       setLoading(true);
       setError(null);
 
-      const result = await authClient.organization.leaveOrganization({
+      const result = await authClient.organization.leave({
         organizationId,
       });
 
@@ -310,7 +313,31 @@ export function useOrganizations() {
         throw new Error(result.error.message);
       }
 
-      return result.data;
+      // Transform the data to match our Organization interface
+      const orgData = result.data;
+      return {
+        ...orgData,
+        createdAt: orgData.createdAt?.toISOString(),
+        members: orgData.members?.map((member) => ({
+          ...member,
+          createdAt: member.createdAt?.toISOString(),
+          user: {
+            ...member.user,
+            id: member.userId,
+          },
+        })),
+        invitations: orgData.invitations?.map((invitation) => ({
+          ...invitation,
+          createdAt: new Date().toISOString(), // TODO: Get actual created date
+          expiresAt: invitation.expiresAt?.toISOString(),
+          inviter: {
+            user: {
+              name: "Unknown", // TODO: Fetch inviter details if needed
+              email: "unknown@example.com",
+            },
+          },
+        })),
+      };
     } catch (err) {
       console.error("Failed to get full organization:", err);
       const errorMessage =

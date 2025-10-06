@@ -153,7 +153,8 @@ function EditRepositoryModal({
             onChange={(value) =>
               setFormData((prev) => ({
                 ...prev,
-                floatThresholdBottom: typeof value === "number" ? value : null,
+                floatThresholdBottom:
+                  typeof value === "number" ? value : undefined,
               }))
             }
           />
@@ -164,7 +165,8 @@ function EditRepositoryModal({
             onChange={(value) =>
               setFormData((prev) => ({
                 ...prev,
-                floatThresholdTop: typeof value === "number" ? value : null,
+                floatThresholdTop:
+                  typeof value === "number" ? value : undefined,
               }))
             }
           />

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvex } from "convex/react";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -60,6 +60,7 @@ export function useOrgCustomers(
   searchTerm?: string
 ): UseOrgCustomersResult {
   const { orgId } = useAuth();
+  const convex = useConvex();
   const [error, setError] = useState<string | null>(null);
 
   console.log("🔍 useOrgCustomers - orgId:", orgId);
@@ -99,9 +100,7 @@ export function useOrgCustomers(
   const deleteOrgCustomerMutation = useMutation(
     api.functions.orgCustomers.deleteOrgCustomer
   );
-  const searchOrgCustomersMutation = useMutation(
-    api.functions.orgCustomers.searchOrgCustomers
-  );
+  const searchOrgCustomersQuery = api.functions.orgCustomers.searchOrgCustomers;
 
   const orgCustomers = useMemo(() => {
     if (!customersData) return [];
@@ -217,7 +216,7 @@ export function useOrgCustomers(
       try {
         await updateOrgCustomerMutation({
           customerId: id as Id<"org_customers">,
-          clerkOrganizationId: orgId,
+          clerkOrganizationId: orgId || undefined,
           firstName: data.firstName,
           lastName: data.lastName,
           title: data.title,
@@ -276,9 +275,9 @@ export function useOrgCustomers(
     async (searchTerm: string): Promise<OrgCustomer[]> => {
       setError(null);
       try {
-        const results = await searchOrgCustomersMutation({
+        const results = await convex.query(searchOrgCustomersQuery, {
           searchTerm: searchTerm,
-          clerkOrganizationId: orgId,
+          clerkOrganizationId: orgId || undefined,
           limit: 20,
         });
 
@@ -308,7 +307,7 @@ export function useOrgCustomers(
         return [];
       }
     },
-    [searchOrgCustomersMutation, orgId]
+    [convex, searchOrgCustomersQuery, orgId]
   );
 
   const refresh = useCallback(async () => {

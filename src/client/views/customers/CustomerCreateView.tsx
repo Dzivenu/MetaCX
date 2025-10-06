@@ -169,7 +169,7 @@ export default function CustomerCreateView({ basePath = "" }: Props) {
                 required
                 disabled={isOrgDisabled || submitting}
                 value={form.values.dob}
-                onChange={(d) => form.setFieldValue("dob", d)}
+                onChange={(d) => form.setFieldValue("dob", d as Date | null)}
                 error={form.errors.dob}
               />
             </Grid.Col>

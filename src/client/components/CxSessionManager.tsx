@@ -7,13 +7,18 @@ import {
   useCreateCxSession,
   useCxSessionMutations,
 } from "@/client/hooks/useCxSessions";
-import { CreateCxSessionData, UpdateCxSessionData } from "@/client/api/cx-sessions";
+import {
+  CreateCxSessionData,
+  UpdateCxSessionData,
+} from "@/client/api/cx-sessions";
 
 // Example component showing how to use the hooks
 export function CxSessionManager() {
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null
+  );
   const [showCreateForm, setShowCreateForm] = useState(false);
-  
+
   // List sessions with pagination and filtering
   const {
     sessions,
@@ -41,7 +46,11 @@ export function CxSessionManager() {
   } = useCxSession(selectedSessionId || undefined);
 
   // Create session
-  const { createSession, isLoading: isCreating, error: createError } = useCreateCxSession();
+  const {
+    createSession,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateCxSession();
 
   // Handle filter changes
   const handleFilterChange = (newFilters: any) => {
@@ -104,7 +113,9 @@ export function CxSessionManager() {
             value={filters.organizationId || ""}
             onChange={(e) =>
               handleFilterChange({
-                organizationId: e.target.value ? Number(e.target.value) : undefined,
+                organizationId: e.target.value
+                  ? Number(e.target.value)
+                  : undefined,
               })
             }
             className="border rounded px-3 py-2"
@@ -159,7 +170,7 @@ export function CxSessionManager() {
         {/* Sessions List */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Sessions List</h2>
-          
+
           {isLoadingSessions ? (
             <div className="text-center py-4">Loading sessions...</div>
           ) : (
@@ -169,16 +180,23 @@ export function CxSessionManager() {
                   <div
                     key={session.id}
                     className={`p-3 border rounded cursor-pointer hover:bg-gray-50 ${
-                      selectedSessionId === session.id ? "border-blue-500 bg-blue-50" : ""
+                      selectedSessionId === session.id
+                        ? "border-blue-500 bg-blue-50"
+                        : ""
                     }`}
                     onClick={() => setSelectedSessionId(session.id)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium">ID: {session.id.slice(0, 8)}...</p>
-                        <p className="text-sm text-gray-600">Status: {session.status || "N/A"}</p>
+                        <p className="font-medium">
+                          ID: {session.id.slice(0, 8)}...
+                        </p>
                         <p className="text-sm text-gray-600">
-                          Created: {new Date(session.createdAt).toLocaleDateString()}
+                          Status: {session.status || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Created:{" "}
+                          {new Date(session.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                       <button
@@ -227,18 +245,22 @@ export function CxSessionManager() {
         {/* Session Details */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Session Details</h2>
-          
+
           {selectedSessionId ? (
             isLoadingSession ? (
               <div className="text-center py-4">Loading session...</div>
             ) : selectedSession ? (
               <SessionDetailsForm
                 session={selectedSession}
-                onUpdate={(data) => handleUpdateSession(selectedSession.id, data)}
+                onUpdate={(data) =>
+                  handleUpdateSession(selectedSession.id, data)
+                }
                 isLoading={false}
               />
             ) : (
-              <div className="text-center py-4 text-gray-500">Session not found</div>
+              <div className="text-center py-4 text-gray-500">
+                Session not found
+              </div>
             )
           ) : (
             <div className="text-center py-4 text-gray-500">
@@ -280,8 +302,8 @@ function SessionDetailsForm({
     e.preventDefault();
     onUpdate({
       status: formData.status || undefined,
-      userId: formData.userId ? Number(formData.userId) : undefined,
-      organizationId: formData.organizationId ? Number(formData.organizationId) : undefined,
+      userId: formData.userId || undefined,
+      organizationId: formData.organizationId || undefined,
     });
   };
 
@@ -296,7 +318,7 @@ function SessionDetailsForm({
           className="w-full border rounded px-3 py-2"
         />
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium mb-1">User ID</label>
         <input
@@ -306,13 +328,17 @@ function SessionDetailsForm({
           className="w-full border rounded px-3 py-2"
         />
       </div>
-      
+
       <div>
-        <label className="block text-sm font-medium mb-1">Organization ID</label>
+        <label className="block text-sm font-medium mb-1">
+          Organization ID
+        </label>
         <input
           type="number"
           value={formData.organizationId}
-          onChange={(e) => setFormData({ ...formData, organizationId: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, organizationId: e.target.value })
+          }
           className="w-full border rounded px-3 py-2"
         />
       </div>
@@ -348,8 +374,8 @@ function CreateSessionModal({
     e.preventDefault();
     onSubmit({
       status: formData.status || undefined,
-      userId: formData.userId ? Number(formData.userId) : undefined,
-      organizationId: formData.organizationId ? Number(formData.organizationId) : undefined,
+      userId: formData.userId || undefined,
+      organizationId: formData.organizationId || undefined,
     });
   };
 
@@ -357,34 +383,42 @@ function CreateSessionModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <h3 className="text-lg font-semibold mb-4">Create New Session</h3>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Status</label>
             <input
               type="text"
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value })
+              }
               className="w-full border rounded px-3 py-2"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">User ID</label>
             <input
               type="number"
               value={formData.userId}
-              onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, userId: e.target.value })
+              }
               className="w-full border rounded px-3 py-2"
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-1">Organization ID</label>
+            <label className="block text-sm font-medium mb-1">
+              Organization ID
+            </label>
             <input
               type="number"
               value={formData.organizationId}
-              onChange={(e) => setFormData({ ...formData, organizationId: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, organizationId: e.target.value })
+              }
               className="w-full border rounded px-3 py-2"
             />
           </div>

@@ -14,7 +14,7 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
   onCancel,
   currencyType = "fiat",
 }) => {
-  const [formData, setFormData] = useState<Partial<Currency>>({
+  const [formData, setFormData] = useState<any>({
     name: "",
     ticker: "",
     rate: 1.0,
@@ -65,10 +65,11 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
 
   useEffect(() => {
     if (currency) {
+      const curr = currency as any;
       setFormData({
         ...currency,
-        rateUpdatedAt: currency.rateUpdatedAt
-          ? new Date(currency.rateUpdatedAt)
+        rateUpdatedAt: curr.rateUpdatedAt
+          ? new Date(curr.rateUpdatedAt)
           : new Date(),
         createdAt: currency.createdAt
           ? new Date(currency.createdAt)
@@ -79,7 +80,7 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
       });
     } else {
       // Set currency type when creating new currency
-      setFormData((prev) => ({ ...prev, typeOf: currencyType }));
+      setFormData((prev: any) => ({ ...prev, typeOf: currencyType }));
     }
   }, [currency, currencyType]);
 
@@ -118,14 +119,14 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
       newValue = (e.target as HTMLInputElement).checked;
     }
 
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: newValue,
     }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors((prev) => ({
+      setErrors((prev: any) => ({
         ...prev,
         [name]: "",
       }));

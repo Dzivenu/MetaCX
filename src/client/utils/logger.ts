@@ -5,6 +5,11 @@
 interface LogContext {
   component?: string;
   action?: string;
+  field?: string;
+  recentChanges?: number;
+  oldValue?: any;
+  newValue?: any;
+  renderCount?: number;
   props?: any;
   state?: any;
   error?: any;
@@ -203,4 +208,3 @@ export function useComponentLogger(componentName: string) {
 }
 
 export default logger;
-

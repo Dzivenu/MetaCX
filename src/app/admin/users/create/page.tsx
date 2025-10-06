@@ -99,8 +99,8 @@ export default function CreateUserPage() {
                   label="First Name"
                   placeholder="Enter first name"
                   withAsterisk
-                  error={errors.first_name?.message}
-                  {...register("first_name", {
+                  error={errors.firstName?.message}
+                  {...register("firstName", {
                     required: "First name is required",
                     minLength: {
                       value: 2,
@@ -114,8 +114,8 @@ export default function CreateUserPage() {
                   label="Last Name"
                   placeholder="Enter last name"
                   withAsterisk
-                  error={errors.last_name?.message}
-                  {...register("last_name", {
+                  error={errors.lastName?.message}
+                  {...register("lastName", {
                     required: "Last name is required",
                     minLength: {
                       value: 2,

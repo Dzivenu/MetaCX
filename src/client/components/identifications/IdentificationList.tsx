@@ -18,7 +18,7 @@ import {
   useOrgIdentifications,
   type OrgIdentification,
 } from "@/client/hooks/useOrgIdentifications";
-import type { Id } from "../../../convex/_generated/dataModel";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 interface Props {
   orgCustomerId?: Id<"org_customers">;

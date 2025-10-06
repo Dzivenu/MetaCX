@@ -160,7 +160,7 @@ export function useRepositories(): UseRepositoriesResult {
             floatCountRequired: data.floatCountRequired,
             currencyTickers: data.currencyTickers,
             // Ensure backend receives organization context
-            clerkOrganizationId: stableOrgId,
+            clerkOrganizationId: stableOrgId || undefined,
           }),
           new Promise((_, reject) =>
             setTimeout(
@@ -176,7 +176,7 @@ export function useRepositories(): UseRepositoriesResult {
         ]);
 
         console.log("🔍 useRepositories - createRepository success:", result);
-        return result;
+        return result as string;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create repository";
@@ -253,7 +253,7 @@ export function useRepositories(): UseRepositoriesResult {
         await reorderRepositoriesMutation({
           orderedRepositoryIds: orderedIds as Id<"org_repositories">[],
           // Pass org to be explicit (server can also infer)
-          clerkOrganizationId: stableOrgId,
+          clerkOrganizationId: stableOrgId || undefined,
         });
         return true;
       } catch (err) {
@@ -338,7 +338,7 @@ export function useRepository(id?: string) {
   const [error, setError] = useState<string | null>(null);
 
   // Convert string ID to Convex ID if provided
-  const convexId = id ? (id as Id<"repositories">) : undefined;
+  const convexId = id ? (id as Id<"org_repositories">) : undefined;
 
   const repository = useQuery(
     api.functions.repositories.getRepositoryById,
@@ -413,7 +413,7 @@ export function useCreateRepository() {
             floatThresholdTop: data.floatThresholdTop,
             floatCountRequired: data.floatCountRequired,
             currencyTickers: data.currencyTickers,
-            clerkOrganizationId: stableOrgId,
+            clerkOrganizationId: stableOrgId || undefined,
           }),
           new Promise((_, reject) =>
             setTimeout(

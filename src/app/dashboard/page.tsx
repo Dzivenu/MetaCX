@@ -76,7 +76,7 @@ export default function DashboardPage() {
                           Organizations
                         </Text>
                         <Text size="sm" c="dimmed">
-                          {organizationList?.data?.length || 0} organizations
+                          {organizationList?.length || 0} organizations
                         </Text>
                       </Stack>
                     </Group>

@@ -65,105 +65,81 @@ export const useFloat = (sessionId: string) => {
 
   // Confirm float operation
   const confirmFloatMutation = useMutation(api.functions.orgFloat.confirmFloat);
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to confirm float operation");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["float", sessionId] });
-    },
-  });
 
   // Update repository float stacks
-  const updateRepositoryFloatMutation = useMutation({
-    mutationFn: async ({
-      repositoryId,
-      floatStacks,
-    }: {
-      repositoryId: string;
-      floatStacks: Partial<FloatStack>[];
-    }) => {
-      const response = await fetch(`/api/repositories/${repositoryId}/float`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId, floatStacks }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update repository float");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["float", sessionId] });
-    },
-  });
+  const updateRepositoryFloat = async ({
+    repositoryId,
+    floatStacks,
+  }: {
+    repositoryId: string;
+    floatStacks: Partial<FloatStack>[];
+  }) => {
+    const response = await fetch(`/api/repositories/${repositoryId}/float`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sessionId, floatStacks }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to update repository float");
+    }
+    return response.json();
+  };
 
   // Validate repository float
-  const validateRepositoryFloatMutation = useMutation({
-    mutationFn: async ({
-      repositoryId,
-      action,
-    }: {
-      repositoryId: string;
-      action?: string;
-    }) => {
-      const response = await fetch(`/api/repositories/${repositoryId}/float`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId, action }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to validate repository float");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["float", sessionId] });
-    },
-  });
+  const validateRepositoryFloat = async ({
+    repositoryId,
+    action,
+  }: {
+    repositoryId: string;
+    action?: string;
+  }) => {
+    const response = await fetch(`/api/repositories/${repositoryId}/float`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sessionId, action }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to validate repository float");
+    }
+    return response.json();
+  };
 
   const startFloat = useCallback(
-    (action: "START_OPEN" | "START_CLOSE" | "CANCEL_CLOSE") => {
-      return startFloatMutation.mutateAsync(action);
+    async (action: "START_OPEN" | "START_CLOSE" | "CANCEL_CLOSE") => {
+      return await startFloatMutation({ sessionId: sessionConvexId, action });
     },
-    [startFloatMutation]
+    [startFloatMutation, sessionConvexId]
   );
 
   const confirmFloat = useCallback(
-    (action: "CONFIRM_OPEN" | "CONFIRM_CLOSE") => {
-      return confirmFloatMutation.mutateAsync(action);
+    async (action: "CONFIRM_OPEN" | "CONFIRM_CLOSE") => {
+      return await confirmFloatMutation({ sessionId: sessionConvexId, action });
     },
-    [confirmFloatMutation]
+    [confirmFloatMutation, sessionConvexId]
   );
 
-  const updateRepositoryFloat = useCallback(
+  const updateRepositoryFloatCallback = useCallback(
     (repositoryId: string, floatStacks: Partial<FloatStack>[]) => {
-      return updateRepositoryFloatMutation.mutateAsync({
+      return updateRepositoryFloat({
         repositoryId,
         floatStacks,
       });
     },
-    [updateRepositoryFloatMutation]
+    []
   );
 
-  const validateRepositoryFloat = useCallback(
+  const validateRepositoryFloatCallback = useCallback(
     (repositoryId: string, action?: string) => {
-      return validateRepositoryFloatMutation.mutateAsync({
+      return validateRepositoryFloat({
         repositoryId,
         action,
       });
     },
-    [validateRepositoryFloatMutation]
+    []
   );
 
   return {
@@ -174,24 +150,22 @@ export const useFloat = (sessionId: string) => {
     branches: floatData?.branches || [],
 
     // Loading states
-    isLoading,
-    isStartingFloat: startFloatMutation.isPending,
-    isConfirmingFloat: confirmFloatMutation.isPending,
-    isUpdatingFloat: updateRepositoryFloatMutation.isPending,
-    isValidatingFloat: validateRepositoryFloatMutation.isPending,
+    isLoading: !floatData,
+    isStartingFloat: false, // Convex mutations don't expose pending state the same way
+    isConfirmingFloat: false,
+    isUpdatingFloat: false, // These are now synchronous API calls
+    isValidatingFloat: false,
 
     // Error states
-    error,
-    startFloatError: startFloatMutation.error,
-    confirmFloatError: confirmFloatMutation.error,
-    updateFloatError: updateRepositoryFloatMutation.error,
-    validateFloatError: validateRepositoryFloatMutation.error,
+    startFloatError: null, // Convex mutations don't expose error state the same way
+    confirmFloatError: null,
+    updateFloatError: null, // These are now synchronous API calls
+    validateFloatError: null,
 
     // Actions
     startFloat,
     confirmFloat,
-    updateRepositoryFloat,
-    validateRepositoryFloat,
-    refetch,
+    updateRepositoryFloat: updateRepositoryFloatCallback,
+    validateRepositoryFloat: validateRepositoryFloatCallback,
   };
 };

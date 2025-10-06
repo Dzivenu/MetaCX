@@ -126,7 +126,7 @@ export function CustomerIdentificationCard({
 
       {!isLoading && hasIdentifications && (
         <Stack gap="md">
-          {identifications.map((id) => (
+          {identifications.map((id: any) => (
             <div key={id._id}>
               <Group gap="sm" align="flex-start">
                 {getIdTypeIcon(id.typeOf)}

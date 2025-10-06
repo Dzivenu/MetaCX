@@ -175,7 +175,7 @@ export const AppCurrencySelection: React.FC = () => {
                         <Text size="xs" c="dimmed">
                           Rate vs {currency.baseRateTicker}
                         </Text>
-                        <Text size="sm" fw={500} family="monospace">
+                        <Text size="sm" fw={500} ff="monospace">
                           {new Intl.NumberFormat("en-US", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 8,

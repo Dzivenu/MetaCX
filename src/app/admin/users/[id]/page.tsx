@@ -144,10 +144,11 @@ export default function UserDetailPage() {
     return new Date(dateString).toLocaleString();
   };
 
-  const getStatusBadge = (isActive: boolean) => {
+  const getStatusBadge = (isActive: boolean | undefined) => {
+    const active = isActive ?? false;
     return (
-      <Badge color={isActive ? "green" : "red"} variant="light">
-        {isActive ? "Active" : "Inactive"}
+      <Badge color={active ? "green" : "red"} variant="light">
+        {active ? "Active" : "Inactive"}
       </Badge>
     );
   };

@@ -36,21 +36,21 @@ export const CurrencyDetailsForm: React.FC<CurrencyDetailsFormProps> = ({
     initialValues: {
       name: currency.name || "",
       ticker: currency.ticker || "",
-      rate: currency.rate || 0,
-      buyMarginMax: currency.buyMarginMax || 0,
-      sellMarginMax: currency.sellMarginMax || 0,
-      buyMarginMin: currency.buyMarginMin || 0,
-      sellMarginMin: currency.sellMarginMin || 0,
+      rate: (currency as any).rate || 0,
+      buyMarginMax: (currency as any).buyMarginMax || 0,
+      sellMarginMax: (currency as any).sellMarginMax || 0,
+      buyMarginMin: (currency as any).buyMarginMin || 0,
+      sellMarginMin: (currency as any).sellMarginMin || 0,
       tradeable: currency.tradeable || false,
-      advertisable: currency.advertisable || false,
-      buy_advertisable: currency.buy_advertisable || false,
-      sell_advertisable: currency.sell_advertisable || false,
-      offset: currency.offset || 0,
-      spread: currency.spread || 0,
-      rateDecimalPlaces: currency.rateDecimalPlaces || 2,
-      amountDecimalPlaces: currency.amountDecimalPlaces || 2,
-      floatThresholdBottom: currency.floatThresholdBottom || 0,
-      floatThresholdTop: currency.floatThresholdTop || 0,
+      advertisable: (currency as any).advertisable || false,
+      buy_advertisable: (currency as any).buy_advertisable || false,
+      sell_advertisable: (currency as any).sell_advertisable || false,
+      offset: (currency as any).offset || 0,
+      spread: (currency as any).spread || 0,
+      rateDecimalPlaces: (currency as any).rateDecimalPlaces || 2,
+      amountDecimalPlaces: (currency as any).amountDecimalPlaces || 2,
+      floatThresholdBottom: (currency as any).floatThresholdBottom || 0,
+      floatThresholdTop: (currency as any).floatThresholdTop || 0,
     },
 
     validate: {
@@ -104,7 +104,7 @@ export const CurrencyDetailsForm: React.FC<CurrencyDetailsFormProps> = ({
               <NumberInput
                 label="Rate"
                 placeholder="Currency rate"
-                precision={6}
+                decimalScale={6}
                 {...form.getInputProps("rate")}
               />
             </Group>
@@ -118,24 +118,24 @@ export const CurrencyDetailsForm: React.FC<CurrencyDetailsFormProps> = ({
             <Group grow>
               <NumberInput
                 label="Buy Margin Max (%)"
-                precision={4}
+                decimalScale={4}
                 {...form.getInputProps("buyMarginMax")}
               />
               <NumberInput
                 label="Sell Margin Max (%)"
-                precision={4}
+                decimalScale={4}
                 {...form.getInputProps("sellMarginMax")}
               />
             </Group>
             <Group grow mt="md">
               <NumberInput
                 label="Buy Margin Min (%)"
-                precision={4}
+                decimalScale={4}
                 {...form.getInputProps("buyMarginMin")}
               />
               <NumberInput
                 label="Sell Margin Min (%)"
-                precision={4}
+                decimalScale={4}
                 {...form.getInputProps("sellMarginMin")}
               />
             </Group>
@@ -180,12 +180,12 @@ export const CurrencyDetailsForm: React.FC<CurrencyDetailsFormProps> = ({
             <Group grow>
               <NumberInput
                 label="Offset"
-                precision={4}
+                decimalScale={4}
                 {...form.getInputProps("offset")}
               />
               <NumberInput
                 label="Spread"
-                precision={4}
+                decimalScale={4}
                 {...form.getInputProps("spread")}
               />
             </Group>

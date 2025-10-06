@@ -141,7 +141,7 @@ export function ActiveSessionProvider({
   }, [activeSession, closeSession]);
 
   const value: ActiveSessionContextType = {
-    activeSession,
+    activeSession: activeSession as any, // TODO: Fix type mismatch between Convex and CxSession
     loading,
     error,
     setActiveSession,
