@@ -123,7 +123,7 @@ export function FloatBreakdownForm({
   const repositories = useMemo(() => {
     if (!rawRepositories) return [];
     return rawRepositories.filter((repo) =>
-      repo.float?.some((currency) => currency.ticker === ticker)
+      repo.float?.some((currency: any) => currency.ticker === ticker)
     );
   }, [rawRepositories, ticker]);
 
@@ -134,11 +134,11 @@ export function FloatBreakdownForm({
     const repo = rawRepositories.find((r) => r.id === selectedRepository);
     if (!repo) return [];
 
-    const currency = repo.float?.find((c) => c.ticker === ticker);
+    const currency = repo.float?.find((c: any) => c.ticker === ticker) as any;
     if (!currency) return [];
 
     return currency.floatStacks
-      .map((stack) => ({
+      .map((stack: any) => ({
         id: stack.id,
         denomination: {
           id: stack.denomination?.id || stack.id, // Use denomination ID if available
@@ -152,7 +152,7 @@ export function FloatBreakdownForm({
         repositoryId: repo.id,
         repositoryName: repo.name,
       }))
-      .sort((a, b) => b.denomination.value - a.denomination.value);
+      .sort((a: any, b: any) => b.denomination.value - a.denomination.value);
   }, [selectedRepository, rawRepositories, ticker]);
 
   // Auto-select first repository if none selected
@@ -416,10 +416,14 @@ export function FloatBreakdownForm({
             placeholder="Select a repository"
             value={selectedRepository}
             onChange={(value) => setSelectedRepository(value || "")}
-            data={useMemo(() => repositories.map((repo) => ({
-              value: repo.id,
-              label: repo.name,
-            })), [repositories])}
+            data={useMemo(
+              () =>
+                repositories.map((repo) => ({
+                  value: repo.id,
+                  label: repo.name,
+                })),
+              [repositories]
+            )}
             disabled={disabled || breakdownCompleted}
           />
         )}

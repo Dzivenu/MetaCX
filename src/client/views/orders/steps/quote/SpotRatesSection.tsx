@@ -32,9 +32,8 @@ export function SpotRatesSection({
   const getSpotRate = (from: string, to: string) => {
     const rates: Record<string, Record<string, number>> = {
       BTC: { CAD: 148092 },
-      CAD: { BTC: 0.00000675 },
+      CAD: { BTC: 0.00000675, ETH: 0.000235 },
       ETH: { CAD: 4250 },
-      CAD: { ETH: 0.000235 },
     };
     return rates[from]?.[to] || 0;
   };

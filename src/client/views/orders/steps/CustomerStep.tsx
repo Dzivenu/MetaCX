@@ -30,12 +30,12 @@ export function CustomerStep() {
     lastName: c.lastName || "",
     email: c.email || undefined,
     telephone: c.telephone || undefined,
-    dob: c.dob || undefined,
+    dob: c.dob ? new Date(c.dob).toISOString().split("T")[0] : undefined,
     blacklisted: c.blacklisted || false,
     // Map other fields as needed
-    organizationId: c.clerkOrgId || "",
-    createdAt: c.createdAt || 0,
-    updatedAt: c.updatedAt || 0,
+    organizationId: c.clerkOrganizationId || "",
+    createdAt: c.createdAt ? new Date(c.createdAt) : new Date(),
+    updatedAt: c.updatedAt ? new Date(c.updatedAt) : new Date(),
   }));
 
   const handleCustomerSelected = useCallback(

@@ -30,7 +30,7 @@ export function QuoteDetailsSection({ quote }: QuoteDetailsSectionProps) {
               value={quote.finalRate}
               readOnly
               size="lg"
-              precision={6}
+              decimalScale={6}
               hideControls
               styles={{
                 input: {
@@ -60,7 +60,7 @@ export function QuoteDetailsSection({ quote }: QuoteDetailsSectionProps) {
               value={quote.margin}
               readOnly
               size="lg"
-              precision={2}
+              decimalScale={2}
               hideControls
               styles={{
                 input: {
@@ -90,7 +90,7 @@ export function QuoteDetailsSection({ quote }: QuoteDetailsSectionProps) {
               value={quote.fee}
               readOnly
               size="lg"
-              precision={2}
+              decimalScale={2}
               hideControls
               styles={{
                 input: {
@@ -120,7 +120,7 @@ export function QuoteDetailsSection({ quote }: QuoteDetailsSectionProps) {
               value={quote.networkFee}
               readOnly
               size="lg"
-              precision={6}
+              decimalScale={6}
               hideControls
               styles={{
                 input: {

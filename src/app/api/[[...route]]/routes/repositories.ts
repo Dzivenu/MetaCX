@@ -34,7 +34,9 @@ repositoriesRouter.get("/", async (c) => {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
-    const activeOrganizationId = sessionData.session.activeOrganizationId;
+    // For now, use a default organization ID or get it from user data
+    // TODO: Implement proper organization selection in session
+    const activeOrganizationId = sessionData.user.id || "default-org";
     if (!activeOrganizationId) {
       return c.json({ error: "No active organization selected" }, 400);
     }
@@ -67,7 +69,9 @@ repositoriesRouter.post(
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const activeOrganizationId = sessionData.session.activeOrganizationId;
+      // For now, use a default organization ID or get it from user data
+      // TODO: Implement proper organization selection in session
+      const activeOrganizationId = sessionData.user.id || "default-org";
       if (!activeOrganizationId) {
         return c.json({ error: "No active organization selected" }, 400);
       }

@@ -97,7 +97,7 @@ export function OutboundFields() {
             label="Outbound Amount (from quote)"
             value={form.outboundSum}
             readOnly
-            precision={6}
+            decimalScale={6}
             step={0.000001}
             min={0}
           />

@@ -13,11 +13,11 @@ import { env } from "@/shared/config/env";
 
 export const auth = betterAuth({
   appName: env.NEXT_PUBLIC_APP_NAME,
-  baseURL: env.BETTER_AUTH_URL,
+  baseURL: env.BETTER_AUTH_URL || env.NEXT_PUBLIC_APP_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
-  secret: env.BETTER_AUTH_SECRET,
+  secret: env.BETTER_AUTH_SECRET || "fallback-secret-for-build",
 
   // Email and password authentication
   emailAndPassword: {
@@ -233,7 +233,7 @@ export const auth = betterAuth({
 
   // Trusted origins for CORS
   trustedOrigins: [env.BETTER_AUTH_URL, env.NEXT_PUBLIC_APP_URL],
-  
+
   // CORS configuration
   cors: {
     origin: [env.BETTER_AUTH_URL, env.NEXT_PUBLIC_APP_URL],

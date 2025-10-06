@@ -177,18 +177,15 @@ export function QuoteBlock({
     if (isEditing) {
       return (
         <Stack>
-          <Text size="lg" fw={600}>Edit Quote</Text>
-          <QuoteForm
-            initialData={quoteData}
-            onChange={handleQuoteChange}
-          />
+          <Text size="lg" fw={600}>
+            Edit Quote
+          </Text>
+          <QuoteForm initialData={quoteData} onChange={handleQuoteChange} />
           <Group justify="flex-end" mt="md">
             <Button variant="light" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              Save Quote
-            </Button>
+            <Button onClick={handleSave}>Save Quote</Button>
           </Group>
         </Stack>
       );
@@ -205,6 +202,7 @@ export function QuoteBlock({
 
     const totalFees = fee + networkFee;
     const inverseFinalRate = finalRate > 0 ? 1 / finalRate : 0;
+    const inverseFinalRateWithoutFees = fxRate > 0 ? 1 / fxRate : 0;
 
     return (
       <Card withBorder p="lg">

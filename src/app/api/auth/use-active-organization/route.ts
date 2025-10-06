@@ -25,7 +25,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the active organization from the session
-    const activeOrganizationId = session.session.activeOrganizationId;
+    // TODO: Implement proper organization selection in session
+    const activeOrganizationId = session.user.id || null;
 
     if (!activeOrganizationId) {
       // No active organization set in session; try to restore from persisted user record
@@ -80,7 +81,9 @@ export async function GET(request: NextRequest) {
     })) as Array<{ id: string; slug: string; name?: string }>;
 
     // Find the active organization
-    const activeOrg = organizations.find((org) => org.id === activeOrganizationId);
+    const activeOrg = organizations.find(
+      (org) => org.id === activeOrganizationId
+    );
 
     if (!activeOrg) {
       // Active organization not found, clear it

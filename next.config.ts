@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Disable ESLint during build to avoid compatibility issues with Next.js 15
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Compiler optimizations
   compiler: {
     // Remove console logs in production

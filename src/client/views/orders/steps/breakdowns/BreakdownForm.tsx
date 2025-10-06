@@ -47,7 +47,7 @@ export function BreakdownForm() {
           placeholder="0.00"
           value={amount}
           onChange={setAmount}
-          precision={2}
+          decimalScale={2}
           step={0.01}
           min={0}
           style={{ minWidth: 120 }}
@@ -63,4 +63,3 @@ export function BreakdownForm() {
     </form>
   );
 }
-

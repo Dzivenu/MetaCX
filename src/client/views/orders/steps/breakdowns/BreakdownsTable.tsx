@@ -35,7 +35,7 @@ export function BreakdownsTable() {
                 onChange={(v) =>
                   updateBreakdownItem(b.id, { amount: Number(v) || 0 })
                 }
-                precision={2}
+                decimalScale={2}
                 step={0.01}
                 min={0}
               />
@@ -60,25 +60,3 @@ export function BreakdownsTable() {
     </Table>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
