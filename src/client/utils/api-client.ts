@@ -37,12 +37,8 @@ export async function apiClient(
       // Optionally trigger a re-authentication flow
       // You could dispatch a Redux action here or emit an event
       if (typeof window !== "undefined") {
-        // Session cleanup handled by better-auth - no localStorage cleanup needed
-        // // Redirect to login if not already on auth pages
-        // const currentPath = window.location.pathname;
-        // if (!currentPath.startsWith('/auth') && !currentPath.startsWith('/login')) {
-        //   window.location.href = '/auth/signin';
-        // }
+        // Session cleanup handled by Clerk
+        // Redirect to login if needed
       }
     }
 

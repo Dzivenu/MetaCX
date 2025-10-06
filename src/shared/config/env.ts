@@ -7,7 +7,6 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z.string().url().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -16,9 +15,6 @@ export const env = createEnv({
     CLERK_JWT_ISSUER_DOMAIN: z.string().url(),
     // Convex Configuration
     CONVEX_DEPLOYMENT: z.string().min(1),
-    // Better Auth Configuration
-    BETTER_AUTH_URL: z.string().url().optional(),
-    BETTER_AUTH_SECRET: z.string().min(1).optional(),
     // S3 Configuration
     S3_ENDPOINT: z.string().url().optional(),
     S3_REGION: z.string().min(1).optional(),
@@ -49,7 +45,6 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     // Clerk Configuration
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
@@ -59,9 +54,6 @@ export const env = createEnv({
     // Convex Configuration
     CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
-    // Better Auth Configuration
-    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
-    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     // App Configuration
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_NODE_ENV: process.env.NEXT_PUBLIC_NODE_ENV,

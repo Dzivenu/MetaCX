@@ -1,3 +1,0 @@
-ALTER TABLE "currencies" RENAME COLUMN "float_target_in_cad" TO "float_target_in_base_currency";--> statement-breakpoint
-ALTER TABLE "repositories" ALTER COLUMN "organization_id" SET DATA TYPE text;--> statement-breakpoint
-ALTER TABLE "repositories" ADD CONSTRAINT "repositories_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;

@@ -1,1 +1,0 @@
-ALTER TABLE "cx_session" ALTER COLUMN "user_id" DROP NOT NULL;

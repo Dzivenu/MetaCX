@@ -7,7 +7,8 @@ This is the metacx web application built with Next.js, TypeScript, and Tailwind 
 - **Next.js 15**: The latest version of the React framework.
 - **TypeScript**: For type-safe code.
 - **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
-- **Drizzle ORM**: A modern TypeScript ORM for PostgreSQL.
+- **Convex**: Real-time backend platform with database, authentication, and serverless functions.
+- **Clerk**: Modern authentication and user management.
 - **Hono**: A small, simple, and ultrafast web framework for the Edge.
 - **React Hook Form**: For flexible and extensible forms.
 - **React Query**: For data fetching and state management.
@@ -32,13 +33,16 @@ This project uses [T3 Env](https://env.t3.gg/) for type-safe environment variabl
    ```
 
 2. Fill in the required environment variables in `.env.local`:
-   - `DATABASE_URL`: Your PostgreSQL database connection string
-   - `BETTER_AUTH_SECRET`: A random secret for Better Auth (generate with `openssl rand -base64 32`)
    - `NEXT_PUBLIC_APP_URL`: Your app's URL (http://localhost:3000 for development)
-   - `S3_ENDPOINT`: Your S3-compatible storage endpoint (e.g., Supabase Storage)
-   - `S3_REGION`: Your S3 region
-   - `S3_ACCESS_KEY_ID`: Your S3 access key ID
-   - `S3_ACCESS_KEY_SECRET`: Your S3 access key secret
+   - `NEXT_PUBLIC_CONVEX_URL`: Your Convex deployment URL
+   - `CONVEX_DEPLOYMENT`: Your Convex deployment name
+   - `CLERK_SECRET_KEY`: Your Clerk secret key
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
+   - `CLERK_JWT_ISSUER_DOMAIN`: Your Clerk JWT issuer domain
+   - `S3_ENDPOINT`: Your S3-compatible storage endpoint (e.g., Supabase Storage) (optional)
+   - `S3_REGION`: Your S3 region (optional)
+   - `S3_ACCESS_KEY_ID`: Your S3 access key ID (optional)
+   - `S3_ACCESS_KEY_SECRET`: Your S3 access key secret (optional)
 
 ### Adding New Environment Variables
 

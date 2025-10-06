@@ -1,122 +1,36 @@
-import { auth } from "@/server/db/better-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/server/db";
-import {
-  user as userTable,
-  member as memberTable,
-  organization as organizationTable,
-} from "@/server/db/schema/better-auth-schema";
-import { and, eq, sql } from "drizzle-orm";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../../../convex/_generated/api";
 
 /**
  * GET /api/auth/use-active-organization
  *
- * This endpoint is called by better-auth's useActiveOrganization hook
- * to fetch the current active organization for the user session.
+ * This endpoint fetches the user's organizations from Convex/Clerk
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get the session from better-auth
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get the active organization from the session
-    // TODO: Implement proper organization selection in session
-    const activeOrganizationId = session.user.id || null;
-
-    if (!activeOrganizationId) {
-      // No active organization set in session; try to restore from persisted user record
-      const dbUser = await db.query.user.findFirst({
-        where: eq(userTable.id, session.user.id),
-      });
-
-      const persistedOrgId = (dbUser?.lastActiveOrganizationId ?? null) as
-        | string
-        | null;
-
-      if (!persistedOrgId) {
-        return NextResponse.json({ activeOrganization: null });
-      }
-
-      // Verify user is still a member of the persisted organization
-      const membership = await db
-        .select({ id: memberTable.id })
-        .from(memberTable)
-        .where(
-          and(
-            eq(memberTable.userId, session.user.id),
-            eq(memberTable.organizationId, persistedOrgId)
-          )
-        );
-
-      if (!membership.length) {
-        return NextResponse.json({ activeOrganization: null });
-      }
-
-      // TODO: Implement proper organization listing when organizations table is created
-      // For now, return a mock organization if one is persisted
-      const organizations = persistedOrgId
-        ? [
-            {
-              id: persistedOrgId,
-              slug: persistedOrgId,
-              name: "Default Organization",
-            },
-          ]
-        : [];
-
-      const activeOrg = organizations.find((org) => org.id === persistedOrgId);
-
-      if (!activeOrg) {
-        return NextResponse.json({ activeOrganization: null });
-      }
-
-      // Inform the client that it should update the session to this org
-      return NextResponse.json({
-        activeOrganization: activeOrg,
-        shouldSetSession: true,
-      });
-    }
-
-    // Fetch the organization details from database
-    const userMemberships = await db
-      .select({
-        organizationId: memberTable.organizationId,
-        role: memberTable.role,
-      })
-      .from(memberTable)
-      .where(eq(memberTable.userId, session.user.id));
-
-    const organizationIds = userMemberships.map((m) => m.organizationId);
-
-    const organizations =
-      organizationIds.length > 0
-        ? await db
-            .select({
-              id: organizationTable.id,
-              slug: organizationTable.slug,
-              name: organizationTable.name,
-            })
-            .from(organizationTable)
-            .where(sql`${organizationTable.id} IN ${organizationIds}`)
-        : [];
-
-    // Find the active organization
-    const activeOrg = organizations.find(
-      (org) => org.id === activeOrganizationId
+    // Get user's organizations from Convex/Clerk
+    const organizations = await convex.action(
+      api.actions.organizations.getUserOrganizationsFromClerk
     );
 
-    if (!activeOrg) {
-      // Active organization not found, clear it
+    if (!organizations || organizations.length === 0) {
       return NextResponse.json({ activeOrganization: null });
     }
 
-    return NextResponse.json({ activeOrganization: activeOrg });
+    // For now, return the first organization as active
+    // TODO: Implement proper active organization selection
+    const activeOrg = organizations[0];
+
+    return NextResponse.json({
+      activeOrganization: {
+        id: activeOrg.id,
+        slug: activeOrg.slug,
+        name: activeOrg.name,
+      },
+    });
   } catch (error) {
     console.error("Error fetching active organization:", error);
     return NextResponse.json(
@@ -129,57 +43,26 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/auth/use-active-organization
  *
- * This endpoint is called by better-auth's organization.setActive method
- * to set the active organization for the user session.
+ * This endpoint sets the active organization using Convex/Clerk
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { organizationId, organizationSlug } = body;
 
-    // Get the session from better-auth
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!organizationId) {
+      return NextResponse.json(
+        { error: "Organization ID is required" },
+        { status: 400 }
+      );
     }
 
-    // If organizationId is null, clear the active organization
-    if (organizationId === null) {
-      // Better Auth will handle the session update automatically
-      // Also clear persisted last active organization on the user record
-      await db
-        .update(userTable)
-        .set({ lastActiveOrganizationId: null, updatedAt: new Date() })
-        .where(eq(userTable.id, session.user.id));
-
-      return NextResponse.json({ success: true, activeOrganization: null });
-    }
+    const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
     // Verify the organization exists and user has access
-    const userMemberships = await db
-      .select({
-        organizationId: memberTable.organizationId,
-        role: memberTable.role,
-      })
-      .from(memberTable)
-      .where(eq(memberTable.userId, session.user.id));
-
-    const organizationIds = userMemberships.map((m) => m.organizationId);
-
-    const organizations =
-      organizationIds.length > 0
-        ? await db
-            .select({
-              id: organizationTable.id,
-              slug: organizationTable.slug,
-              name: organizationTable.name,
-            })
-            .from(organizationTable)
-            .where(sql`${organizationTable.id} IN ${organizationIds}`)
-        : [];
+    const organizations = await convex.action(
+      api.actions.organizations.getUserOrganizationsFromClerk
+    );
 
     // Find the organization by ID or slug
     const targetOrg = organizations.find(
@@ -193,16 +76,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Better Auth will handle the session update automatically
-    // Persist the active organization on the user record for future sessions
-    await db
-      .update(userTable)
-      .set({ lastActiveOrganizationId: targetOrg.id, updatedAt: new Date() })
-      .where(eq(userTable.id, session.user.id));
-
+    // TODO: Implement session management for active organization
+    // For now, just return success
     return NextResponse.json({
       success: true,
-      activeOrganization: targetOrg,
+      activeOrganization: {
+        id: targetOrg.id,
+        slug: targetOrg.slug,
+        name: targetOrg.name,
+      },
     });
   } catch (error) {
     console.error("Error setting active organization:", error);

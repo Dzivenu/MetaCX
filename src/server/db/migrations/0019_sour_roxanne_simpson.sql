@@ -1,1 +1,0 @@
-ALTER TABLE "currencies" ADD COLUMN "is_base_currency" boolean DEFAULT false NOT NULL;

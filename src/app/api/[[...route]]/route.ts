@@ -1,19 +1,7 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
-import { authRouter } from "./routes/auth";
-import { cxSessionRouter } from "./routes/cx-sessions";
-import { repositoriesRouter } from "./routes/repositories";
 
 const app = new Hono().basePath("/api");
-
-// Mount auth routes
-app.route("/auth", authRouter);
-
-// Mount cx-session routes
-app.route("/cx-sessions", cxSessionRouter);
-
-// Mount repository routes
-app.route("/repositories", repositoriesRouter);
 
 // Add your other routes here
 app.get("/", (c) => {
