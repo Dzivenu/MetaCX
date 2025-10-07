@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useOrganizations } from "@/client/hooks/useOrganizations";
+import { useOrgMembershipsConvex } from "@/client/hooks/useOrgMembershipsConvex";
+import { useActiveOrganization } from "@/client/hooks/useActiveOrganization";
+import { Id } from "../../../../convex/_generated/dataModel";
 import {
   Modal,
   TextInput,
@@ -24,7 +26,11 @@ export function InviteMemberModal({
   opened,
   onClose,
 }: InviteMemberModalProps) {
-  const { inviteMember, loading } = useOrganizations();
+  const { activeOrganization } = useActiveOrganization();
+  const { inviteMember, membersLoading } = useOrgMembershipsConvex(
+    organizationId as Id<"organizations">,
+    activeOrganization?.id
+  );
   const [formData, setFormData] = useState({
     email: "",
     role: "member",
@@ -55,7 +61,6 @@ export function InviteMemberModal({
 
     try {
       await inviteMember(
-        organizationId,
         formData.email.trim(),
         formData.role as "member" | "admin" | "owner"
       );
@@ -126,7 +131,7 @@ export function InviteMemberModal({
             <Button variant="subtle" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" loading={loading}>
+            <Button type="submit" loading={membersLoading}>
               Send Invitation
             </Button>
           </Group>

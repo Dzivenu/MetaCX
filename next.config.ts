@@ -38,42 +38,26 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Server-side external packages (don't bundle for server)
+  serverExternalPackages: ["convex"],
+
   // Enable webpack 5 optimizations
-  webpack: (config, { dev }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
+    // Fix for "self is not defined" error in SSR
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        encoding: false,
+        canvas: false,
+      };
+    }
+
     // Optimize for development with Turbo
     if (dev) {
       config.cache = {
         type: "filesystem",
         buildDependencies: {
           config: [__filename],
-        },
-      };
-    }
-
-    // Production optimizations
-    if (!dev) {
-      // Enable webpack optimizations
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: "all",
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: "vendors",
-              chunks: "all",
-            },
-            mantine: {
-              test: /[\\/]node_modules[\\/]@mantine[\\/]/,
-              name: "mantine",
-              chunks: "all",
-            },
-            convex: {
-              test: /[\\/]node_modules[\\/]convex[\\/]/,
-              name: "convex",
-              chunks: "all",
-            },
-          },
         },
       };
     }

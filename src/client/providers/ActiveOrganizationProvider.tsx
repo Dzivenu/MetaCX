@@ -2,7 +2,33 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "@/client/hooks/useClerkAuth";
-import { Member, Invitation } from "@/client/hooks/useOrganizations";
+
+interface Member {
+  id: string;
+  userId: string;
+  role: "owner" | "admin" | "member";
+  joinedAt: string;
+  user?: {
+    name: string;
+    email: string;
+    image?: string;
+  };
+}
+
+interface Invitation {
+  id: string;
+  email: string;
+  role: "owner" | "admin" | "member";
+  status: "pending" | "accepted" | "declined" | "expired" | "cancelled";
+  expiresAt: string;
+  createdAt: string;
+  inviter?: {
+    user: {
+      name: string;
+      email: string;
+    };
+  };
+}
 
 interface Organization {
   id: string;

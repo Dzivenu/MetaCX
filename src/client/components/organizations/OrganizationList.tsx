@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useOrganizations } from "@/client/hooks/useOrganizations";
+import { useOrganizationList } from "@clerk/nextjs";
 import { useActiveOrganization } from "@/client/hooks/useActiveOrganization";
 import { CreateOrganizationModal } from "./CreateOrganizationModal";
-import { EditOrganizationModal } from "./EditOrganizationModal";
 import { OrganizationCard } from "./OrganizationCard";
 
 export function OrganizationList() {
@@ -13,15 +12,23 @@ export function OrganizationList() {
     loading: activeOrgLoading,
     setActiveOrganization,
   } = useActiveOrganization();
-  const {
-    organizations,
-    loading: orgLoading,
-    error,
-    deleteOrganization,
-  } = useOrganizations();
+  const { userMemberships, isLoaded } = useOrganizationList({
+    userMemberships: {
+      infinite: true,
+    },
+  });
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingOrg, setEditingOrg] = useState<any>(null);
+
+  // Extract organizations from Clerk membership list
+  const organizations =
+    userMemberships?.data?.map((membership) => ({
+      id: membership.organization.id,
+      slug: membership.organization.slug || "",
+      name: membership.organization.name,
+      logo: membership.organization.imageUrl,
+      metadata: {},
+    })) || [];
 
   const handleSetActive = async (orgId: string, orgSlug: string) => {
     try {
@@ -31,23 +38,7 @@ export function OrganizationList() {
     }
   };
 
-  const handleDelete = async (orgId: string, orgName: string) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete "${orgName}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
-
-    try {
-      await deleteOrganization(orgId);
-    } catch (err) {
-      console.error("Failed to delete organization:", err);
-    }
-  };
-
-  if ((activeOrgLoading || orgLoading) && organizations.length === 0) {
+  if ((activeOrgLoading || !isLoaded) && organizations.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -69,12 +60,6 @@ export function OrganizationList() {
           Create Organization
         </button>
       </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {error}
-        </div>
-      )}
 
       {organizations.length === 0 ? (
         <div className="text-center py-12">
@@ -100,8 +85,6 @@ export function OrganizationList() {
               organization={org}
               isActive={activeOrganization?.id === org.id}
               onSetActive={() => handleSetActive(org.id, org.slug)}
-              onEdit={() => setEditingOrg(org)}
-              onDelete={() => handleDelete(org.id, org.name)}
             />
           ))}
         </div>
@@ -111,13 +94,6 @@ export function OrganizationList() {
         opened={showCreateModal}
         onClose={() => setShowCreateModal(false)}
       />
-
-      {editingOrg && (
-        <EditOrganizationModal
-          organization={editingOrg}
-          onClose={() => setEditingOrg(null)}
-        />
-      )}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Providers } from "@/client/providers";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "metacx",
   description: "metacx web application",

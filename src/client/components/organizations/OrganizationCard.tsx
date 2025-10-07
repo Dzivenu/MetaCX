@@ -1,34 +1,49 @@
 "use client";
 
-import { Organization } from '@/client/hooks/useOrganizations';
+interface Organization {
+  id: string;
+  slug: string;
+  name: string;
+  logo?: string;
+  description?: string;
+  metadata?: {
+    description?: string;
+  };
+  members?: any[];
+  invitations?: any[];
+}
 
 interface OrganizationCardProps {
   organization: Organization;
   isActive: boolean;
   onSetActive: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export function OrganizationCard({ 
-  organization, 
-  isActive, 
-  onSetActive, 
-  onEdit, 
-  onDelete 
+export function OrganizationCard({
+  organization,
+  isActive,
+  onSetActive,
+  onEdit,
+  onDelete,
 }: OrganizationCardProps) {
   const memberCount = organization.members?.length || 0;
-  const invitationCount = organization.invitations?.filter(inv => inv.status === 'pending').length || 0;
+  const invitationCount =
+    organization.invitations?.filter((inv) => inv.status === "pending")
+      .length || 0;
 
   return (
-    <div className={`bg-white rounded-lg border-2 p-6 transition-all hover:shadow-lg ${
-      isActive ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-    }`}>
+    <div
+      className={`bg-white rounded-lg border-2 p-6 transition-all hover:shadow-lg ${
+        isActive ? "border-blue-500 bg-blue-50" : "border-gray-200"
+      }`}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           {organization.logo ? (
-            <img 
-              src={organization.logo} 
+            <img
+              src={organization.logo}
               alt={organization.name}
               className="w-12 h-12 rounded-lg object-cover"
             />
@@ -44,7 +59,7 @@ export function OrganizationCard({
             <p className="text-sm text-gray-500">@{organization.slug}</p>
           </div>
         </div>
-        
+
         {isActive && (
           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
             Active
@@ -59,9 +74,14 @@ export function OrganizationCard({
       )}
 
       <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-        <span>{memberCount} member{memberCount !== 1 ? 's' : ''}</span>
+        <span>
+          {memberCount} member{memberCount !== 1 ? "s" : ""}
+        </span>
         {invitationCount > 0 && (
-          <span>{invitationCount} pending invitation{invitationCount !== 1 ? 's' : ''}</span>
+          <span>
+            {invitationCount} pending invitation
+            {invitationCount !== 1 ? "s" : ""}
+          </span>
         )}
       </div>
 
@@ -74,26 +94,50 @@ export function OrganizationCard({
             Set Active
           </button>
         )}
-        
-        <button
-          onClick={onEdit}
-          className="px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
-          title="Edit organization"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-        </button>
-        
-        <button
-          onClick={onDelete}
-          className="px-3 py-2 text-red-600 hover:text-red-900 transition-colors"
-          title="Delete organization"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
+
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className="px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+            title="Edit organization"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </button>
+        )}
+
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="px-3 py-2 text-red-600 hover:text-red-900 transition-colors"
+            title="Delete organization"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );
