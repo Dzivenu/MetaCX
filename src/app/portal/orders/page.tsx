@@ -336,7 +336,20 @@ export default function OrdersPage() {
                 title: "Customer",
                 sortable: true,
                 render: (order: any) => {
-                  return order.customerName ? (
+                  return order.customerName && order.orgCustomerId ? (
+                    <Group
+                      gap="xs"
+                      style={{ cursor: "pointer" }}
+                      onClick={() =>
+                        router.push(`/portal/customers/${order.orgCustomerId}`)
+                      }
+                    >
+                      <IconUser size={16} style={{ opacity: 0.6 }} />
+                      <Text fw={500} c="blue" td="underline">
+                        {order.customerName}
+                      </Text>
+                    </Group>
+                  ) : order.customerName ? (
                     <Group gap="xs">
                       <IconUser size={16} style={{ opacity: 0.6 }} />
                       <Text fw={500}>{order.customerName}</Text>

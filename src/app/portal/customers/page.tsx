@@ -91,54 +91,54 @@ export default function PortalCustomersPage() {
           </Group>
         </div>
 
-        {/* Stats Cards */}
-        <Grid>
-          <Grid.Col span={{ base: 12, sm: 4 }}>
-            <Card withBorder>
-              <Group justify="space-between">
-                <div>
-                  <Text size="xs" tt="uppercase" fw={700} c="dimmed">
-                    Total Customers
+        {/* Stats Cards - Compact Inline */}
+        <Group gap="md" grow>
+          <Card withBorder p="md">
+            <Group gap="sm" wrap="nowrap">
+              <IconUser size={24} color="var(--mantine-color-blue-6)" />
+              <div style={{ flex: 1 }}>
+                <Group gap="xs" align="baseline" wrap="nowrap">
+                  <Text size="sm" fw={600} c="dimmed">
+                    Total Customers:
                   </Text>
                   <Text fw={700} size="xl">
                     {customerStats.total}
                   </Text>
-                </div>
-                <IconUser size={24} color="var(--mantine-color-blue-6)" />
-              </Group>
-            </Card>
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 4 }}>
-            <Card withBorder>
-              <Group justify="space-between">
-                <div>
-                  <Text size="xs" tt="uppercase" fw={700} c="dimmed">
-                    Active Customers
+                </Group>
+              </div>
+            </Group>
+          </Card>
+          <Card withBorder p="md">
+            <Group gap="sm" wrap="nowrap">
+              <IconUser size={24} color="var(--mantine-color-green-6)" />
+              <div style={{ flex: 1 }}>
+                <Group gap="xs" align="baseline" wrap="nowrap">
+                  <Text size="sm" fw={600} c="dimmed">
+                    Active Customers:
                   </Text>
                   <Text fw={700} size="xl" c="green">
                     {customerStats.active}
                   </Text>
-                </div>
-                <IconUser size={24} color="var(--mantine-color-green-6)" />
-              </Group>
-            </Card>
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 4 }}>
-            <Card withBorder>
-              <Group justify="space-between">
-                <div>
-                  <Text size="xs" tt="uppercase" fw={700} c="dimmed">
-                    Blacklisted
+                </Group>
+              </div>
+            </Group>
+          </Card>
+          <Card withBorder p="md">
+            <Group gap="sm" wrap="nowrap">
+              <IconUser size={24} color="var(--mantine-color-red-6)" />
+              <div style={{ flex: 1 }}>
+                <Group gap="xs" align="baseline" wrap="nowrap">
+                  <Text size="sm" fw={600} c="dimmed">
+                    Blacklisted:
                   </Text>
                   <Text fw={700} size="xl" c="red">
                     {customerStats.blacklisted}
                   </Text>
-                </div>
-                <IconUser size={24} color="var(--mantine-color-red-6)" />
-              </Group>
-            </Card>
-          </Grid.Col>
-        </Grid>
+                </Group>
+              </div>
+            </Group>
+          </Card>
+        </Group>
 
         {/* Filters/Search removed (handled inside CustomerSearchTable) */}
 
