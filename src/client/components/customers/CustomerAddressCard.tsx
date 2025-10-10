@@ -19,6 +19,13 @@ import {
   IconEdit,
   IconPlus,
   IconDotsVertical,
+  IconRoad,
+  IconBuilding,
+  IconMap,
+  IconMailbox,
+  IconWorld,
+  IconStar,
+  IconCheck,
 } from "@tabler/icons-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -100,16 +107,26 @@ export function CustomerAddressCard({
         <Group justify="space-between" align="center" mb="md">
           {showTitle && <Title order={4}>Address Information</Title>}
           {!showTitle && <Title order={5}>Address</Title>}
-          <Button
-            variant="light"
-            size="xs"
-            leftSection={
-              hasAddresses ? <IconEdit size={14} /> : <IconPlus size={14} />
-            }
-            onClick={handleAddNew}
-          >
-            {hasAddresses ? "Add" : "Add"}
-          </Button>
+          <Group gap="xs">
+            {hasAddresses && (
+              <Button
+                variant="light"
+                size="xs"
+                leftSection={<IconEdit size={14} />}
+                onClick={() => handleEdit(addresses[0])}
+              >
+                Edit
+              </Button>
+            )}
+            <Button
+              variant="light"
+              size="xs"
+              leftSection={<IconPlus size={14} />}
+              onClick={handleAddNew}
+            >
+              Add
+            </Button>
+          </Group>
         </Group>
 
         {isLoading && (
@@ -171,6 +188,16 @@ export function CustomerAddressCard({
                 </Group>
 
                 <Stack gap="xs" pl="xs">
+                  {/* Address Type */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Type
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {address.addressType || "—"}
+                    </Text>
+                  </Group>
+
                   {/* Street Address */}
                   <Group
                     justify="space-between"
@@ -204,10 +231,10 @@ export function CustomerAddressCard({
                     </Text>
                   </Group>
 
-                  {/* State */}
+                  {/* State/Province */}
                   <Group justify="space-between" wrap="nowrap">
                     <Text size="xs" c="dimmed">
-                      State
+                      State/Province
                     </Text>
                     <Text size="sm" ta="right">
                       {address.stateName || address.stateCode}
@@ -232,6 +259,48 @@ export function CustomerAddressCard({
                     <Text size="sm" ta="right">
                       {address.countryName || address.countryCode || "—"}
                     </Text>
+                  </Group>
+
+                  {/* Primary Status */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Primary
+                    </Text>
+                    <Badge
+                      color={address.primary ? "blue" : "gray"}
+                      size="sm"
+                      variant="light"
+                    >
+                      {address.primary ? "Yes" : "No"}
+                    </Badge>
+                  </Group>
+
+                  {/* Verified Status */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Verified
+                    </Text>
+                    <Badge
+                      color={address.verified ? "green" : "gray"}
+                      size="sm"
+                      variant="light"
+                    >
+                      {address.verified ? "Yes" : "No"}
+                    </Badge>
+                  </Group>
+
+                  {/* Active Status */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Active
+                    </Text>
+                    <Badge
+                      color={address.active ? "green" : "red"}
+                      size="sm"
+                      variant="light"
+                    >
+                      {address.active ? "Yes" : "No"}
+                    </Badge>
                   </Group>
 
                   {/* Notes */}

@@ -22,8 +22,10 @@ export interface OrgAddress {
   countryCode?: string;
   countryName: string;
   primary?: boolean;
+  verified?: boolean;
   active?: boolean;
   addressFull?: string;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,7 +43,9 @@ export interface CreateOrgAddressData {
   countryCode?: string;
   countryName: string;
   primary?: boolean;
+  verified?: boolean;
   addressFull?: string;
+  notes?: string;
 }
 
 interface UseOrgAddressesResult {
@@ -116,8 +120,10 @@ export function useOrgAddresses(
       countryCode: address.countryCode,
       countryName: address.countryName || "",
       primary: address.primary || false,
+      verified: address.verified || false,
       active: address.active !== false,
       addressFull: address.addressFull,
+      notes: address.notes,
       createdAt: new Date(address.createdAt).toISOString(),
       updatedAt: new Date(address.updatedAt).toISOString(),
     }));
@@ -181,7 +187,9 @@ export function useOrgAddresses(
           countryCode: data.countryCode || "",
           countryName: data.countryName || "", // Use provided country name
           primary: data.primary,
+          verified: data.verified,
           addressFull: data.addressFull,
+          notes: data.notes,
         });
 
         return {
@@ -199,8 +207,10 @@ export function useOrgAddresses(
           countryCode: data.countryCode,
           countryName: data.countryName,
           primary: data.primary || false,
+          verified: data.verified || false,
           active: true,
           addressFull: data.addressFull,
+          notes: data.notes,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -248,9 +258,11 @@ export function useOrgAddresses(
             countryName: data.countryName,
           }),
           ...(data.primary !== undefined && { primary: data.primary }),
+          ...(data.verified !== undefined && { verified: data.verified }),
           ...(data.addressFull !== undefined && {
             addressFull: data.addressFull,
           }),
+          ...(data.notes !== undefined && { notes: data.notes }),
           ...(data.active !== undefined && { active: data.active }),
         });
 
@@ -277,10 +289,12 @@ export function useOrgAddresses(
               countryName: data.countryName,
             }),
             ...(data.primary !== undefined && { primary: data.primary }),
+            ...(data.verified !== undefined && { verified: data.verified }),
             ...(data.active !== undefined && { active: data.active }),
             ...(data.addressFull !== undefined && {
               addressFull: data.addressFull,
             }),
+            ...(data.notes !== undefined && { notes: data.notes }),
             updatedAt: new Date().toISOString(),
           };
           return updatedAddress as OrgAddress;

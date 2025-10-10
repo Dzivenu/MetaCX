@@ -188,6 +188,16 @@ export function CustomerIdentificationCard({
                 </Group>
 
                 <Stack gap="xs" pl="xs">
+                  {/* Document Type */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Type
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {formatIdType(id.typeOf)}
+                    </Text>
+                  </Group>
+
                   {/* Document Number */}
                   <Group justify="space-between" wrap="nowrap">
                     <Text size="xs" c="dimmed">
@@ -209,45 +219,91 @@ export function CustomerIdentificationCard({
                   </Group>
 
                   {/* Issuing State/Province */}
-                  {(id.issuingStateName || id.issuingStateCode) && (
-                    <Group justify="space-between" wrap="nowrap">
-                      <Text size="xs" c="dimmed">
-                        State/Province
-                      </Text>
-                      <Text size="sm" ta="right">
-                        {id.issuingStateName || id.issuingStateCode}
-                      </Text>
-                    </Group>
-                  )}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      State/Province
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {id.issuingStateName || id.issuingStateCode || "—"}
+                    </Text>
+                  </Group>
 
                   {/* Issue Date */}
-                  {id.issueDate && (
-                    <Group justify="space-between" wrap="nowrap">
-                      <Text size="xs" c="dimmed">
-                        Issued
-                      </Text>
-                      <Text size="sm" ta="right">
-                        {formatDate(id.issueDate)}
-                      </Text>
-                    </Group>
-                  )}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Issued
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {id.issueDate ? formatDate(id.issueDate) : "—"}
+                    </Text>
+                  </Group>
 
                   {/* Expiry Date */}
-                  {id.expiryDate && (
-                    <Group justify="space-between" wrap="nowrap">
-                      <Text size="xs" c="dimmed">
-                        Expires
-                      </Text>
-                      <Text
-                        size="sm"
-                        ta="right"
-                        c={id.expiryDate < Date.now() ? "red" : undefined}
-                      >
-                        {formatDate(id.expiryDate)}
-                        {id.expiryDate < Date.now() && " (Expired)"}
-                      </Text>
-                    </Group>
-                  )}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Expires
+                    </Text>
+                    <Text
+                      size="sm"
+                      ta="right"
+                      c={
+                        id.expiryDate && id.expiryDate < Date.now()
+                          ? "red"
+                          : undefined
+                      }
+                    >
+                      {id.expiryDate ? (
+                        <>
+                          {formatDate(id.expiryDate)}
+                          {id.expiryDate < Date.now() && " (Expired)"}
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </Text>
+                  </Group>
+
+                  {/* Primary Status */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Primary
+                    </Text>
+                    <Badge
+                      color={id.primary ? "blue" : "gray"}
+                      size="sm"
+                      variant="light"
+                    >
+                      {id.primary ? "Yes" : "No"}
+                    </Badge>
+                  </Group>
+
+                  {/* Verified Status */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Verified
+                    </Text>
+                    <Badge
+                      color={id.verified ? "green" : "gray"}
+                      size="sm"
+                      variant="light"
+                    >
+                      {id.verified ? "Yes" : "No"}
+                    </Badge>
+                  </Group>
+
+                  {/* Active Status */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Active
+                    </Text>
+                    <Badge
+                      color={id.active ? "green" : "red"}
+                      size="sm"
+                      variant="light"
+                    >
+                      {id.active ? "Yes" : "No"}
+                    </Badge>
+                  </Group>
 
                   {/* Description/Notes */}
                   {id.description && (

@@ -75,6 +75,7 @@ export function CustomerAddressModal({
       postalCode: addressToEdit?.postalCode || "",
       countryCode: addressToEdit?.countryCode || "US",
       primary: addressToEdit?.primary || false,
+      verified: addressToEdit?.verified || false,
       active: addressToEdit?.active !== false,
       notes: addressToEdit?.notes || "",
     },
@@ -121,6 +122,7 @@ export function CustomerAddressModal({
         postalCode: addressToEdit?.postalCode || "",
         countryCode: countryCode,
         primary: addressToEdit?.primary || false,
+        verified: addressToEdit?.verified || false,
         active: addressToEdit?.active !== false,
         notes: addressToEdit?.notes || "",
       });
@@ -186,7 +188,9 @@ export function CustomerAddressModal({
           countryCode: values.countryCode,
           countryName: countryName,
           primary: values.primary,
+          verified: values.verified,
           active: values.active,
+          notes: values.notes || undefined,
         });
       } else {
         await createOrgAddress({
@@ -202,6 +206,8 @@ export function CustomerAddressModal({
           countryCode: values.countryCode,
           countryName: countryName,
           primary: values.primary,
+          verified: values.verified,
+          notes: values.notes || undefined,
         });
       }
       handleClose();
@@ -319,15 +325,22 @@ export function CustomerAddressModal({
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 6 }}>
+          <Grid.Col span={{ base: 12, md: 4 }}>
             <Checkbox
               label="Primary Address"
               {...form.getInputProps("primary", { type: "checkbox" })}
             />
           </Grid.Col>
 
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Checkbox
+              label="Verified"
+              {...form.getInputProps("verified", { type: "checkbox" })}
+            />
+          </Grid.Col>
+
           {isEditing && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={{ base: 12, md: 4 }}>
               <Checkbox
                 label="Active"
                 {...form.getInputProps("active", { type: "checkbox" })}
