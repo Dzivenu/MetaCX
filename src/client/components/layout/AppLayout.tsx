@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { AppShell } from "@mantine/core";
 import {
   useUser,
@@ -17,6 +18,7 @@ interface AppLayoutProps {
 }
 
 function AppLayoutContent({ children }: AppLayoutProps) {
+  const [collapsed, setCollapsed] = useState(false);
   const { logout } = useAuth(); // Keep for backward compatibility
   const { isSignedIn, isLoaded } = useClerkAuth();
   const { user, isLoaded: userLoaded } = useUser();
@@ -38,13 +40,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const shouldShowSidebar = isAuthenticated;
   const isSidebarDisabled = !organization && !activeOrganization;
 
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={
         shouldShowSidebar
           ? {
-              width: 300,
+              width: collapsed ? 80 : 300,
               breakpoint: "sm",
             }
           : undefined
@@ -57,7 +63,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {shouldShowSidebar && (
         <AppShell.Navbar p={0}>
-          <NavbarSegmented disabled={isSidebarDisabled} />
+          <NavbarSegmented
+            disabled={isSidebarDisabled}
+            collapsed={collapsed}
+            onToggleCollapse={toggleCollapsed}
+          />
         </AppShell.Navbar>
       )}
 
