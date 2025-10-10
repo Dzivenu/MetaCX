@@ -20,7 +20,25 @@ export const listByBreakable = query({
       )
       .order("asc")
       .collect();
-    return rows;
+
+    // Enrich with denomination data
+    const enrichedRows = await Promise.all(
+      rows.map(async (row) => {
+        let denominatedValue = 0;
+        if (row.orgDenominationId) {
+          const denomination = await ctx.db.get(row.orgDenominationId);
+          if (denomination) {
+            denominatedValue = Number(denomination.value || 0);
+          }
+        }
+        return {
+          ...row,
+          denominatedValue,
+        };
+      })
+    );
+
+    return enrichedRows;
   },
 });
 
@@ -86,7 +104,10 @@ export const setForBreakable = mutation({
 
     const now = Date.now();
 
-    // Remove existing breakdowns for this breakable
+    // Determine the direction(s) being updated
+    const directions = new Set(args.breakdowns.map((b) => b.direction));
+
+    // Remove existing breakdowns for this breakable AND specific direction(s)
     const existing = await ctx.db
       .query("org_breakdowns")
       .withIndex("by_breakable", (q) =>
@@ -95,8 +116,12 @@ export const setForBreakable = mutation({
           .eq("breakableId", args.breakableId)
       )
       .collect();
+
+    // Only delete breakdowns that match the directions being updated
     for (const row of existing) {
-      await ctx.db.delete(row._id);
+      if (row.direction && directions.has(row.direction)) {
+        await ctx.db.delete(row._id);
+      }
     }
 
     // Insert new breakdowns

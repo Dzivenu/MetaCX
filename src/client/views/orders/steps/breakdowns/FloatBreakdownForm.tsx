@@ -82,6 +82,7 @@ interface FloatBreakdownFormProps {
   targetSum: number;
   onBreakdownChange?: (breakdowns: any[], isValid: boolean) => void;
   disabled?: boolean;
+  orderId?: string; // Optional: use this orderId instead of context
 }
 
 export function FloatBreakdownForm({
@@ -90,8 +91,19 @@ export function FloatBreakdownForm({
   targetSum,
   onBreakdownChange,
   disabled = false,
+  orderId: propOrderId,
 }: FloatBreakdownFormProps) {
-  const { quoteState } = useOrderCreation();
+  // Try to get quoteState from context, but allow fallback
+  let contextOrderId: string | undefined;
+  try {
+    const { quoteState } = useOrderCreation();
+    contextOrderId = quoteState.orderId;
+  } catch {
+    // Context not available - that's okay if orderId prop is provided
+    contextOrderId = undefined;
+  }
+
+  const effectiveOrderId = propOrderId || contextOrderId;
   const { activeSession } = useActiveSession();
 
   // State for float stacks and breakdowns
@@ -117,7 +129,7 @@ export function FloatBreakdownForm({
     saveBreakdowns,
     commit: commitBreakdowns,
     clear: clearBreakdowns,
-  } = useOrgBreakdowns("org_orders", quoteState.orderId);
+  } = useOrgBreakdowns("org_orders", effectiveOrderId);
 
   // Available repositories from float data - filter by ticker
   const repositories = useMemo(() => {
@@ -259,10 +271,10 @@ export function FloatBreakdownForm({
 
   // Handle breakdown submission
   const handleSubmitBreakdown = useCallback(async () => {
-    if (!isBreakdownValid || !quoteState.orderId) {
+    if (!isBreakdownValid || !effectiveOrderId) {
       console.log("Cannot submit - invalid breakdown or no order ID:", {
         isBreakdownValid,
-        orderId: quoteState.orderId,
+        orderId: effectiveOrderId,
       });
       return;
     }
@@ -298,7 +310,7 @@ export function FloatBreakdownForm({
     }
   }, [
     isBreakdownValid,
-    quoteState.orderId,
+    effectiveOrderId,
     floatStacks,
     direction,
     saveBreakdowns,
