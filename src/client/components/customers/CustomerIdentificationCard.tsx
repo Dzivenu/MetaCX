@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   Title,
@@ -10,6 +10,7 @@ import {
   Badge,
   Loader,
   Button,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconId,
@@ -21,6 +22,7 @@ import {
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { OrgCustomer } from "@/client/hooks/useOrgCustomersConvex";
+import { CustomerIdentificationModal } from "./CustomerIdentificationModal";
 
 interface CustomerIdentificationCardProps {
   customer: OrgCustomer;
@@ -31,6 +33,10 @@ export function CustomerIdentificationCard({
   customer,
   showTitle = true,
 }: CustomerIdentificationCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedIdentification, setSelectedIdentification] =
+    useState<any>(null);
+
   // Fetch identifications for this customer
   const identifications = useQuery(
     api.functions.orgIdentifications.listByCustomer,
@@ -42,6 +48,21 @@ export function CustomerIdentificationCard({
 
   const isLoading = identifications === undefined;
   const hasIdentifications = identifications && identifications.length > 0;
+
+  const handleAddNew = () => {
+    setSelectedIdentification(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (identification: any) => {
+    setSelectedIdentification(identification);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedIdentification(null);
+  };
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return null;
@@ -85,134 +106,150 @@ export function CustomerIdentificationCard({
   };
 
   return (
-    <Card withBorder>
-      {/* Header with title and add/edit button */}
-      <Group justify="space-between" align="center" mb="md">
-        {showTitle && <Title order={4}>Identification Documents</Title>}
-        {!showTitle && <Title order={5}>Identification</Title>}
-        <Button
-          variant="light"
-          size="xs"
-          leftSection={
-            hasIdentifications ? <IconEdit size={14} /> : <IconPlus size={14} />
-          }
-          onClick={() => {
-            // TODO: Implement identification editing/creation
-            const action = hasIdentifications ? "Edit" : "Add";
-            console.log(`${action} identifications for customer:`, customer.id);
-          }}
-        >
-          {hasIdentifications ? "Edit" : "Add"}
-        </Button>
-      </Group>
-
-      {isLoading && (
-        <Group gap="sm">
-          <Loader size="sm" />
-          <Text size="sm" c="dimmed">
-            Loading identification documents...
-          </Text>
+    <>
+      <Card withBorder>
+        {/* Header with title and add/edit button */}
+        <Group justify="space-between" align="center" mb="md">
+          {showTitle && <Title order={4}>Identification Documents</Title>}
+          {!showTitle && <Title order={5}>Identification</Title>}
+          <Button
+            variant="light"
+            size="xs"
+            leftSection={
+              hasIdentifications ? (
+                <IconEdit size={14} />
+              ) : (
+                <IconPlus size={14} />
+              )
+            }
+            onClick={handleAddNew}
+          >
+            {hasIdentifications ? "Add" : "Add"}
+          </Button>
         </Group>
-      )}
 
-      {!isLoading && !hasIdentifications && (
-        <Group gap="sm">
-          <IconId size={20} color="var(--mantine-color-gray-6)" />
-          <Text size="sm" c="dimmed">
-            No identification documents available
-          </Text>
-        </Group>
-      )}
+        {isLoading && (
+          <Group gap="sm">
+            <Loader size="sm" />
+            <Text size="sm" c="dimmed">
+              Loading identification documents...
+            </Text>
+          </Group>
+        )}
 
-      {!isLoading && hasIdentifications && (
-        <Stack gap="md">
-          {identifications.map((id: any) => (
-            <div key={id._id}>
-              <Group gap="sm" align="flex-start">
-                {getIdTypeIcon(id.typeOf)}
-                <div style={{ flex: 1 }}>
-                  <Group gap="xs" mb="xs">
-                    <Badge
-                      color={getIdTypeColor(id.typeOf)}
-                      size="xs"
-                      variant="light"
-                    >
-                      {formatIdType(id.typeOf)}
-                    </Badge>
-                    {!id.active && (
-                      <Badge color="red" size="xs" variant="outline">
-                        Inactive
+        {!isLoading && !hasIdentifications && (
+          <Group gap="sm">
+            <IconId size={20} color="var(--mantine-color-gray-6)" />
+            <Text size="sm" c="dimmed">
+              No identification documents available
+            </Text>
+          </Group>
+        )}
+
+        {!isLoading && hasIdentifications && (
+          <Stack gap="md">
+            {identifications.map((id: any) => (
+              <div key={id._id}>
+                <Group gap="sm" align="flex-start">
+                  {getIdTypeIcon(id.typeOf)}
+                  <div style={{ flex: 1 }}>
+                    <Group gap="xs" mb="xs">
+                      <Badge
+                        color={getIdTypeColor(id.typeOf)}
+                        size="xs"
+                        variant="light"
+                      >
+                        {formatIdType(id.typeOf)}
                       </Badge>
-                    )}
-                    {id.verified && (
-                      <Badge color="green" size="xs" variant="outline">
-                        Verified
-                      </Badge>
-                    )}
-                  </Group>
-
-                  <Stack gap="xs">
-                    {id.documentNumber && (
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Document Number
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          {id.documentNumber}
-                        </Text>
-                      </div>
-                    )}
-
-                    {(id.issuingCountryName || id.issuingCountryCode) && (
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Issuing Country
-                        </Text>
-                        <Text size="sm">
-                          {id.issuingCountryName || id.issuingCountryCode}
-                        </Text>
-                      </div>
-                    )}
-
-                    <Group gap="md">
-                      {id.issueDate && (
-                        <div>
-                          <Text size="xs" c="dimmed">
-                            Issued
-                          </Text>
-                          <Text size="sm">{formatDate(id.issueDate)}</Text>
-                        </div>
+                      {!id.active && (
+                        <Badge color="red" size="xs" variant="outline">
+                          Inactive
+                        </Badge>
                       )}
-                      {id.expiryDate && (
-                        <div>
-                          <Text size="xs" c="dimmed">
-                            Expires
-                          </Text>
-                          <Text
-                            size="sm"
-                            c={id.expiryDate < Date.now() ? "red" : undefined}
-                          >
-                            {formatDate(id.expiryDate)}
-                          </Text>
-                        </div>
+                      {id.verified && (
+                        <Badge color="green" size="xs" variant="outline">
+                          Verified
+                        </Badge>
                       )}
                     </Group>
 
-                    {id.notes && (
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Notes
-                        </Text>
-                        <Text size="sm">{id.notes}</Text>
-                      </div>
-                    )}
-                  </Stack>
-                </div>
-              </Group>
-            </div>
-          ))}
-        </Stack>
-      )}
-    </Card>
+                    <Stack gap="xs">
+                      {id.referenceNumber && (
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Document Number
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            {id.referenceNumber}
+                          </Text>
+                        </div>
+                      )}
+
+                      {(id.issuingCountryName || id.issuingCountryCode) && (
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Issuing Country
+                          </Text>
+                          <Text size="sm">
+                            {id.issuingCountryName || id.issuingCountryCode}
+                          </Text>
+                        </div>
+                      )}
+
+                      <Group gap="md">
+                        {id.issueDate && (
+                          <div>
+                            <Text size="xs" c="dimmed">
+                              Issued
+                            </Text>
+                            <Text size="sm">{formatDate(id.issueDate)}</Text>
+                          </div>
+                        )}
+                        {id.expiryDate && (
+                          <div>
+                            <Text size="xs" c="dimmed">
+                              Expires
+                            </Text>
+                            <Text
+                              size="sm"
+                              c={id.expiryDate < Date.now() ? "red" : undefined}
+                            >
+                              {formatDate(id.expiryDate)}
+                            </Text>
+                          </div>
+                        )}
+                      </Group>
+
+                      {id.description && (
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Notes
+                          </Text>
+                          <Text size="sm">{id.description}</Text>
+                        </div>
+                      )}
+                    </Stack>
+                  </div>
+                  <ActionIcon
+                    variant="subtle"
+                    size="sm"
+                    onClick={() => handleEdit(id)}
+                  >
+                    <IconEdit size={14} />
+                  </ActionIcon>
+                </Group>
+              </div>
+            ))}
+          </Stack>
+        )}
+      </Card>
+
+      <CustomerIdentificationModal
+        customer={customer}
+        opened={isModalOpen}
+        onClose={handleCloseModal}
+        identificationToEdit={selectedIdentification}
+      />
+    </>
   );
 }

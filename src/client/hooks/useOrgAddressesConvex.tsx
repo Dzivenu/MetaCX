@@ -12,6 +12,7 @@ export interface OrgAddress {
   clerkOrganizationId: string;
   parentType: string;
   parentId: string;
+  addressType?: string;
   line1: string;
   line2?: string;
   city: string;
@@ -30,6 +31,7 @@ export interface OrgAddress {
 export interface CreateOrgAddressData {
   parentType: string;
   parentId: string;
+  addressType?: string;
   line1: string;
   line2?: string;
   city: string;
@@ -104,11 +106,12 @@ export function useOrgAddresses(
       clerkOrganizationId: address.clerkOrganizationId,
       parentType: address.parentType,
       parentId: address.parentId,
+      addressType: address.addressType,
       line1: address.line1,
       line2: address.line2,
       city: address.city,
-      stateCode: address.state || "",
-      stateName: address.state || "",
+      stateCode: address.stateCode || address.state || "",
+      stateName: address.stateName || address.state || "",
       postalCode: address.postalCode,
       countryCode: address.countryCode,
       countryName: address.countryName || "",
@@ -161,6 +164,7 @@ export function useOrgAddresses(
         const result = await createOrgAddressMutation({
           parentType: data.parentType,
           parentId: data.parentId,
+          addressType: data.addressType,
           line1: data.line1,
           line2: data.line2,
           city: data.city,
@@ -168,7 +172,7 @@ export function useOrgAddresses(
           stateName: data.stateName,
           postalCode: data.postalCode,
           countryCode: data.countryCode || "",
-          countryName: "", // TODO: Add country name mapping
+          countryName: data.countryName || "", // Use provided country name
           primary: data.primary,
           addressFull: data.addressFull,
         });
@@ -178,6 +182,7 @@ export function useOrgAddresses(
           clerkOrganizationId: orgId || "",
           parentType: data.parentType,
           parentId: data.parentId,
+          addressType: data.addressType,
           line1: data.line1,
           line2: data.line2,
           city: data.city,
@@ -212,6 +217,10 @@ export function useOrgAddresses(
       try {
         await updateOrgAddressMutation({
           addressId: id as Id<"org_addresses">,
+          ...("addressType" in data &&
+            data.addressType !== undefined && {
+              addressType: data.addressType,
+            }),
           ...(data.line1 !== undefined && { line1: data.line1 }),
           ...(data.line2 !== undefined && { line2: data.line2 }),
           ...(data.city !== undefined && { city: data.city }),
@@ -236,6 +245,9 @@ export function useOrgAddresses(
         if (existingAddress) {
           const updatedAddress = {
             ...existingAddress,
+            ...(data.addressType !== undefined && {
+              addressType: data.addressType,
+            }),
             ...(data.line1 !== undefined && { line1: data.line1 }),
             ...(data.line2 !== undefined && { line2: data.line2 }),
             ...(data.city !== undefined && { city: data.city }),

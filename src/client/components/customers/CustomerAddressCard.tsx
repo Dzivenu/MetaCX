@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   Title,
@@ -10,11 +10,20 @@ import {
   Badge,
   Loader,
   Button,
+  Menu,
+  ActionIcon,
 } from "@mantine/core";
-import { IconMapPin, IconHome, IconEdit, IconPlus } from "@tabler/icons-react";
+import {
+  IconMapPin,
+  IconHome,
+  IconEdit,
+  IconPlus,
+  IconDotsVertical,
+} from "@tabler/icons-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { OrgCustomer } from "@/client/hooks/useOrgCustomersConvex";
+import { CustomerAddressModal } from "./CustomerAddressModal";
 
 interface CustomerAddressCardProps {
   customer: OrgCustomer;
@@ -25,6 +34,9 @@ export function CustomerAddressCard({
   customer,
   showTitle = true,
 }: CustomerAddressCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+
   // Fetch addresses for this customer
   const addresses = useQuery(
     api.functions.orgAddresses.getOrgAddressesByParent,
@@ -37,6 +49,21 @@ export function CustomerAddressCard({
 
   const isLoading = addresses === undefined;
   const hasAddresses = addresses && addresses.length > 0;
+
+  const handleAddNew = () => {
+    setSelectedAddress(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (address: any) => {
+    setSelectedAddress(address);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAddress(null);
+  };
 
   const formatAddress = (address: any) => {
     const parts = [
@@ -67,89 +94,101 @@ export function CustomerAddressCard({
   };
 
   return (
-    <Card withBorder>
-      {/* Header with title and add/edit button */}
-      <Group justify="space-between" align="center" mb="md">
-        {showTitle && <Title order={4}>Address Information</Title>}
-        {!showTitle && <Title order={5}>Address</Title>}
-        <Button
-          variant="light"
-          size="xs"
-          leftSection={
-            hasAddresses ? <IconEdit size={14} /> : <IconPlus size={14} />
-          }
-          onClick={() => {
-            // TODO: Implement address editing/creation
-            const action = hasAddresses ? "Edit" : "Add";
-            console.log(`${action} addresses for customer:`, customer.id);
-          }}
-        >
-          {hasAddresses ? "Edit" : "Add"}
-        </Button>
-      </Group>
-
-      {isLoading && (
-        <Group gap="sm">
-          <Loader size="sm" />
-          <Text size="sm" c="dimmed">
-            Loading addresses...
-          </Text>
+    <>
+      <Card withBorder>
+        {/* Header with title and add/edit button */}
+        <Group justify="space-between" align="center" mb="md">
+          {showTitle && <Title order={4}>Address Information</Title>}
+          {!showTitle && <Title order={5}>Address</Title>}
+          <Button
+            variant="light"
+            size="xs"
+            leftSection={
+              hasAddresses ? <IconEdit size={14} /> : <IconPlus size={14} />
+            }
+            onClick={handleAddNew}
+          >
+            {hasAddresses ? "Add" : "Add"}
+          </Button>
         </Group>
-      )}
 
-      {!isLoading && !hasAddresses && (
-        <Group gap="sm">
-          <IconMapPin size={20} color="var(--mantine-color-gray-6)" />
-          <Text size="sm" c="dimmed">
-            No address information available
-          </Text>
-        </Group>
-      )}
+        {isLoading && (
+          <Group gap="sm">
+            <Loader size="sm" />
+            <Text size="sm" c="dimmed">
+              Loading addresses...
+            </Text>
+          </Group>
+        )}
 
-      {!isLoading && hasAddresses && (
-        <Stack gap="md">
-          {addresses.map((address) => (
-            <div key={address._id}>
-              <Group gap="sm" align="flex-start">
-                <IconHome
-                  size={16}
-                  color="var(--mantine-color-gray-6)"
-                  style={{ marginTop: 2 }}
-                />
-                <div style={{ flex: 1 }}>
-                  <Group gap="xs" mb="xs">
-                    <Badge
-                      color={getAddressTypeColor(address.addressType)}
-                      size="xs"
-                      variant="light"
-                    >
-                      {address.addressType || "Address"}
-                    </Badge>
-                    {address.primary && (
-                      <Badge color="blue" size="xs" variant="outline">
-                        Primary
+        {!isLoading && !hasAddresses && (
+          <Group gap="sm">
+            <IconMapPin size={20} color="var(--mantine-color-gray-6)" />
+            <Text size="sm" c="dimmed">
+              No address information available
+            </Text>
+          </Group>
+        )}
+
+        {!isLoading && hasAddresses && (
+          <Stack gap="md">
+            {addresses.map((address) => (
+              <div key={address._id}>
+                <Group gap="sm" align="flex-start">
+                  <IconHome
+                    size={16}
+                    color="var(--mantine-color-gray-6)"
+                    style={{ marginTop: 2 }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <Group gap="xs" mb="xs">
+                      <Badge
+                        color={getAddressTypeColor(address.addressType)}
+                        size="xs"
+                        variant="light"
+                      >
+                        {address.addressType || "Address"}
                       </Badge>
-                    )}
-                    {!address.active && (
-                      <Badge color="red" size="xs" variant="outline">
-                        Inactive
-                      </Badge>
-                    )}
-                  </Group>
+                      {address.primary && (
+                        <Badge color="blue" size="xs" variant="outline">
+                          Primary
+                        </Badge>
+                      )}
+                      {!address.active && (
+                        <Badge color="red" size="xs" variant="outline">
+                          Inactive
+                        </Badge>
+                      )}
+                    </Group>
 
-                  <Text size="sm">{formatAddress(address)}</Text>
+                    <Text size="sm">{formatAddress(address)}</Text>
 
-                  {address.notes && (
-                    <Text size="xs" c="dimmed" mt="xs">
-                      {address.notes}
-                    </Text>
-                  )}
-                </div>
-              </Group>
-            </div>
-          ))}
-        </Stack>
-      )}
-    </Card>
+                    {address.notes && (
+                      <Text size="xs" c="dimmed" mt="xs">
+                        {address.notes}
+                      </Text>
+                    )}
+                  </div>
+                  <ActionIcon
+                    variant="subtle"
+                    size="sm"
+                    onClick={() => handleEdit(address)}
+                  >
+                    <IconEdit size={14} />
+                  </ActionIcon>
+                </Group>
+              </div>
+            ))}
+          </Stack>
+        )}
+      </Card>
+
+      <CustomerAddressModal
+        customer={customer}
+        opened={isModalOpen}
+        onClose={handleCloseModal}
+        addressToEdit={selectedAddress}
+      />
+    </>
   );
 }
