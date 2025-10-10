@@ -76,7 +76,6 @@ export function CustomerAddressModal({
       countryCode: addressToEdit?.countryCode || "US",
       primary: addressToEdit?.primary || false,
       verified: addressToEdit?.verified || false,
-      active: addressToEdit?.active !== false,
       notes: addressToEdit?.notes || "",
     },
     validate: {
@@ -123,7 +122,6 @@ export function CustomerAddressModal({
         countryCode: countryCode,
         primary: addressToEdit?.primary || false,
         verified: addressToEdit?.verified || false,
-        active: addressToEdit?.active !== false,
         notes: addressToEdit?.notes || "",
       });
     }
@@ -189,7 +187,6 @@ export function CustomerAddressModal({
           countryName: countryName,
           primary: values.primary,
           verified: values.verified,
-          active: values.active,
           notes: values.notes || undefined,
         });
       } else {
@@ -325,28 +322,19 @@ export function CustomerAddressModal({
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <Checkbox
               label="Primary Address"
               {...form.getInputProps("primary", { type: "checkbox" })}
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <Checkbox
               label="Verified"
               {...form.getInputProps("verified", { type: "checkbox" })}
             />
           </Grid.Col>
-
-          {isEditing && (
-            <Grid.Col span={{ base: 12, md: 4 }}>
-              <Checkbox
-                label="Active"
-                {...form.getInputProps("active", { type: "checkbox" })}
-              />
-            </Grid.Col>
-          )}
 
           <Grid.Col span={12}>
             <Group justify="flex-end" mt="md">

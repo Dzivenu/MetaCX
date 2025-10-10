@@ -18,6 +18,12 @@ import {
   IconCreditCard,
   IconEdit,
   IconPlus,
+  IconHash,
+  IconWorld,
+  IconMap,
+  IconCalendar,
+  IconStar,
+  IconCheck,
 } from "@tabler/icons-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -112,20 +118,26 @@ export function CustomerIdentificationCard({
         <Group justify="space-between" align="center" mb="md">
           {showTitle && <Title order={4}>Identification Documents</Title>}
           {!showTitle && <Title order={5}>Identification</Title>}
-          <Button
-            variant="light"
-            size="xs"
-            leftSection={
-              hasIdentifications ? (
-                <IconEdit size={14} />
-              ) : (
-                <IconPlus size={14} />
-              )
-            }
-            onClick={handleAddNew}
-          >
-            {hasIdentifications ? "Add" : "Add"}
-          </Button>
+          <Group gap="xs">
+            {hasIdentifications && (
+              <Button
+                variant="light"
+                size="xs"
+                leftSection={<IconEdit size={14} />}
+                onClick={() => handleEdit(identifications[0])}
+              >
+                Edit
+              </Button>
+            )}
+            <Button
+              variant="light"
+              size="xs"
+              leftSection={<IconPlus size={14} />}
+              onClick={handleAddNew}
+            >
+              Add
+            </Button>
+          </Group>
         </Group>
 
         {isLoading && (
@@ -150,10 +162,16 @@ export function CustomerIdentificationCard({
           <Stack gap="lg">
             {identifications.map((id: any) => (
               <div key={id._id}>
-                <Group gap="sm" align="flex-start" mb="xs">
-                  {getIdTypeIcon(id.typeOf)}
-                  <div style={{ flex: 1 }}>
-                    <Group gap="xs" mb="xs">
+                <Stack gap="xs">
+                  {/* Document Type */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Group gap="xs">
+                      {getIdTypeIcon(id.typeOf)}
+                      <Text size="xs" c="dimmed">
+                        Type
+                      </Text>
+                    </Group>
+                    <Group gap="xs">
                       <Badge
                         color={getIdTypeColor(id.typeOf)}
                         size="xs"
@@ -177,32 +195,16 @@ export function CustomerIdentificationCard({
                         </Badge>
                       )}
                     </Group>
-                  </div>
-                  <ActionIcon
-                    variant="subtle"
-                    size="sm"
-                    onClick={() => handleEdit(id)}
-                  >
-                    <IconEdit size={14} />
-                  </ActionIcon>
-                </Group>
-
-                <Stack gap="xs" pl="xs">
-                  {/* Document Type */}
-                  <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Type
-                    </Text>
-                    <Text size="sm" ta="right">
-                      {formatIdType(id.typeOf)}
-                    </Text>
                   </Group>
 
                   {/* Document Number */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Document #
-                    </Text>
+                    <Group gap="xs">
+                      <IconHash size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        Document #
+                      </Text>
+                    </Group>
                     <Text size="sm" fw={500} ta="right">
                       {id.referenceNumber || "—"}
                     </Text>
@@ -210,9 +212,15 @@ export function CustomerIdentificationCard({
 
                   {/* Issuing Country */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Country
-                    </Text>
+                    <Group gap="xs">
+                      <IconWorld
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Country
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {id.issuingCountryName || id.issuingCountryCode || "—"}
                     </Text>
@@ -220,9 +228,12 @@ export function CustomerIdentificationCard({
 
                   {/* Issuing State/Province */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      State/Province
-                    </Text>
+                    <Group gap="xs">
+                      <IconMap size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        State/Province
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {id.issuingStateName || id.issuingStateCode || "—"}
                     </Text>
@@ -230,9 +241,15 @@ export function CustomerIdentificationCard({
 
                   {/* Issue Date */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Issued
-                    </Text>
+                    <Group gap="xs">
+                      <IconCalendar
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Issued
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {id.issueDate ? formatDate(id.issueDate) : "—"}
                     </Text>
@@ -240,9 +257,15 @@ export function CustomerIdentificationCard({
 
                   {/* Expiry Date */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Expires
-                    </Text>
+                    <Group gap="xs">
+                      <IconCalendar
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Expires
+                      </Text>
+                    </Group>
                     <Text
                       size="sm"
                       ta="right"
@@ -265,9 +288,12 @@ export function CustomerIdentificationCard({
 
                   {/* Primary Status */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Primary
-                    </Text>
+                    <Group gap="xs">
+                      <IconStar size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        Primary
+                      </Text>
+                    </Group>
                     <Badge
                       color={id.primary ? "blue" : "gray"}
                       size="sm"
@@ -279,29 +305,21 @@ export function CustomerIdentificationCard({
 
                   {/* Verified Status */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Verified
-                    </Text>
+                    <Group gap="xs">
+                      <IconCheck
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Verified
+                      </Text>
+                    </Group>
                     <Badge
                       color={id.verified ? "green" : "gray"}
                       size="sm"
                       variant="light"
                     >
                       {id.verified ? "Yes" : "No"}
-                    </Badge>
-                  </Group>
-
-                  {/* Active Status */}
-                  <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Active
-                    </Text>
-                    <Badge
-                      color={id.active ? "green" : "red"}
-                      size="sm"
-                      variant="light"
-                    >
-                      {id.active ? "Yes" : "No"}
                     </Badge>
                   </Group>
 

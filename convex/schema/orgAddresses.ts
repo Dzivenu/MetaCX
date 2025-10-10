@@ -59,7 +59,7 @@ export const org_addresses = defineTable({
 
   // Status and priority flags
   primary: v.optional(v.boolean()), // Is this the primary address for the parent entity?
-  active: v.optional(v.boolean()), // Is this address currently active? (default true)
+  active: v.optional(v.boolean()), // @deprecated - No longer used in UI, kept for backwards compatibility
   verified: v.optional(v.boolean()), // Has this address been verified/confirmed?
   confidential: v.optional(v.boolean()), // Should this address be treated as confidential?
 

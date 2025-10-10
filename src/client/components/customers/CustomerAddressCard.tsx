@@ -151,14 +151,16 @@ export function CustomerAddressCard({
           <Stack gap="lg">
             {addresses.map((address) => (
               <div key={address._id}>
-                <Group gap="sm" align="flex-start" mb="xs">
-                  <IconHome
-                    size={16}
-                    color="var(--mantine-color-gray-6)"
-                    style={{ marginTop: 2 }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <Group gap="xs" mb="xs">
+                <Stack gap="xs">
+                  {/* Address Type */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Group gap="xs">
+                      <IconHome size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        Type
+                      </Text>
+                    </Group>
+                    <Group gap="xs">
                       <Badge
                         color={getAddressTypeColor(address.addressType)}
                         size="xs"
@@ -177,25 +179,6 @@ export function CustomerAddressCard({
                         </Badge>
                       )}
                     </Group>
-                  </div>
-                  <ActionIcon
-                    variant="subtle"
-                    size="sm"
-                    onClick={() => handleEdit(address)}
-                  >
-                    <IconEdit size={14} />
-                  </ActionIcon>
-                </Group>
-
-                <Stack gap="xs" pl="xs">
-                  {/* Address Type */}
-                  <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Type
-                    </Text>
-                    <Text size="sm" ta="right">
-                      {address.addressType || "—"}
-                    </Text>
                   </Group>
 
                   {/* Street Address */}
@@ -204,13 +187,12 @@ export function CustomerAddressCard({
                     wrap="nowrap"
                     align="flex-start"
                   >
-                    <Text
-                      size="xs"
-                      c="dimmed"
-                      style={{ minWidth: "fit-content" }}
-                    >
-                      Street
-                    </Text>
+                    <Group gap="xs">
+                      <IconRoad size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        Street
+                      </Text>
+                    </Group>
                     <Text
                       size="sm"
                       ta="right"
@@ -223,9 +205,15 @@ export function CustomerAddressCard({
 
                   {/* City */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      City
-                    </Text>
+                    <Group gap="xs">
+                      <IconBuilding
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        City
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {address.city}
                     </Text>
@@ -233,9 +221,12 @@ export function CustomerAddressCard({
 
                   {/* State/Province */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      State/Province
-                    </Text>
+                    <Group gap="xs">
+                      <IconMap size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        State/Province
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {address.stateName || address.stateCode}
                     </Text>
@@ -243,9 +234,15 @@ export function CustomerAddressCard({
 
                   {/* Postal Code */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Postal Code
-                    </Text>
+                    <Group gap="xs">
+                      <IconMailbox
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Postal Code
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {address.postalCode}
                     </Text>
@@ -253,9 +250,15 @@ export function CustomerAddressCard({
 
                   {/* Country */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Country
-                    </Text>
+                    <Group gap="xs">
+                      <IconWorld
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Country
+                      </Text>
+                    </Group>
                     <Text size="sm" ta="right">
                       {address.countryName || address.countryCode || "—"}
                     </Text>
@@ -263,9 +266,12 @@ export function CustomerAddressCard({
 
                   {/* Primary Status */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Primary
-                    </Text>
+                    <Group gap="xs">
+                      <IconStar size={14} color="var(--mantine-color-gray-6)" />
+                      <Text size="xs" c="dimmed">
+                        Primary
+                      </Text>
+                    </Group>
                     <Badge
                       color={address.primary ? "blue" : "gray"}
                       size="sm"
@@ -277,29 +283,21 @@ export function CustomerAddressCard({
 
                   {/* Verified Status */}
                   <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Verified
-                    </Text>
+                    <Group gap="xs">
+                      <IconCheck
+                        size={14}
+                        color="var(--mantine-color-gray-6)"
+                      />
+                      <Text size="xs" c="dimmed">
+                        Verified
+                      </Text>
+                    </Group>
                     <Badge
                       color={address.verified ? "green" : "gray"}
                       size="sm"
                       variant="light"
                     >
                       {address.verified ? "Yes" : "No"}
-                    </Badge>
-                  </Group>
-
-                  {/* Active Status */}
-                  <Group justify="space-between" wrap="nowrap">
-                    <Text size="xs" c="dimmed">
-                      Active
-                    </Text>
-                    <Badge
-                      color={address.active ? "green" : "red"}
-                      size="sm"
-                      variant="light"
-                    >
-                      {address.active ? "Yes" : "No"}
                     </Badge>
                   </Group>
 

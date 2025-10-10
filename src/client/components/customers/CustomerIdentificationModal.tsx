@@ -84,7 +84,6 @@ export function CustomerIdentificationModal({
       description: identificationToEdit?.description || "",
       verified: identificationToEdit?.verified || false,
       primary: identificationToEdit?.primary || false,
-      active: identificationToEdit?.active !== false,
     },
     validate: {
       typeOf: (value) => (!value?.trim() ? "Document type is required" : null),
@@ -129,7 +128,6 @@ export function CustomerIdentificationModal({
         description: identificationToEdit?.description || "",
         verified: identificationToEdit?.verified || false,
         primary: identificationToEdit?.primary || false,
-        active: identificationToEdit?.active !== false,
       });
     }
   }, [identificationToEdit, opened]);
@@ -202,7 +200,6 @@ export function CustomerIdentificationModal({
           description: values.description || undefined,
           verified: values.verified,
           primary: values.primary,
-          active: values.active,
         });
       } else {
         // Create - include orgCustomerId
@@ -330,28 +327,19 @@ export function CustomerIdentificationModal({
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <Checkbox
               label="Verified"
               {...form.getInputProps("verified", { type: "checkbox" })}
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <Checkbox
               label="Primary"
               {...form.getInputProps("primary", { type: "checkbox" })}
             />
           </Grid.Col>
-
-          {isEditing && (
-            <Grid.Col span={{ base: 12, md: 4 }}>
-              <Checkbox
-                label="Active"
-                {...form.getInputProps("active", { type: "checkbox" })}
-              />
-            </Grid.Col>
-          )}
 
           <Grid.Col span={12}>
             <Group justify="flex-end" mt="md">

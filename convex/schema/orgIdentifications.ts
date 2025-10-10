@@ -40,7 +40,7 @@ export const org_identifications = defineTable({
   provinceCode: v.optional(v.string()),
   provinceName: v.optional(v.string()),
   provinceOther: v.optional(v.string()),
-  active: v.optional(v.boolean()), // default true
+  active: v.optional(v.boolean()), // @deprecated - No longer used in UI, kept for backwards compatibility
   orderId: v.optional(v.string()),
 
   // Audit
