@@ -26,7 +26,11 @@ export function PreviewStep() {
       {/* All three blocks inline in one row */}
       <Grid>
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <QuoteBlock orderId={quoteState.orderId} mode="preview" showEditButton={true} />
+          <QuoteBlock
+            orderId={quoteState.orderId}
+            mode="preview"
+            showEditButton={true}
+          />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
           <CustomerBlock orderId={quoteState.orderId} mode="preview" />
