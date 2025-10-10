@@ -147,10 +147,10 @@ export function CustomerIdentificationCard({
         )}
 
         {!isLoading && hasIdentifications && (
-          <Stack gap="md">
+          <Stack gap="lg">
             {identifications.map((id: any) => (
               <div key={id._id}>
-                <Group gap="sm" align="flex-start">
+                <Group gap="sm" align="flex-start" mb="xs">
                   {getIdTypeIcon(id.typeOf)}
                   <div style={{ flex: 1 }}>
                     <Group gap="xs" mb="xs">
@@ -161,9 +161,9 @@ export function CustomerIdentificationCard({
                       >
                         {formatIdType(id.typeOf)}
                       </Badge>
-                      {!id.active && (
-                        <Badge color="red" size="xs" variant="outline">
-                          Inactive
+                      {id.primary && (
+                        <Badge color="blue" size="xs" variant="outline">
+                          Primary
                         </Badge>
                       )}
                       {id.verified && (
@@ -171,64 +171,12 @@ export function CustomerIdentificationCard({
                           Verified
                         </Badge>
                       )}
+                      {!id.active && (
+                        <Badge color="red" size="xs" variant="outline">
+                          Inactive
+                        </Badge>
+                      )}
                     </Group>
-
-                    <Stack gap="xs">
-                      {id.referenceNumber && (
-                        <div>
-                          <Text size="xs" c="dimmed">
-                            Document Number
-                          </Text>
-                          <Text size="sm" fw={500}>
-                            {id.referenceNumber}
-                          </Text>
-                        </div>
-                      )}
-
-                      {(id.issuingCountryName || id.issuingCountryCode) && (
-                        <div>
-                          <Text size="xs" c="dimmed">
-                            Issuing Country
-                          </Text>
-                          <Text size="sm">
-                            {id.issuingCountryName || id.issuingCountryCode}
-                          </Text>
-                        </div>
-                      )}
-
-                      <Group gap="md">
-                        {id.issueDate && (
-                          <div>
-                            <Text size="xs" c="dimmed">
-                              Issued
-                            </Text>
-                            <Text size="sm">{formatDate(id.issueDate)}</Text>
-                          </div>
-                        )}
-                        {id.expiryDate && (
-                          <div>
-                            <Text size="xs" c="dimmed">
-                              Expires
-                            </Text>
-                            <Text
-                              size="sm"
-                              c={id.expiryDate < Date.now() ? "red" : undefined}
-                            >
-                              {formatDate(id.expiryDate)}
-                            </Text>
-                          </div>
-                        )}
-                      </Group>
-
-                      {id.description && (
-                        <div>
-                          <Text size="xs" c="dimmed">
-                            Notes
-                          </Text>
-                          <Text size="sm">{id.description}</Text>
-                        </div>
-                      )}
-                    </Stack>
                   </div>
                   <ActionIcon
                     variant="subtle"
@@ -238,6 +186,89 @@ export function CustomerIdentificationCard({
                     <IconEdit size={14} />
                   </ActionIcon>
                 </Group>
+
+                <Stack gap="xs" pl="xs">
+                  {/* Document Number */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Document #
+                    </Text>
+                    <Text size="sm" fw={500} ta="right">
+                      {id.referenceNumber || "—"}
+                    </Text>
+                  </Group>
+
+                  {/* Issuing Country */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Country
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {id.issuingCountryName || id.issuingCountryCode || "—"}
+                    </Text>
+                  </Group>
+
+                  {/* Issuing State/Province */}
+                  {(id.issuingStateName || id.issuingStateCode) && (
+                    <Group justify="space-between" wrap="nowrap">
+                      <Text size="xs" c="dimmed">
+                        State/Province
+                      </Text>
+                      <Text size="sm" ta="right">
+                        {id.issuingStateName || id.issuingStateCode}
+                      </Text>
+                    </Group>
+                  )}
+
+                  {/* Issue Date */}
+                  {id.issueDate && (
+                    <Group justify="space-between" wrap="nowrap">
+                      <Text size="xs" c="dimmed">
+                        Issued
+                      </Text>
+                      <Text size="sm" ta="right">
+                        {formatDate(id.issueDate)}
+                      </Text>
+                    </Group>
+                  )}
+
+                  {/* Expiry Date */}
+                  {id.expiryDate && (
+                    <Group justify="space-between" wrap="nowrap">
+                      <Text size="xs" c="dimmed">
+                        Expires
+                      </Text>
+                      <Text
+                        size="sm"
+                        ta="right"
+                        c={id.expiryDate < Date.now() ? "red" : undefined}
+                      >
+                        {formatDate(id.expiryDate)}
+                        {id.expiryDate < Date.now() && " (Expired)"}
+                      </Text>
+                    </Group>
+                  )}
+
+                  {/* Description/Notes */}
+                  {id.description && (
+                    <Group
+                      justify="space-between"
+                      wrap="nowrap"
+                      align="flex-start"
+                    >
+                      <Text size="xs" c="dimmed">
+                        Notes
+                      </Text>
+                      <Text
+                        size="sm"
+                        ta="right"
+                        style={{ maxWidth: "60%", wordBreak: "break-word" }}
+                      >
+                        {id.description}
+                      </Text>
+                    </Group>
+                  )}
+                </Stack>
               </div>
             ))}
           </Stack>

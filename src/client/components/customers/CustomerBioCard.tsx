@@ -60,83 +60,124 @@ export function CustomerBioCard({
           </Button>
         </Group>
 
-        <Stack gap="md">
+        <Stack gap="xs">
           {/* Name */}
-          <Group gap="sm">
-            <IconUser size={20} color="var(--mantine-color-gray-6)" />
-            <div>
-              <Text fw={500} size="sm">
-                {fullName}
-              </Text>
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs">
+              <IconUser size={14} color="var(--mantine-color-gray-6)" />
               <Text size="xs" c="dimmed">
-                Customer ID: {customer.id}
+                Name
               </Text>
-            </div>
+            </Group>
+            <Text size="sm" fw={500} ta="right">
+              {fullName}
+            </Text>
           </Group>
 
-          {/* Contact Information */}
-          {(customer.email || customer.telephone) && (
-            <Stack gap="xs">
-              {customer.email && (
-                <Group gap="sm">
-                  <IconMail size={16} color="var(--mantine-color-gray-6)" />
-                  <Text size="sm">{customer.email}</Text>
-                </Group>
-              )}
-              {customer.telephone && (
-                <Group gap="sm">
-                  <IconPhone size={16} color="var(--mantine-color-gray-6)" />
-                  <Text size="sm">{customer.telephone}</Text>
-                </Group>
-              )}
-            </Stack>
-          )}
-
           {/* Date of Birth */}
-          {customer.dob && (
-            <Group gap="sm">
-              <IconCalendar size={16} color="var(--mantine-color-gray-6)" />
-              <div>
-                <Text size="sm">Date of Birth</Text>
-                <Text size="xs" c="dimmed">
-                  {formatDate(customer.dob)}
-                </Text>
-              </div>
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs">
+              <IconCalendar size={14} color="var(--mantine-color-gray-6)" />
+              <Text size="xs" c="dimmed">
+                Date of Birth
+              </Text>
             </Group>
-          )}
+            <Text size="sm" ta="right">
+              {customer.dob ? formatDate(customer.dob) : "—"}
+            </Text>
+          </Group>
 
-          {/* Occupation & Employer */}
-          {(customer.occupation || customer.employer) && (
-            <Group gap="sm">
-              <IconBriefcase size={16} color="var(--mantine-color-gray-6)" />
-              <div>
-                {customer.occupation && (
-                  <Text size="sm">{customer.occupation}</Text>
-                )}
-                {customer.employer && (
-                  <Text size="xs" c="dimmed">
-                    at {customer.employer}
-                  </Text>
-                )}
-              </div>
+          {/* Email */}
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs">
+              <IconMail size={14} color="var(--mantine-color-gray-6)" />
+              <Text size="xs" c="dimmed">
+                Email
+              </Text>
             </Group>
-          )}
+            <Text size="sm" ta="right" style={{ wordBreak: "break-word" }}>
+              {customer.email || "—"}
+            </Text>
+          </Group>
 
-          {/* Status */}
-          <Group gap="sm">
+          {/* Telephone */}
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs">
+              <IconPhone size={14} color="var(--mantine-color-gray-6)" />
+              <Text size="xs" c="dimmed">
+                Telephone
+              </Text>
+            </Group>
+            <Text size="sm" ta="right">
+              {customer.telephone || "—"}
+            </Text>
+          </Group>
+
+          {/* Occupation */}
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs">
+              <IconBriefcase size={14} color="var(--mantine-color-gray-6)" />
+              <Text size="xs" c="dimmed">
+                Occupation
+              </Text>
+            </Group>
+            <Text size="sm" ta="right">
+              {customer.occupation || "—"}
+            </Text>
+          </Group>
+
+          {/* Employer */}
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="xs">
+              <IconBriefcase size={14} color="var(--mantine-color-gray-6)" />
+              <Text size="xs" c="dimmed">
+                Employer
+              </Text>
+            </Group>
+            <Text size="sm" ta="right">
+              {customer.employer || "—"}
+            </Text>
+          </Group>
+
+          {/* Active Status */}
+          <Group justify="space-between" wrap="nowrap">
+            <Text size="xs" c="dimmed">
+              Active
+            </Text>
+            <Badge
+              color={customer.active ? "green" : "gray"}
+              size="sm"
+              variant="light"
+            >
+              {customer.active ? "Yes" : "No"}
+            </Badge>
+          </Group>
+
+          {/* Blacklisted Status */}
+          <Group justify="space-between" wrap="nowrap">
+            <Text size="xs" c="dimmed">
+              Blacklisted
+            </Text>
             <Badge
               color={customer.blacklisted ? "red" : "green"}
               size="sm"
               variant="light"
             >
-              {customer.blacklisted ? "Blacklisted" : "Active"}
+              {customer.blacklisted ? "Yes" : "No"}
             </Badge>
-            {customer.blacklisted && customer.blacklistReason && (
-              <Text size="xs" c="red">
+          </Group>
+
+          {/* Blacklist Reason */}
+          {customer.blacklisted && customer.blacklistReason && (
+            <Group justify="space-between" wrap="nowrap" align="flex-start">
+              <Text size="xs" c="dimmed">
+                Reason
+              </Text>
+              <Text size="xs" c="red" ta="right" style={{ maxWidth: "60%" }}>
                 {customer.blacklistReason}
               </Text>
-            )}
-          </Group>
+            </Group>
+          )}
         </Stack>
       </Card>
 

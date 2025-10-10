@@ -160,8 +160,15 @@ export function useOrgAddresses(
   const createOrgAddress = useCallback(
     async (data: CreateOrgAddressData): Promise<OrgAddress | null> => {
       setError(null);
+      if (!orgId) {
+        const errorMessage = "No active organization selected";
+        setError(errorMessage);
+        console.error("Error creating org address:", errorMessage);
+        return null;
+      }
       try {
         const result = await createOrgAddressMutation({
+          clerkOrganizationId: orgId,
           parentType: data.parentType,
           parentId: data.parentId,
           addressType: data.addressType,
@@ -214,9 +221,16 @@ export function useOrgAddresses(
       data: Partial<OrgAddress>
     ): Promise<OrgAddress | null> => {
       setError(null);
+      if (!orgId) {
+        const errorMessage = "No active organization selected";
+        setError(errorMessage);
+        console.error("Error updating org address:", errorMessage);
+        return null;
+      }
       try {
         await updateOrgAddressMutation({
           addressId: id as Id<"org_addresses">,
+          clerkOrganizationId: orgId,
           ...("addressType" in data &&
             data.addressType !== undefined && {
               addressType: data.addressType,
@@ -280,7 +294,7 @@ export function useOrgAddresses(
         return null;
       }
     },
-    [updateOrgAddressMutation, orgAddresses]
+    [updateOrgAddressMutation, orgAddresses, orgId]
   );
 
   const deleteOrgAddress = useCallback(

@@ -131,10 +131,10 @@ export function CustomerAddressCard({
         )}
 
         {!isLoading && hasAddresses && (
-          <Stack gap="md">
+          <Stack gap="lg">
             {addresses.map((address) => (
               <div key={address._id}>
-                <Group gap="sm" align="flex-start">
+                <Group gap="sm" align="flex-start" mb="xs">
                   <IconHome
                     size={16}
                     color="var(--mantine-color-gray-6)"
@@ -160,14 +160,6 @@ export function CustomerAddressCard({
                         </Badge>
                       )}
                     </Group>
-
-                    <Text size="sm">{formatAddress(address)}</Text>
-
-                    {address.notes && (
-                      <Text size="xs" c="dimmed" mt="xs">
-                        {address.notes}
-                      </Text>
-                    )}
                   </div>
                   <ActionIcon
                     variant="subtle"
@@ -177,6 +169,91 @@ export function CustomerAddressCard({
                     <IconEdit size={14} />
                   </ActionIcon>
                 </Group>
+
+                <Stack gap="xs" pl="xs">
+                  {/* Street Address */}
+                  <Group
+                    justify="space-between"
+                    wrap="nowrap"
+                    align="flex-start"
+                  >
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      style={{ minWidth: "fit-content" }}
+                    >
+                      Street
+                    </Text>
+                    <Text
+                      size="sm"
+                      ta="right"
+                      style={{ wordBreak: "break-word" }}
+                    >
+                      {address.line1}
+                      {address.line2 && `, ${address.line2}`}
+                    </Text>
+                  </Group>
+
+                  {/* City */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      City
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {address.city}
+                    </Text>
+                  </Group>
+
+                  {/* State */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      State
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {address.stateName || address.stateCode}
+                    </Text>
+                  </Group>
+
+                  {/* Postal Code */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Postal Code
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {address.postalCode}
+                    </Text>
+                  </Group>
+
+                  {/* Country */}
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="xs" c="dimmed">
+                      Country
+                    </Text>
+                    <Text size="sm" ta="right">
+                      {address.countryName || address.countryCode || "—"}
+                    </Text>
+                  </Group>
+
+                  {/* Notes */}
+                  {address.notes && (
+                    <Group
+                      justify="space-between"
+                      wrap="nowrap"
+                      align="flex-start"
+                    >
+                      <Text size="xs" c="dimmed">
+                        Notes
+                      </Text>
+                      <Text
+                        size="sm"
+                        ta="right"
+                        style={{ maxWidth: "60%", wordBreak: "break-word" }}
+                      >
+                        {address.notes}
+                      </Text>
+                    </Group>
+                  )}
+                </Stack>
               </div>
             ))}
           </Stack>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Modal,
   Button,
@@ -14,6 +14,7 @@ import {
 import { useForm } from "@mantine/form";
 import { useOrgAddresses } from "@/client/hooks/useOrgAddressesConvex";
 import type { OrgCustomer } from "@/client/hooks/useOrgCustomersConvex";
+import countriesStatesData from "@/client/data/countries-states.json";
 
 interface CustomerAddressModalProps {
   customer: OrgCustomer;
@@ -30,6 +31,38 @@ export function CustomerAddressModal({
 }: CustomerAddressModalProps) {
   const { createOrgAddress, updateOrgAddress } = useOrgAddresses();
   const isEditing = !!addressToEdit;
+  const [selectedCountry, setSelectedCountry] = useState<string>(
+    addressToEdit?.countryCode || "US"
+  );
+  const [isOtherState, setIsOtherState] = useState(false);
+
+  // Get country options
+  const countryOptions = useMemo(
+    () =>
+      countriesStatesData.countries.map((country) => ({
+        value: country.code,
+        label: country.name,
+      })),
+    []
+  );
+
+  // Get state options based on selected country
+  const stateOptions = useMemo(() => {
+    const country = countriesStatesData.countries.find(
+      (c) => c.code === selectedCountry
+    );
+    if (!country) return [];
+
+    const states = country.states.map((state) => ({
+      value: state.code,
+      label: state.name,
+    }));
+
+    // Add "Other" option at the end
+    states.push({ value: "OTHER", label: "Other (Enter Manually)" });
+
+    return states;
+  }, [selectedCountry]);
 
   const form = useForm({
     initialValues: {
@@ -41,7 +74,6 @@ export function CustomerAddressModal({
       stateName: addressToEdit?.stateName || "",
       postalCode: addressToEdit?.postalCode || "",
       countryCode: addressToEdit?.countryCode || "US",
-      countryName: addressToEdit?.countryName || "United States",
       primary: addressToEdit?.primary || false,
       active: addressToEdit?.active !== false,
       notes: addressToEdit?.notes || "",
@@ -49,30 +81,45 @@ export function CustomerAddressModal({
     validate: {
       line1: (value) => (!value?.trim() ? "Address line 1 is required" : null),
       city: (value) => (!value?.trim() ? "City is required" : null),
-      stateCode: (value) => (!value?.trim() ? "State code is required" : null),
-      stateName: (value) => (!value?.trim() ? "State name is required" : null),
       postalCode: (value) =>
         !value?.trim() ? "Postal/ZIP code is required" : null,
-      countryCode: (value) =>
-        !value?.trim() ? "Country code is required" : null,
-      countryName: (value) =>
-        !value?.trim() ? "Country name is required" : null,
+      countryCode: (value) => (!value ? "Country is required" : null),
+      stateCode: (value, values) => {
+        if (isOtherState && !values.stateName?.trim()) {
+          return "State name is required";
+        }
+        if (!isOtherState && !value?.trim()) {
+          return "State is required";
+        }
+        return null;
+      },
     },
   });
 
   // Reset form when addressToEdit changes
   useEffect(() => {
     if (opened) {
+      const countryCode = addressToEdit?.countryCode || "US";
+      setSelectedCountry(countryCode);
+
+      // Check if the state is in the list or if it's "OTHER"
+      const country = countriesStatesData.countries.find(
+        (c) => c.code === countryCode
+      );
+      const stateExists = country?.states.some(
+        (s) => s.code === addressToEdit?.stateCode
+      );
+      setIsOtherState(addressToEdit?.stateCode && !stateExists ? true : false);
+
       form.setValues({
         addressType: addressToEdit?.addressType || "home",
         line1: addressToEdit?.line1 || "",
         line2: addressToEdit?.line2 || "",
         city: addressToEdit?.city || "",
-        stateCode: addressToEdit?.stateCode || "",
+        stateCode: stateExists ? addressToEdit?.stateCode || "" : "OTHER",
         stateName: addressToEdit?.stateName || "",
         postalCode: addressToEdit?.postalCode || "",
-        countryCode: addressToEdit?.countryCode || "US",
-        countryName: addressToEdit?.countryName || "United States",
+        countryCode: countryCode,
         primary: addressToEdit?.primary || false,
         active: addressToEdit?.active !== false,
         notes: addressToEdit?.notes || "",
@@ -80,19 +127,64 @@ export function CustomerAddressModal({
     }
   }, [addressToEdit, opened]);
 
+  // Handle country change
+  const handleCountryChange = (value: string | null) => {
+    if (value) {
+      setSelectedCountry(value);
+      const country = countriesStatesData.countries.find(
+        (c) => c.code === value
+      );
+      form.setFieldValue("countryCode", value);
+      // Reset state when country changes
+      form.setFieldValue("stateCode", "");
+      form.setFieldValue("stateName", "");
+      setIsOtherState(false);
+    }
+  };
+
+  // Handle state change
+  const handleStateChange = (value: string | null) => {
+    if (value === "OTHER") {
+      setIsOtherState(true);
+      form.setFieldValue("stateCode", "OTHER");
+      form.setFieldValue("stateName", "");
+    } else if (value) {
+      setIsOtherState(false);
+      form.setFieldValue("stateCode", value);
+      // Find and set the state name
+      const country = countriesStatesData.countries.find(
+        (c) => c.code === selectedCountry
+      );
+      const state = country?.states.find((s) => s.code === value);
+      if (state) {
+        form.setFieldValue("stateName", state.name);
+      }
+    }
+  };
+
   const handleSubmit = form.onSubmit(async (values) => {
     try {
+      // Get country name from the selected country code
+      const country = countriesStatesData.countries.find(
+        (c) => c.code === values.countryCode
+      );
+      const countryName = country?.name || values.countryCode;
+
+      // Use stateCode and stateName appropriately
+      const finalStateCode = isOtherState ? "OTHER" : values.stateCode;
+      const finalStateName = values.stateName;
+
       if (isEditing) {
         await updateOrgAddress(addressToEdit._id, {
           addressType: values.addressType,
           line1: values.line1,
           line2: values.line2 || undefined,
           city: values.city,
-          stateCode: values.stateCode,
-          stateName: values.stateName,
+          stateCode: finalStateCode,
+          stateName: finalStateName,
           postalCode: values.postalCode,
           countryCode: values.countryCode,
-          countryName: values.countryName,
+          countryName: countryName,
           primary: values.primary,
           active: values.active,
         });
@@ -104,11 +196,11 @@ export function CustomerAddressModal({
           line1: values.line1,
           line2: values.line2 || undefined,
           city: values.city,
-          stateCode: values.stateCode,
-          stateName: values.stateName,
+          stateCode: finalStateCode,
+          stateName: finalStateName,
           postalCode: values.postalCode,
           countryCode: values.countryCode,
-          countryName: values.countryName,
+          countryName: countryName,
           primary: values.primary,
         });
       }
@@ -174,22 +266,41 @@ export function CustomerAddressModal({
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label="State/Province Code"
-              placeholder="CA, NY, ON, etc."
+            <Select
+              label="Country"
+              placeholder="Select country"
               withAsterisk
-              {...form.getInputProps("stateCode")}
+              data={countryOptions}
+              value={form.values.countryCode}
+              onChange={handleCountryChange}
+              searchable
+              error={form.errors.countryCode}
             />
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label="State/Province Name"
-              placeholder="California, New York, Ontario, etc."
+            <Select
+              label="State/Province"
+              placeholder="Select state or province"
               withAsterisk
-              {...form.getInputProps("stateName")}
+              data={stateOptions}
+              value={form.values.stateCode}
+              onChange={handleStateChange}
+              searchable
+              error={form.errors.stateCode}
             />
           </Grid.Col>
+
+          {isOtherState && (
+            <Grid.Col span={12}>
+              <TextInput
+                label="State/Province Name (Other)"
+                placeholder="Enter state or province name"
+                withAsterisk
+                {...form.getInputProps("stateName")}
+              />
+            </Grid.Col>
+          )}
 
           <Grid.Col span={{ base: 12, md: 6 }}>
             <TextInput
@@ -197,24 +308,6 @@ export function CustomerAddressModal({
               placeholder="12345"
               withAsterisk
               {...form.getInputProps("postalCode")}
-            />
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label="Country Code"
-              placeholder="US, CA, GB, etc."
-              withAsterisk
-              {...form.getInputProps("countryCode")}
-            />
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label="Country Name"
-              placeholder="United States, Canada, etc."
-              withAsterisk
-              {...form.getInputProps("countryName")}
             />
           </Grid.Col>
 
