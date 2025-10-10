@@ -22,9 +22,10 @@ export const listOrgOrders = query({
       return []; // No active organization
     }
 
+    let orders;
     // If session ID is provided, filter by both org and session
     if (args.orgSessionId) {
-      const orders = await ctx.db
+      const allOrders = await ctx.db
         .query("org_orders")
         .withIndex("by_org_session", (q) =>
           q.eq("orgSessionId", args.orgSessionId)
@@ -33,17 +34,34 @@ export const listOrgOrders = query({
         .take(args.limit || 100);
 
       // Additional filter by organization to ensure security
-      return orders.filter((order) => order.clerk_org_id === orgId);
+      orders = allOrders.filter((order) => order.clerk_org_id === orgId);
+    } else {
+      // Otherwise, get all orders for the organization
+      orders = await ctx.db
+        .query("org_orders")
+        .withIndex("by_clerk_org_id", (q) => q.eq("clerk_org_id", orgId))
+        .order("desc")
+        .take(args.limit || 100);
     }
 
-    // Otherwise, get all orders for the organization
-    const orders = await ctx.db
-      .query("org_orders")
-      .withIndex("by_clerk_org_id", (q) => q.eq("clerk_org_id", orgId))
-      .order("desc")
-      .take(args.limit || 100);
+    // Enrich orders with customer names
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        let customerName = null;
+        if (order.orgCustomerId) {
+          const customer = await ctx.db.get(order.orgCustomerId);
+          if (customer) {
+            customerName = `${customer.firstName} ${customer.lastName}`.trim();
+          }
+        }
+        return {
+          ...order,
+          customerName,
+        };
+      })
+    );
 
-    return orders;
+    return enrichedOrders;
   },
 });
 

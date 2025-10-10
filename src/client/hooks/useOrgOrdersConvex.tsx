@@ -24,6 +24,8 @@ export interface OrgOrder {
   status?: string;
   orgSessionId?: string;
   userId?: string;
+  orgCustomerId?: string;
+  customerName?: string; // Enriched from Convex query
   inboundOrgRepositoryId?: string;
   outboundOrgRepositoryId?: string;
   createdAt: string;
@@ -143,6 +145,8 @@ export function useOrgOrders(
       status: order.status,
       orgSessionId: order.orgSessionId,
       userId: order.userId,
+      orgCustomerId: order.orgCustomerId,
+      customerName: order.customerName, // From Convex enrichment
       inboundOrgRepositoryId: order.inboundOrgRepositoryId,
       outboundOrgRepositoryId: order.outboundOrgRepositoryId,
       createdAt: new Date(order.createdAt).toISOString(),
