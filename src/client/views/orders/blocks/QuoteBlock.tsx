@@ -142,9 +142,9 @@ export function QuoteBlock({
     finalRate: Number(order?.finalRate) || 0,
   });
 
-  const handleQuoteChange = (data: QuoteFormData) => {
+  const handleQuoteChange = React.useCallback((data: QuoteFormData) => {
     setQuoteData(data);
-  };
+  }, []);
 
   const handleSave = async () => {
     if (!order) return;

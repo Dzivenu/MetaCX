@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Button,
   Text,
@@ -97,21 +103,32 @@ export function QuoteForm({
     [orgCurrencies]
   );
 
-  // Initialize currency calculator
+  // Initialize currency calculator - use a ref to avoid reinitializing on every render
   const [calcCurrencies, setCalcCurrencies] = useState(calculatorCurrencies);
+  const prevTickersRef = useRef<string>("");
+
   useEffect(() => {
-    const prev = (calcCurrencies || []).map((c) => c.ticker).join(",");
     const next = (calculatorCurrencies || []).map((c) => c.ticker).join(",");
-    if (prev !== next) setCalcCurrencies(calculatorCurrencies);
+    if (prevTickersRef.current !== next) {
+      prevTickersRef.current = next;
+      setCalcCurrencies(calculatorCurrencies);
+    }
   }, [calculatorCurrencies]);
 
-  const calculator = useCurrencyCalculator({
-    serviceFee: formData.fee || 2,
-    networkFee: formData.networkFee || 0,
-    useMockData: false,
-    autoLoadFloatBalance: true,
-    currencies: calcCurrencies,
-  });
+  // Use stable initial fee values to prevent calculator reinitialization
+  // The actual fee values are updated via the effect below when formData changes
+  const calculatorOptions = useMemo(
+    () => ({
+      serviceFee: 2, // Stable default
+      networkFee: 0, // Stable default
+      useMockData: false,
+      autoLoadFloatBalance: true,
+      currencies: calcCurrencies,
+    }),
+    [calcCurrencies]
+  );
+
+  const calculator = useCurrencyCalculator(calculatorOptions);
 
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [warningsExpanded, setWarningsExpanded] = useState(true);
@@ -145,8 +162,9 @@ export function QuoteForm({
     ) {
       calculator.updateNetworkFee(formData.networkFee);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    calculator,
+    // Do NOT include calculator in dependencies - it changes on every render
     formData.inboundTicker,
     formData.outboundTicker,
     formData.inboundSum,
@@ -174,8 +192,9 @@ export function QuoteForm({
     ) {
       setFormData((prev) => ({ ...prev, finalRate: calculator.finalRate }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    calculator,
+    // Do NOT include calculator in dependencies - it changes on every render
     calculator?.outboundAmount,
     calculator?.finalRate,
     formData.outboundSum,
@@ -201,13 +220,12 @@ export function QuoteForm({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setLastRefresh(new Date());
-    calculator.refreshRates();
-  };
+    calculator?.refreshRates();
+  }, [calculator]);
 
-  const handleSwap = () => {
-    calculator.swapCurrencies();
+  const handleSwap = useCallback(() => {
     setFormData((prev) => ({
       ...prev,
       inboundTicker: prev.outboundTicker,
@@ -215,10 +233,27 @@ export function QuoteForm({
       inboundSum: prev.outboundSum,
       outboundSum: prev.inboundSum,
     }));
-  };
+  }, []);
 
   // Emit changes to parent consumers when formData changes
+  const prevFormDataRef = React.useRef<QuoteFormData | null>(null);
   useEffect(() => {
+    // Only call onChange if formData actually changed from previous value
+    if (
+      prevFormDataRef.current &&
+      prevFormDataRef.current.inboundTicker === formData.inboundTicker &&
+      prevFormDataRef.current.inboundSum === formData.inboundSum &&
+      prevFormDataRef.current.outboundTicker === formData.outboundTicker &&
+      prevFormDataRef.current.outboundSum === formData.outboundSum &&
+      prevFormDataRef.current.margin === formData.margin &&
+      prevFormDataRef.current.fee === formData.fee &&
+      prevFormDataRef.current.networkFee === formData.networkFee &&
+      prevFormDataRef.current.finalRate === formData.finalRate
+    ) {
+      return; // No change, skip onChange call
+    }
+
+    prevFormDataRef.current = formData;
     onChange?.(formData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
@@ -250,8 +285,8 @@ export function QuoteForm({
               <Grid.Col span={{ base: 12, md: 5 }}>
                 <CurrencySection
                   type="INBOUND"
-                  ticker={calculator.inboundTicker || formData.inboundTicker}
-                  amount={calculator.inboundAmount || formData.inboundSum}
+                  ticker={formData.inboundTicker}
+                  amount={formData.inboundSum}
                   onTickerChange={(ticker) =>
                     updateField("inboundTicker", ticker)
                   }
@@ -265,7 +300,7 @@ export function QuoteForm({
                   outboundTicker={formData.outboundTicker}
                   lastRefresh={lastRefresh}
                   onRefresh={handleRefresh}
-                  loading={calculator.isLoading}
+                  loading={calculator?.isLoading}
                 />
               </Grid.Col>
 
@@ -288,7 +323,7 @@ export function QuoteForm({
                     variant="light"
                     color="blue"
                     onClick={handleSwap}
-                    disabled={calculator.isLoading}
+                    disabled={calculator?.isLoading}
                   >
                     <IconArrowsRightLeft size={24} />
                   </ActionIcon>
@@ -299,7 +334,7 @@ export function QuoteForm({
                     variant="outline"
                     color="orange"
                     onClick={handleRefresh}
-                    loading={calculator.isLoading}
+                    loading={calculator?.isLoading}
                   >
                     <IconRefresh size={16} />
                   </ActionIcon>
@@ -310,8 +345,8 @@ export function QuoteForm({
               <Grid.Col span={{ base: 12, md: 5 }}>
                 <CurrencySection
                   type="OUTBOUND"
-                  ticker={calculator.outboundTicker || formData.outboundTicker}
-                  amount={calculator.outboundAmount || formData.outboundSum}
+                  ticker={formData.outboundTicker}
+                  amount={formData.outboundSum}
                   onTickerChange={(ticker) =>
                     updateField("outboundTicker", ticker)
                   }
@@ -336,13 +371,11 @@ export function QuoteForm({
                       variant="outline"
                       size="xs"
                       onClick={() => {
-                        calculator.resetLocks();
-                        calculator.updateServiceFee(2);
-                        calculator.updateNetworkFee(0);
                         updateField("fee", 2);
                         updateField("networkFee", 0);
+                        updateField("margin", 0);
                       }}
-                      disabled={calculator.isLoading}
+                      disabled={calculator?.isLoading}
                     >
                       Reset
                     </Button>
@@ -368,13 +401,12 @@ export function QuoteForm({
                       </ActionIcon>
                     </Group>
                     <NumberInput
-                      value={calculator.finalRate || formData.finalRate}
+                      value={formData.finalRate}
                       onChange={(value) => {
                         const numValue =
                           typeof value === "string"
                             ? parseFloat(value) || 0
                             : value;
-                        calculator.updateFinalRate(numValue);
                         updateField("finalRate", numValue);
                       }}
                       decimalScale={6}
@@ -383,7 +415,7 @@ export function QuoteForm({
                       placeholder="0.000000"
                       rightSection={
                         <Text size="xs" c="dimmed">
-                          {calculator.inboundTicker}/{calculator.outboundTicker}
+                          {formData.inboundTicker}/{formData.outboundTicker}
                         </Text>
                       }
                       styles={{
@@ -410,13 +442,12 @@ export function QuoteForm({
                       </ActionIcon>
                     </Group>
                     <NumberInput
-                      value={calculator.margin || formData.margin}
+                      value={formData.margin}
                       onChange={(value) => {
                         const numValue =
                           typeof value === "string"
                             ? parseFloat(value) || 0
                             : value;
-                        calculator.updateMargin(numValue);
                         updateField("margin", numValue);
                       }}
                       decimalScale={2}
@@ -453,13 +484,12 @@ export function QuoteForm({
                       </ActionIcon>
                     </Group>
                     <NumberInput
-                      value={calculator.serviceFee || formData.fee}
+                      value={formData.fee}
                       onChange={(value) => {
                         const numValue =
                           typeof value === "string"
                             ? parseFloat(value) || 0
                             : value;
-                        calculator.updateServiceFee(numValue);
                         updateField("fee", numValue);
                       }}
                       decimalScale={2}
@@ -495,13 +525,12 @@ export function QuoteForm({
                       </ActionIcon>
                     </Group>
                     <NumberInput
-                      value={calculator.networkFee || formData.networkFee}
+                      value={formData.networkFee}
                       onChange={(value) => {
                         const numValue =
                           typeof value === "string"
                             ? parseFloat(value) || 0
                             : value;
-                        calculator.updateNetworkFee(numValue);
                         updateField("networkFee", numValue);
                       }}
                       decimalScale={6}

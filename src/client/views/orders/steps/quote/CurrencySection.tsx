@@ -97,36 +97,22 @@ export function CurrencySection({
     [currenciesKey]
   );
 
-  // Handle amount change with real-time calculation
+  // Handle amount change - only call the parent callback
+  // Parent (QuoteForm) will handle calculator updates via its effects
   const handleAmountChange = (value: number | string) => {
     const numValue = typeof value === "string" ? parseFloat(value) || 0 : value;
 
     // Guard against redundant updates
     if (numValue === amount) return;
 
-    if (calculator) {
-      if (type === "INBOUND") {
-        calculator.updateInboundAmount(numValue);
-      } else {
-        calculator.updateOutboundAmount(numValue);
-      }
-    }
-
     onAmountChange(numValue);
   };
 
-  // Handle currency change with recalculation
+  // Handle currency change - only call the parent callback
+  // Parent (QuoteForm) will handle calculator updates via its effects
   const handleCurrencyChange = (newTicker: string) => {
     // Guard against redundant updates
     if (!newTicker || newTicker === ticker) return;
-
-    if (calculator) {
-      if (type === "INBOUND") {
-        calculator.changeInboundCurrency(newTicker);
-      } else {
-        calculator.changeOutboundCurrency(newTicker);
-      }
-    }
 
     onTickerChange(newTicker);
   };
