@@ -176,18 +176,18 @@ export function QuoteBlock({
     // If we're editing, show the edit form instead
     if (isEditing) {
       return (
-        <Stack>
-          <Text size="lg" fw={600}>
-            Edit Quote
-          </Text>
-          <QuoteForm initialData={quoteData} onChange={handleQuoteChange} />
-          <Group justify="flex-end" mt="md">
-            <Button variant="light" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save Quote</Button>
-          </Group>
-        </Stack>
+        <Card withBorder p="md">
+          <Stack gap="md">
+            <Title order={5}>Edit Quote</Title>
+            <QuoteForm initialData={quoteData} onChange={handleQuoteChange} />
+            <Group justify="flex-end" mt="md">
+              <Button variant="light" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave}>Save Quote</Button>
+            </Group>
+          </Stack>
+        </Card>
       );
     }
 
@@ -205,40 +205,89 @@ export function QuoteBlock({
     const inverseFinalRateWithoutFees = fxRate > 0 ? 1 / fxRate : 0;
 
     return (
-      <Card withBorder p="lg">
-        {/* Main quote display - matching front app design */}
-        <Box mb="xl">
-          <Group justify="center" align="center" gap="xl">
-            {/* Inbound Currency */}
-            <CurrencyDisplay
-              label="Inbound"
-              amount={inboundAmount}
-              ticker={order.inboundTicker || "CAD"}
-              icon={<IconArrowDown size={16} />}
-              color="green"
-            />
+      <Card withBorder p="md">
+        {/* Header with Edit button */}
+        <Group justify="space-between" align="center" mb="md">
+          <Title order={5}>Quote Details</Title>
+          {showEditButton && (
+            <Button
+              variant="light"
+              size="xs"
+              leftSection={<IconEdit size={14} />}
+              onClick={handleEdit}
+            >
+              Edit
+            </Button>
+          )}
+        </Group>
 
-            {/* Arrow */}
-            <ThemeIcon size="lg" variant="light" color="blue">
-              <IconArrowRight size={20} />
-            </ThemeIcon>
-
-            {/* Outbound Currency */}
-            <CurrencyDisplay
-              label="Outbound"
-              amount={outboundAmount}
-              ticker={order.outboundTicker || "BTC"}
-              icon={<IconArrowUp size={16} />}
-              color="orange"
-            />
-          </Group>
-        </Box>
-
-        <Divider mb="lg" />
-
-        {/* Quote details in two columns like front app */}
         <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
+          {/* Column 1: Currency Display */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Title order={6} mb="md" c="dimmed">
+              Currency Exchange
+            </Title>
+            <Stack gap="xs">
+              {/* Currencies side by side */}
+              <Group justify="space-between" align="stretch" gap="xs" grow>
+                {/* Inbound Currency */}
+                <Stack gap={4} align="center" style={{ flex: 1 }}>
+                  <Group gap="xs" justify="center">
+                    <ThemeIcon size="sm" variant="light" color="green">
+                      <IconArrowDown size={14} />
+                    </ThemeIcon>
+                    <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+                      Inbound
+                    </Text>
+                  </Group>
+                  <Group gap="xs" align="center" justify="center">
+                    <ThemeIcon size="md" variant="light" color="green">
+                      <IconCoins size={16} />
+                    </ThemeIcon>
+                    <Text fw={700} size="md">
+                      {order.inboundTicker || "CAD"}
+                    </Text>
+                  </Group>
+                  <Text fw={600} size="lg" style={{ margin: 0, padding: 0 }}>
+                    {inboundAmount.toLocaleString()}
+                  </Text>
+                </Stack>
+
+                {/* Arrow */}
+                <Stack justify="center" align="center">
+                  <ThemeIcon size="md" variant="light" color="blue">
+                    <IconArrowRight size={18} />
+                  </ThemeIcon>
+                </Stack>
+
+                {/* Outbound Currency */}
+                <Stack gap={4} align="center" style={{ flex: 1 }}>
+                  <Group gap="xs" justify="center">
+                    <ThemeIcon size="sm" variant="light" color="orange">
+                      <IconArrowUp size={14} />
+                    </ThemeIcon>
+                    <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+                      Outbound
+                    </Text>
+                  </Group>
+                  <Group gap="xs" align="center" justify="center">
+                    <ThemeIcon size="md" variant="light" color="orange">
+                      <IconCoins size={16} />
+                    </ThemeIcon>
+                    <Text fw={700} size="md">
+                      {order.outboundTicker || "BTC"}
+                    </Text>
+                  </Group>
+                  <Text fw={600} size="lg" style={{ margin: 0, padding: 0 }}>
+                    {outboundAmount.toLocaleString()}
+                  </Text>
+                </Stack>
+              </Group>
+            </Stack>
+          </Grid.Col>
+
+          {/* Column 2: Rate Information */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
             <Title order={6} mb="md" c="dimmed">
               Rate Information
             </Title>
@@ -270,7 +319,8 @@ export function QuoteBlock({
             </Stack>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 6 }}>
+          {/* Column 3: Fee Breakdown */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
             <Title order={6} mb="md" c="dimmed">
               Fee Breakdown
             </Title>
@@ -301,23 +351,16 @@ export function QuoteBlock({
                   color="violet"
                 />
               )}
+              <Divider />
+              <Text size="xs" c="dimmed">
+                Updated:{" "}
+                {order.updatedAt
+                  ? new Date(order.updatedAt).toLocaleString()
+                  : "N/A"}
+              </Text>
             </Stack>
           </Grid.Col>
         </Grid>
-
-        {/* Status and metadata */}
-        <Divider my="lg" />
-        <Group justify="space-between" align="center">
-          <Badge color="blue" variant="light">
-            {order.status || "DRAFT"}
-          </Badge>
-          <Text size="xs" c="dimmed">
-            Updated:{" "}
-            {order.updatedAt
-              ? new Date(order.updatedAt).toLocaleString()
-              : "N/A"}
-          </Text>
-        </Group>
       </Card>
     );
   }

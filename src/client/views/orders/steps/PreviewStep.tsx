@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Alert, Title, Stack } from "@mantine/core";
+import { Alert, Title, Stack, Grid } from "@mantine/core";
 import { useOrderCreation } from "@/client/contexts/OrderCreationContext";
 import { QuoteBlock } from "@/client/views/orders/blocks/QuoteBlock";
 import { CustomerBlock } from "@/client/views/orders/blocks/CustomerBlock";
@@ -23,14 +23,18 @@ export function PreviewStep() {
     <Stack gap="lg">
       <Title order={2}>Order Summary</Title>
 
-      {/* Quote - Full width */}
-      <QuoteBlock orderId={quoteState.orderId} mode="preview" />
-
-      {/* Customer - Full width */}
-      <CustomerBlock orderId={quoteState.orderId} mode="preview" />
-
-      {/* Breakdown - Full width */}
-      <BreakdownBlock orderId={quoteState.orderId} mode="preview" />
+      {/* All three blocks inline in one row */}
+      <Grid>
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <QuoteBlock orderId={quoteState.orderId} mode="preview" showEditButton={true} />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <CustomerBlock orderId={quoteState.orderId} mode="preview" />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <BreakdownBlock orderId={quoteState.orderId} mode="preview" />
+        </Grid.Col>
+      </Grid>
     </Stack>
   );
 }
