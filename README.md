@@ -1,113 +1,343 @@
-# metacx
+# MetaCX
 
-This is the metacx web application built with Next.js, TypeScript, and Tailwind CSS. It comes pre-configured with a basic project structure, essential libraries, and a set of development guidelines.
+A modern web application for currency exchange management built with Next.js, TypeScript, and Convex.
+
+## Tech Stack
+
+### Core Framework
+
+- **Next.js 15.1.8**: React framework with App Router, Server Components, and Turbo compiler
+- **React 19**: Latest React with improved concurrent features
+- **TypeScript 5**: Type-safe development
+
+### Backend & Database
+
+- **Convex 1.25.4**: Real-time backend platform with:
+  - Real-time database with automatic reactivity
+  - Serverless functions and actions
+  - Built-in authentication integration
+  - Automatic API generation from schema
+
+### Authentication
+
+- **Clerk 6.31.3**: Modern authentication and user management
+  - Email/password authentication
+  - Social logins
+  - Organization management
+  - User profiles and sessions
+
+### UI Components & Styling
+
+- **Mantine 8.1.3**: Comprehensive React component library
+  - Forms, modals, notifications
+  - Data tables, charts, and carousels
+  - Rich text editor (TipTap)
+  - Date pickers and calendars
+- **Tabler Icons 3.34.0**: Beautiful icon library
+- **Recharts 3.1.0**: Composable charting library
+
+### State Management
+
+- **Redux Toolkit 2.6.1**: Predictable state management
+- **React Query (TanStack) 5.76.1**: Server state management and caching
+- **React Hook Form 7.56.4**: Performant form management
+
+### Validation & API
+
+- **Zod 3.25.76**: TypeScript-first schema validation
+- **T3 Env**: Type-safe environment variables
+- **Hono 4.6.11**: Ultrafast web framework for API routes
+
+### Development Tools
+
+- **Concurrently**: Run multiple development servers
+- **ESLint**: Code linting
+- **TypeScript**: Static type checking
+- **Turbo Mode**: Fast refresh and compilation
 
 ## Features
 
-- **Next.js 15**: The latest version of the React framework.
-- **TypeScript**: For type-safe code.
-- **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
-- **Convex**: Real-time backend platform with database, authentication, and serverless functions.
-- **Clerk**: Modern authentication and user management.
-- **Hono**: A small, simple, and ultrafast web framework for the Edge.
-- **React Hook Form**: For flexible and extensible forms.
-- **React Query**: For data fetching and state management.
-- **Redux Toolkit**: For predictable state management.
-- **Zod**: For data validation.
-- **Playwright**: For end-to-end testing.
+- 🔐 **Multi-tenant Organization Management**: Create and manage multiple organizations
+- 💱 **Currency Exchange**: Real-time currency exchange rates and calculations
+- 👥 **Customer Management**: Track customers, contacts, and addresses
+- 📦 **Float Management**: Manage currency floats and transfers
+- 🏦 **Repository Management**: Track physical currency repositories
+- 📊 **CX Sessions**: Manage customer exchange sessions
+- 📈 **Analytics & Reporting**: View organizational activities and statistics
+- 🎨 **Modern UI**: Beautiful, responsive interface with Mantine components
+- ⚡ **Real-time Updates**: Instant data synchronization with Convex
+- 🔒 **Role-based Access**: Secure organization-based permissions
 
-## Environment Variables
+## Prerequisites
 
-This project uses [T3 Env](https://env.t3.gg/) for type-safe environment variables.
+Before you begin, ensure you have the following installed:
 
-### Setup
-
-1. Copy either the `env.example` or `sample.env` file to `.env.local`:
-
-   ```bash
-   # Option 1: Use env.example (template with placeholders)
-   cp env.example .env.local
-
-   # Option 2: Use sample.env (working example values)
-   cp sample.env .env.local
-   ```
-
-2. Fill in the required environment variables in `.env.local`:
-   - `NEXT_PUBLIC_APP_URL`: Your app's URL (http://localhost:3000 for development)
-   - `NEXT_PUBLIC_CONVEX_URL`: Your Convex deployment URL
-   - `CONVEX_DEPLOYMENT`: Your Convex deployment name
-   - `CLERK_SECRET_KEY`: Your Clerk secret key
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
-   - `CLERK_JWT_ISSUER_DOMAIN`: Your Clerk JWT issuer domain
-   - `S3_ENDPOINT`: Your S3-compatible storage endpoint (e.g., Supabase Storage) (optional)
-   - `S3_REGION`: Your S3 region (optional)
-   - `S3_ACCESS_KEY_ID`: Your S3 access key ID (optional)
-   - `S3_ACCESS_KEY_SECRET`: Your S3 access key secret (optional)
-
-### Adding New Environment Variables
-
-1. Add the variable to the appropriate section in `src/env.ts`:
-
-   - `server`: For server-side only variables
-   - `client`: For client-side variables (must be prefixed with `NEXT_PUBLIC_`)
-
-2. Add the variable to the `runtimeEnv` object in `src/env.ts`
-
-3. Add the variable to `env.example` with an example value
-
-4. Import and use the variable from `src/env.ts`:
-
-   ```typescript
-   import { env } from "@/env";
-
-   // Use env.VARIABLE_NAME instead of process.env.VARIABLE_NAME
-   ```
+- **Node.js** (v18 or higher)
+- **Yarn** (v1.22.21) - the project uses Yarn as the package manager
+- **Convex Account** - Sign up at [convex.dev](https://convex.dev)
+- **Clerk Account** - Sign up at [clerk.com](https://clerk.com)
+- **Open Exchange Rates API Key** - Get a free key at [openexchangerates.org](https://openexchangerates.org/signup/free)
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone and Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Navigate to the metacx directory
+cd apps/metacx
+
+# Install dependencies
+yarn install
 ```
 
-Open [http://localhost:4000](http://localhost:4000) with your browser to see the result.
+### 2. Set Up Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy the sample environment file and configure your variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+# Copy the sample.env file
+cp sample.env .env.local
+```
 
-## Learn More
+Edit `.env.local` and fill in your credentials:
 
-To learn more about Next.js, take a look at the following resources:
+#### Required Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **App Configuration**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+  - `NEXT_PUBLIC_APP_URL`: Your app's URL (default: `http://localhost:4000`)
+  - `NEXT_PUBLIC_APP_NAME`: Your app name (default: `MetaCX`)
+  - `NEXT_PUBLIC_APP_DESCRIPTION`: App description
 
-## Deploy on Vercel
+- **Convex Configuration**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  - `NEXT_PUBLIC_CONVEX_URL`: Your Convex deployment URL
+  - `CONVEX_DEPLOYMENT`: Your Convex deployment name (auto-generated by Convex)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Clerk Authentication**
+
+  - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
+  - `CLERK_SECRET_KEY`: Your Clerk secret key
+  - `CLERK_JWT_ISSUER_DOMAIN`: Your Clerk JWT issuer domain
+
+- **Currency Exchange APIs**
+  - `OPEN_EXCHANGE_RATE_APP_ID`: Server-side API key for Open Exchange Rates
+  - `NEXT_PUBLIC_OPEN_EXCHANGE_RATE_APP_ID`: Client-side API key (optional)
+  - `NEXT_PUBLIC_APP_METALS_API`: Metals API key (optional)
+
+#### Optional Variables
+
+- **S3 Storage** (for file uploads)
+  - `S3_ENDPOINT`: S3-compatible storage endpoint
+  - `S3_REGION`: Storage region
+  - `S3_ACCESS_KEY_ID`: Access key ID
+  - `S3_ACCESS_KEY_SECRET`: Access key secret
+
+### 3. Set Up Convex
+
+Initialize and deploy your Convex backend:
+
+```bash
+# Login to Convex (if not already logged in)
+npx convex login
+
+# Initialize Convex (creates deployment and updates .env.local)
+npx convex dev
+```
+
+This will:
+
+- Create a new Convex deployment
+- Generate your `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL`
+- Start the Convex development server
+- Watch for schema changes
+
+### 4. Set Up Clerk
+
+1. Create a new application at [clerk.com](https://clerk.com)
+2. Configure authentication methods (Email, Social, etc.)
+3. Set up Organization management (required for multi-tenancy)
+4. Copy your API keys to `.env.local`
+5. Configure webhook endpoints (see [CLERK_SETUP.md](./docs/CLERK_SETUP.md))
+
+### 5. Run the Development Server
+
+```bash
+# Run both Next.js and Convex in development mode
+yarn dev
+
+# Or run them separately:
+yarn dev:next    # Next.js only (port 4000)
+yarn dev:convex  # Convex only
+```
+
+Open [http://localhost:4000](http://localhost:4000) in your browser.
+
+### 6. Build for Production
+
+```bash
+# Build the Next.js application
+yarn build
+
+# Start the production server
+yarn start
+```
 
 ## Project Structure
 
-The project structure is organized as follows:
-
 ```
-src/
-├── app/         # Next.js App Router pages
-├── client/      # Client-side React code
-├── server/      # Server-side logic
-└── shared/      # Shared utilities and types
+metacx/
+├── convex/              # Convex backend
+│   ├── schema/          # Database schema definitions
+│   ├── functions/       # Convex query/mutation functions
+│   ├── actions/         # Convex actions (for external APIs)
+│   └── auth.config.js   # Clerk authentication config
+├── src/
+│   ├── app/             # Next.js App Router
+│   │   ├── (dashboard)/ # Dashboard routes
+│   │   ├── admin/       # Admin panel routes
+│   │   ├── api/         # API routes
+│   │   ├── auth/        # Authentication pages
+│   │   ├── portal/      # Customer portal
+│   │   └── organizations/ # Organization management
+│   ├── client/          # Client-side code
+│   │   ├── components/  # React components
+│   │   ├── hooks/       # Custom React hooks
+│   │   ├── providers/   # Context providers
+│   │   └── services/    # Business logic
+│   ├── server/          # Server-side code
+│   │   ├── auth/        # Auth utilities
+│   │   └── convex/      # Convex server client
+│   └── shared/          # Shared utilities
+│       ├── config/      # Configuration files
+│       ├── lib/         # Shared libraries
+│       └── types/       # TypeScript types
+└── docs/                # Documentation
 ```
 
-For more details on the project structure and development guidelines, please refer to the `.cursorrules` file.
+## Available Scripts
+
+- `yarn dev` - Run Next.js and Convex in development mode (port 4000)
+- `yarn dev:next` - Run Next.js only
+- `yarn dev:convex` - Run Convex only
+- `yarn build` - Build for production
+- `yarn start` - Start production server
+- `yarn lint` - Run ESLint
+- `yarn db:reset-convex` - Reset Convex database
+- `yarn db:stats-convex` - View Convex database statistics
+
+## Key Features Explained
+
+### Multi-tenant Architecture
+
+- Organizations can be created and managed independently
+- Each organization has its own currencies, customers, and repositories
+- Role-based access control per organization
+
+### Real-time Currency Exchange
+
+- Automatic exchange rate updates from Open Exchange Rates API
+- Support for metals pricing
+- Real-time calculations and conversions
+- Historical rate tracking
+
+### Float Management System
+
+- Track physical currency in repositories
+- Transfer floats between repositories
+- Automated float snapshots and auditing
+- Access logs for security
+
+### Customer Exchange Sessions
+
+- Create and manage CX sessions for customer transactions
+- Track session activities and changes
+- Automatic session logging
+
+## Documentation
+
+- [Clerk Setup Guide](./docs/CLERK_SETUP.md) - Configure Clerk authentication
+- [Float System Documentation](./docs/FLOAT_SYSTEM.md) - Understanding the float management system
+
+## Development Guidelines
+
+### Environment Variables
+
+- Use `src/shared/config/env.ts` for type-safe environment variables
+- Add new variables to the schema in `env.ts`
+- Always use the `env` object instead of `process.env`
+
+### Convex Development
+
+- Schema changes are automatically detected and deployed
+- Use Convex DevTools for debugging
+- Functions are auto-generated from schema definitions
+
+### Component Development
+
+- Use Mantine components for UI consistency
+- Follow the existing component structure in `src/client/components`
+- Use TypeScript for all new components
+
+## Troubleshooting
+
+### Port 4000 Already in Use
+
+```bash
+# Kill process on port 4000 (Windows)
+netstat -ano | findstr :4000
+taskkill /PID <PID> /F
+
+# Or use a different port
+yarn dev:next -- -p 3000
+```
+
+### Convex Connection Issues
+
+- Ensure you're logged in: `npx convex login`
+- Check your `NEXT_PUBLIC_CONVEX_URL` in `.env.local`
+- Restart Convex: `npx convex dev`
+
+### Clerk Authentication Issues
+
+- Verify all Clerk keys are correct in `.env.local`
+- Check webhook configuration in Clerk dashboard
+- Ensure JWT issuer domain matches your Clerk configuration
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Configure environment variables
+4. Deploy
+
+### Convex Production
+
+```bash
+# Deploy to production
+npx convex deploy
+```
+
+### Environment Variables for Production
+
+Ensure all environment variables are set in your hosting platform:
+
+- Vercel: Project Settings → Environment Variables
+- Convex: Dashboard → Environment
+
+## Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Test thoroughly
+4. Submit a pull request
+
+## License
+
+This project is private and proprietary.
+
+## Support
+
+For issues and questions, contact the development team.
