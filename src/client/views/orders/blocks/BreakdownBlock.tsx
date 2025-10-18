@@ -105,47 +105,49 @@ export function BreakdownBlock({
     const outboundSum = Number(order.outboundSum) || 0;
 
     return (
-      <Card withBorder>
-        <Stack gap="lg">
-          <Group justify="space-between" align="center">
-            <Title order={4}>Edit Order Breakdowns</Title>
-            <Button
-              variant="light"
-              color="gray"
-              leftSection={<IconX size={16} />}
-              onClick={() => {
-                setIsEditing(false);
-                setInboundCompleted(false);
-                setOutboundCompleted(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </Group>
+      <Stack gap="md">
+        {/* Header with Cancel button - outside the card */}
+        <Group justify="space-between" align="center">
+          <Title order={3}>Edit Order Breakdowns</Title>
+          <Button
+            variant="outline"
+            leftSection={<IconX size={16} />}
+            onClick={() => {
+              setIsEditing(false);
+              setInboundCompleted(false);
+              setOutboundCompleted(false);
+            }}
+          >
+            Cancel
+          </Button>
+        </Group>
 
-          {/* Inbound Breakdown Form */}
-          {inboundSum > 0 && order.inboundTicker && (
-            <FloatBreakdownForm
-              direction="INBOUND"
-              ticker={order.inboundTicker}
-              targetSum={inboundSum}
-              orderId={orderId}
-              onBreakdownChange={handleInboundComplete}
-            />
-          )}
+        <Card withBorder>
+          <Stack gap="lg">
+            {/* Inbound Breakdown Form */}
+            {inboundSum > 0 && order.inboundTicker && (
+              <FloatBreakdownForm
+                direction="INBOUND"
+                ticker={order.inboundTicker}
+                targetSum={inboundSum}
+                orderId={orderId}
+                onBreakdownChange={handleInboundComplete}
+              />
+            )}
 
-          {/* Outbound Breakdown Form */}
-          {outboundSum > 0 && order.outboundTicker && (
-            <FloatBreakdownForm
-              direction="OUTBOUND"
-              ticker={order.outboundTicker}
-              targetSum={outboundSum}
-              orderId={orderId}
-              onBreakdownChange={handleOutboundComplete}
-            />
-          )}
-        </Stack>
-      </Card>
+            {/* Outbound Breakdown Form */}
+            {outboundSum > 0 && order.outboundTicker && (
+              <FloatBreakdownForm
+                direction="OUTBOUND"
+                ticker={order.outboundTicker}
+                targetSum={outboundSum}
+                orderId={orderId}
+                onBreakdownChange={handleOutboundComplete}
+              />
+            )}
+          </Stack>
+        </Card>
+      </Stack>
     );
   }
 
@@ -252,19 +254,19 @@ export function BreakdownBlock({
   const hasAny = hasInbound || hasOutbound;
 
   return (
-    <Card withBorder>
-      <Stack gap="md">
-        <Group justify="space-between" align="center">
-          <Title order={4}>Order Breakdowns</Title>
-          <Button
-            variant="light"
-            leftSection={<IconEdit size={16} />}
-            onClick={() => setIsEditing(true)}
-          >
-            Edit
-          </Button>
-        </Group>
+    <Stack gap="md">
+      {/* Header with Edit button - outside the card */}
+      <Group justify="space-between" align="center">
+        <Title order={3}>Order Breakdowns</Title>
+        <Button
+          leftSection={<IconEdit size={16} />}
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </Button>
+      </Group>
 
+      <Card withBorder>
         {!breakdowns || breakdowns.length === 0 ? (
           <Text c="dimmed" size="sm">
             No breakdowns have been created for this order yet.
@@ -280,7 +282,7 @@ export function BreakdownBlock({
             </Grid.Col>
           </Grid>
         )}
-      </Stack>
-    </Card>
+      </Card>
+    </Stack>
   );
 }

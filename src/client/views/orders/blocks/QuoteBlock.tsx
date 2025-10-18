@@ -176,18 +176,22 @@ export function QuoteBlock({
     // If we're editing, show the edit form instead
     if (isEditing) {
       return (
-        <Card withBorder p="md">
-          <Stack gap="md">
-            <Title order={5}>Edit Quote</Title>
-            <QuoteForm initialData={quoteData} onChange={handleQuoteChange} />
-            <Group justify="flex-end" mt="md">
-              <Button variant="light" onClick={handleCancel}>
+        <Stack gap="md">
+          {/* Header with Cancel button - outside the card */}
+          <Group justify="space-between" align="center">
+            <Title order={3}>Edit Quote</Title>
+            <Group gap="sm">
+              <Button variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
               <Button onClick={handleSave}>Save Quote</Button>
             </Group>
-          </Stack>
-        </Card>
+          </Group>
+
+          <Card withBorder p="md">
+            <QuoteForm initialData={quoteData} onChange={handleQuoteChange} />
+          </Card>
+        </Stack>
       );
     }
 
@@ -205,163 +209,160 @@ export function QuoteBlock({
     const inverseFinalRateWithoutFees = fxRate > 0 ? 1 / fxRate : 0;
 
     return (
-      <Card withBorder p="md">
-        {/* Header with Edit button */}
-        <Group justify="space-between" align="center" mb="md">
-          <Title order={5}>Quote Details</Title>
+      <Stack gap="md">
+        {/* Header with Edit button - outside the card */}
+        <Group justify="space-between" align="center">
+          <Title order={3}>Quote Details</Title>
           {showEditButton && (
-            <Button
-              variant="light"
-              size="xs"
-              leftSection={<IconEdit size={14} />}
-              onClick={handleEdit}
-            >
+            <Button leftSection={<IconEdit size={16} />} onClick={handleEdit}>
               Edit
             </Button>
           )}
         </Group>
 
-        <Grid>
-          {/* Column 1: Currency Display */}
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <Title order={6} mb="md" c="dimmed">
-              Currency Exchange
-            </Title>
-            <Stack gap="xs">
-              {/* Currencies side by side */}
-              <Group justify="space-between" align="stretch" gap="xs" grow>
-                {/* Inbound Currency */}
-                <Stack gap={4} align="center" style={{ flex: 1 }}>
-                  <Group gap="xs" justify="center">
-                    <ThemeIcon size="sm" variant="light" color="green">
-                      <IconArrowDown size={14} />
-                    </ThemeIcon>
-                    <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-                      Inbound
+        <Card withBorder p="md">
+          <Grid>
+            {/* Column 1: Currency Display */}
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Title order={6} mb="md" c="dimmed">
+                Currency Exchange
+              </Title>
+              <Stack gap="xs">
+                {/* Currencies side by side */}
+                <Group justify="space-between" align="stretch" gap="xs" grow>
+                  {/* Inbound Currency */}
+                  <Stack gap={4} align="center" style={{ flex: 1 }}>
+                    <Group gap="xs" justify="center">
+                      <ThemeIcon size="sm" variant="light" color="green">
+                        <IconArrowDown size={14} />
+                      </ThemeIcon>
+                      <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+                        Inbound
+                      </Text>
+                    </Group>
+                    <Group gap="xs" align="center" justify="center">
+                      <ThemeIcon size="md" variant="light" color="green">
+                        <IconCoins size={16} />
+                      </ThemeIcon>
+                      <Text fw={700} size="md">
+                        {order.inboundTicker || "CAD"}
+                      </Text>
+                    </Group>
+                    <Text fw={600} size="lg" style={{ margin: 0, padding: 0 }}>
+                      {inboundAmount.toLocaleString()}
                     </Text>
-                  </Group>
-                  <Group gap="xs" align="center" justify="center">
-                    <ThemeIcon size="md" variant="light" color="green">
-                      <IconCoins size={16} />
+                  </Stack>
+
+                  {/* Arrow */}
+                  <Stack justify="center" align="center">
+                    <ThemeIcon size="md" variant="light" color="blue">
+                      <IconArrowRight size={18} />
                     </ThemeIcon>
-                    <Text fw={700} size="md">
-                      {order.inboundTicker || "CAD"}
+                  </Stack>
+
+                  {/* Outbound Currency */}
+                  <Stack gap={4} align="center" style={{ flex: 1 }}>
+                    <Group gap="xs" justify="center">
+                      <ThemeIcon size="sm" variant="light" color="orange">
+                        <IconArrowUp size={14} />
+                      </ThemeIcon>
+                      <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+                        Outbound
+                      </Text>
+                    </Group>
+                    <Group gap="xs" align="center" justify="center">
+                      <ThemeIcon size="md" variant="light" color="orange">
+                        <IconCoins size={16} />
+                      </ThemeIcon>
+                      <Text fw={700} size="md">
+                        {order.outboundTicker || "BTC"}
+                      </Text>
+                    </Group>
+                    <Text fw={600} size="lg" style={{ margin: 0, padding: 0 }}>
+                      {outboundAmount.toLocaleString()}
                     </Text>
-                  </Group>
-                  <Text fw={600} size="lg" style={{ margin: 0, padding: 0 }}>
-                    {inboundAmount.toLocaleString()}
-                  </Text>
-                </Stack>
+                  </Stack>
+                </Group>
+              </Stack>
+            </Grid.Col>
 
-                {/* Arrow */}
-                <Stack justify="center" align="center">
-                  <ThemeIcon size="md" variant="light" color="blue">
-                    <IconArrowRight size={18} />
-                  </ThemeIcon>
-                </Stack>
-
-                {/* Outbound Currency */}
-                <Stack gap={4} align="center" style={{ flex: 1 }}>
-                  <Group gap="xs" justify="center">
-                    <ThemeIcon size="sm" variant="light" color="orange">
-                      <IconArrowUp size={14} />
-                    </ThemeIcon>
-                    <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-                      Outbound
-                    </Text>
-                  </Group>
-                  <Group gap="xs" align="center" justify="center">
-                    <ThemeIcon size="md" variant="light" color="orange">
-                      <IconCoins size={16} />
-                    </ThemeIcon>
-                    <Text fw={700} size="md">
-                      {order.outboundTicker || "BTC"}
-                    </Text>
-                  </Group>
-                  <Text fw={600} size="lg" style={{ margin: 0, padding: 0 }}>
-                    {outboundAmount.toLocaleString()}
-                  </Text>
-                </Stack>
-              </Group>
-            </Stack>
-          </Grid.Col>
-
-          {/* Column 2: Rate Information */}
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <Title order={6} mb="md" c="dimmed">
-              Rate Information
-            </Title>
-            <Stack gap="sm">
-              <QuoteItem
-                icon={<IconTrendingUp size={16} />}
-                label="Final Rate"
-                value={finalRate.toFixed(6)}
-                color="blue"
-              />
-              <QuoteItem
-                icon={<IconTrendingUp size={16} />}
-                label="Inverse Final Rate"
-                value={inverseFinalRate.toFixed(6)}
-                color="indigo"
-              />
-              <QuoteItem
-                icon={<IconCalculator size={16} />}
-                label="Inverse Rate (No Fees)"
-                value={inverseFinalRateWithoutFees.toFixed(6)}
-                color="cyan"
-              />
-              <QuoteItem
-                icon={<IconPercentage size={16} />}
-                label="Margin"
-                value={`${margin.toFixed(2)}%`}
-                color="grape"
-              />
-            </Stack>
-          </Grid.Col>
-
-          {/* Column 3: Fee Breakdown */}
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <Title order={6} mb="md" c="dimmed">
-              Fee Breakdown
-            </Title>
-            <Stack gap="sm">
-              <QuoteItem
-                icon={<IconCoins size={16} />}
-                label="Service Fee"
-                value={`$${fee.toFixed(2)}`}
-                color="yellow"
-              />
-              <QuoteItem
-                icon={<IconReceipt size={16} />}
-                label="Network Fee"
-                value={`$${networkFee.toFixed(2)}`}
-                color="orange"
-              />
-              <QuoteItem
-                icon={<IconCash size={16} />}
-                label="Total Fees"
-                value={`$${totalFees.toFixed(2)}`}
-                color="red"
-              />
-              {fxRate > 0 && (
+            {/* Column 2: Rate Information */}
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Title order={6} mb="md" c="dimmed">
+                Rate Information
+              </Title>
+              <Stack gap="sm">
+                <QuoteItem
+                  icon={<IconTrendingUp size={16} />}
+                  label="Final Rate"
+                  value={finalRate.toFixed(6)}
+                  color="blue"
+                />
+                <QuoteItem
+                  icon={<IconTrendingUp size={16} />}
+                  label="Inverse Final Rate"
+                  value={inverseFinalRate.toFixed(6)}
+                  color="indigo"
+                />
+                <QuoteItem
+                  icon={<IconCalculator size={16} />}
+                  label="Inverse Rate (No Fees)"
+                  value={inverseFinalRateWithoutFees.toFixed(6)}
+                  color="cyan"
+                />
                 <QuoteItem
                   icon={<IconPercentage size={16} />}
-                  label="FX Rate"
-                  value={fxRate.toFixed(6)}
-                  color="violet"
+                  label="Margin"
+                  value={`${margin.toFixed(2)}%`}
+                  color="grape"
                 />
-              )}
-              <Divider />
-              <Text size="xs" c="dimmed">
-                Updated:{" "}
-                {order.updatedAt
-                  ? new Date(order.updatedAt).toLocaleString()
-                  : "N/A"}
-              </Text>
-            </Stack>
-          </Grid.Col>
-        </Grid>
-      </Card>
+              </Stack>
+            </Grid.Col>
+
+            {/* Column 3: Fee Breakdown */}
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Title order={6} mb="md" c="dimmed">
+                Fee Breakdown
+              </Title>
+              <Stack gap="sm">
+                <QuoteItem
+                  icon={<IconCoins size={16} />}
+                  label="Service Fee"
+                  value={`$${fee.toFixed(2)}`}
+                  color="yellow"
+                />
+                <QuoteItem
+                  icon={<IconReceipt size={16} />}
+                  label="Network Fee"
+                  value={`$${networkFee.toFixed(2)}`}
+                  color="orange"
+                />
+                <QuoteItem
+                  icon={<IconCash size={16} />}
+                  label="Total Fees"
+                  value={`$${totalFees.toFixed(2)}`}
+                  color="red"
+                />
+                {fxRate > 0 && (
+                  <QuoteItem
+                    icon={<IconPercentage size={16} />}
+                    label="FX Rate"
+                    value={fxRate.toFixed(6)}
+                    color="violet"
+                  />
+                )}
+                <Divider />
+                <Text size="xs" c="dimmed">
+                  Updated:{" "}
+                  {order.updatedAt
+                    ? new Date(order.updatedAt).toLocaleString()
+                    : "N/A"}
+                </Text>
+              </Stack>
+            </Grid.Col>
+          </Grid>
+        </Card>
+      </Stack>
     );
   }
 
