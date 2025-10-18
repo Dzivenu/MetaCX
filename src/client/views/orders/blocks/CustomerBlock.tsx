@@ -230,11 +230,6 @@ export function CustomerBlock({
                 ? "Customer not found"
                 : "No customer selected"}
             </Text>
-            {/* Debug info */}
-            <Text size="xs" c="red" mt="xs">
-              Debug: Order.orgCustomerId = "{order.orgCustomerId || "undefined"}
-              "
-            </Text>
           </Card>
         </Stack>
       );
