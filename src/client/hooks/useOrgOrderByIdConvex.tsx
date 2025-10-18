@@ -24,6 +24,7 @@ export interface OrgOrderById {
   orgCustomerId?: string;
   inboundOrgRepositoryId?: string;
   outboundOrgRepositoryId?: string;
+  clerkOrganizationId?: string;
   createdAt: string;
   updatedAt: string;
   openDt?: string;
@@ -59,6 +60,7 @@ export function useOrgOrderById(orderId?: string) {
       orgCustomerId: (data as any).orgCustomerId,
       inboundOrgRepositoryId: data.inboundOrgRepositoryId,
       outboundOrgRepositoryId: data.outboundOrgRepositoryId,
+      clerkOrganizationId: (data as any).clerkOrganizationId,
       createdAt: new Date(data.createdAt).toISOString(),
       updatedAt: new Date(data.updatedAt).toISOString(),
       openDt: data.openDt ? new Date(data.openDt).toISOString() : undefined,
@@ -68,6 +70,3 @@ export function useOrgOrderById(orderId?: string) {
 
   return { order, isLoading: data === undefined, updateOrgOrder };
 }
-
-
-

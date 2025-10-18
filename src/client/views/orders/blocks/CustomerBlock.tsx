@@ -1,8 +1,17 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Title, Text, Stack, Card, Grid, Button, Group } from "@mantine/core";
-import { IconEdit } from "@tabler/icons-react";
+import {
+  Title,
+  Text,
+  Stack,
+  Card,
+  Grid,
+  Button,
+  Group,
+  Tabs,
+} from "@mantine/core";
+import { IconEdit, IconSearch, IconUserPlus } from "@tabler/icons-react";
 import { useOrgOrderById } from "@/client/hooks/useOrgOrderByIdConvex";
 import { useOrgCustomers } from "@/client/hooks/useOrgCustomersConvex";
 import {
@@ -11,6 +20,10 @@ import {
   CustomerIdentificationCard,
   CustomerSearchTable,
 } from "@/client/components/customers";
+import {
+  CustomerForm,
+  type CustomerFormValues,
+} from "@/client/components/customers/CustomerForm";
 import { useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
@@ -23,16 +36,85 @@ export function CustomerBlock({
   orderId: string;
   mode?: "preview" | "edit";
 }) {
+  // All hooks must be called at the top level
   const [isEditing, setIsEditing] = useState(false);
   const updateOrderMutation = useMutation(
     api.functions.orgOrders.updateOrgOrder
   );
+  const createCustomerMutation = useMutation(
+    api.functions.orgCustomers.createOrgCustomer
+  );
 
-  if (!orderId || orderId === "new") {
+  // Pass undefined to hooks if orderId is invalid to prevent hook errors
+  const validOrderId = orderId && orderId !== "new" ? orderId : undefined;
+  const { order, isLoading } = useOrgOrderById(validOrderId);
+  const { orgCustomers, loading: customersLoading } = useOrgCustomers(200);
+
+  // ALL useCallback hooks must be defined before any conditional returns
+  const handleCustomerSelected = useCallback(
+    async (customer: Customer) => {
+      if (!order) return;
+      console.log("🔍 CustomerBlock - Customer selected:", customer.id);
+      try {
+        await updateOrderMutation({
+          orderId: order.id as Id<"org_orders">,
+          orgCustomerId: customer.id as Id<"org_customers">,
+        });
+        setIsEditing(false);
+        console.log("✅ Customer updated successfully");
+      } catch (error) {
+        console.error("❌ Error updating customer:", error);
+      }
+    },
+    [updateOrderMutation, order]
+  );
+
+  const handleCreateCustomer = useCallback(
+    async (values: CustomerFormValues) => {
+      if (!order) return;
+      console.log("🔍 CustomerBlock - Creating customer:", values);
+      try {
+        // Create customer via Convex
+        const customerId = await createCustomerMutation({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          title: values.title || undefined,
+          middleName: values.middleName || undefined,
+          dob: values.dob ? new Date(values.dob).getTime() : undefined,
+          occupation: values.occupation || undefined,
+          employer: values.employer || undefined,
+          telephone: values.telephone || undefined,
+          email: values.email || undefined,
+          clerkOrganizationId: order.clerkOrganizationId,
+        });
+
+        // Attach the new customer to the order
+        await updateOrderMutation({
+          orderId: order.id as Id<"org_orders">,
+          orgCustomerId: customerId as Id<"org_customers">,
+        });
+
+        setIsEditing(false);
+        console.log("✅ Customer created and attached successfully");
+      } catch (error) {
+        console.error("❌ Error creating customer:", error);
+        throw error;
+      }
+    },
+    [createCustomerMutation, updateOrderMutation, order]
+  );
+
+  const handleCancel = useCallback(() => {
+    setIsEditing(false);
+  }, []);
+
+  // Early return after all hooks are called
+  if (!validOrderId) {
     return <div>No order</div>;
   }
-  const { order, isLoading } = useOrgOrderById(orderId);
-  const { orgCustomers, loading: customersLoading } = useOrgCustomers(200);
+
+  if (isLoading) return <div>Loading customer…</div>;
+  if (!order) return <div>No order</div>;
 
   // Debug logging
   console.log("🔍 CustomerBlock Debug:", {
@@ -57,30 +139,6 @@ export function CustomerBlock({
     updatedAt: c.updatedAt ? new Date(c.updatedAt) : new Date(),
   }));
 
-  const handleCustomerSelected = useCallback(
-    async (customer: Customer) => {
-      console.log("🔍 CustomerBlock - Customer selected:", customer.id);
-      try {
-        await updateOrderMutation({
-          orderId: order!.id as Id<"org_orders">,
-          orgCustomerId: customer.id as Id<"org_customers">,
-        });
-        setIsEditing(false);
-        console.log("✅ Customer updated successfully");
-      } catch (error) {
-        console.error("❌ Error updating customer:", error);
-      }
-    },
-    [updateOrderMutation, order]
-  );
-
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
-
-  if (isLoading) return <div>Loading customer…</div>;
-  if (!order) return <div>No order</div>;
-
   const customer = orgCustomers.find((c) => c.id === order.orgCustomerId);
 
   console.log(
@@ -89,27 +147,51 @@ export function CustomerBlock({
     customer?.lastName
   );
 
-  // Show edit mode with customer search
+  // Show edit mode with customer search/create tabs
   if (isEditing) {
     return (
       <Stack gap="md">
         {/* Header with Cancel button - outside the card */}
         <Group justify="space-between" align="center">
-          <Title order={3}>Select Customer</Title>
+          <Title order={3}>Select or Create Customer</Title>
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
         </Group>
 
         <Card withBorder>
-          <Text size="sm" c="dimmed" mb="md">
-            Search and select a customer for this order.
-          </Text>
-          <CustomerSearchTable
-            customers={customers}
-            loading={customersLoading}
-            onCustomerSelected={handleCustomerSelected}
-          />
+          <Tabs defaultValue="search">
+            <Tabs.List>
+              <Tabs.Tab value="search" leftSection={<IconSearch size={16} />}>
+                Search Customer
+              </Tabs.Tab>
+              <Tabs.Tab value="create" leftSection={<IconUserPlus size={16} />}>
+                Create Customer
+              </Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="search" pt="md">
+              <Text size="sm" c="dimmed" mb="md">
+                Search and select an existing customer for this order.
+              </Text>
+              <CustomerSearchTable
+                customers={customers}
+                loading={customersLoading}
+                onCustomerSelected={handleCustomerSelected}
+              />
+            </Tabs.Panel>
+
+            <Tabs.Panel value="create" pt="md">
+              <Text size="sm" c="dimmed" mb="md">
+                Create a new customer and attach them to this order.
+              </Text>
+              <CustomerForm
+                onSubmit={handleCreateCustomer}
+                submitLabel="Create & Attach Customer"
+                showCancel={false}
+              />
+            </Tabs.Panel>
+          </Tabs>
         </Card>
       </Stack>
     );

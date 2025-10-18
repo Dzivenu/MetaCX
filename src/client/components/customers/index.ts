@@ -5,3 +5,4 @@ export { CustomerIdentificationCard } from "./CustomerIdentificationCard";
 export { CustomerEditModal } from "./CustomerEditModal";
 export { CustomerAddressModal } from "./CustomerAddressModal";
 export { CustomerIdentificationModal } from "./CustomerIdentificationModal";
+export { CustomerForm, type CustomerFormValues } from "./CustomerForm";
