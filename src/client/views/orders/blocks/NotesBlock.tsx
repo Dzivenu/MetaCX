@@ -21,7 +21,6 @@ import {
   IconX,
   IconTrash,
   IconNote,
-  IconRefresh,
 } from "@tabler/icons-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -96,12 +95,6 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
     (api.functions as any).orgNotes?.deleteOrgNote
   );
 
-  // Manual refresh function
-  const handleRefresh = () => {
-    // Force refetch by invalidating the query
-    void (api.functions as any).orgNotes?.getOrgNotesByEntity;
-  };
-
   const handleAddNote = async () => {
     if (!newNoteMessage.trim() || !order) {
       return;
@@ -156,22 +149,13 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
       {/* Header with Add button */}
       <Group justify="space-between" align="center">
         <Title order={3}>Order Notes</Title>
-        <Group gap="xs">
-          <ActionIcon
-            variant="light"
-            onClick={handleRefresh}
-            title="Refresh notes"
-          >
-            <IconRefresh size={16} />
-          </ActionIcon>
-          <Button
-            leftSection={<IconPlus size={16} />}
-            onClick={() => setIsAdding(!isAdding)}
-            variant={isAdding ? "outline" : "filled"}
-          >
-            {isAdding ? "Cancel" : "Add Note"}
-          </Button>
-        </Group>
+        <Button
+          leftSection={<IconPlus size={16} />}
+          onClick={() => setIsAdding(!isAdding)}
+          variant={isAdding ? "outline" : "filled"}
+        >
+          {isAdding ? "Cancel" : "Add Note"}
+        </Button>
       </Group>
 
       {/* Add Note Form */}

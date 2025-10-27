@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import {
   Title,
   Text,
@@ -11,7 +11,8 @@ import {
   Group,
   Tabs,
 } from "@mantine/core";
-import { IconEdit, IconSearch, IconUserPlus } from "@tabler/icons-react";
+import { IconEdit, IconSearch, IconUserPlus, IconEye } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import { useOrgOrderById } from "@/client/hooks/useOrgOrderByIdConvex";
 import { useOrgCustomers } from "@/client/hooks/useOrgCustomersConvex";
 import {
@@ -36,6 +37,9 @@ export function CustomerBlock({
   orderId: string;
   mode?: "preview" | "edit";
 }) {
+  const router = useRouter();
+  const customerRef = useRef<any>(null);
+  
   // All hooks must be called at the top level
   const [isEditing, setIsEditing] = useState(false);
   const updateOrderMutation = useMutation(
@@ -104,6 +108,13 @@ export function CustomerBlock({
     setIsEditing(false);
   }, []);
 
+  const handleViewCustomer = useCallback(() => {
+    const customer = customerRef.current;
+    if (customer) {
+      router.push(`/portal/customers/${customer.id}`);
+    }
+  }, [router]);
+
   // Early return after all hooks are called
   if (!validOrderId) {
     return <div>No order</div>;
@@ -127,6 +138,9 @@ export function CustomerBlock({
   }));
 
   const customer = orgCustomers.find((c) => c.id === order.orgCustomerId);
+
+  // Update the ref with the current customer
+  customerRef.current = customer;
 
   // Show edit mode with customer search/create tabs
   if (isEditing) {
@@ -183,15 +197,25 @@ export function CustomerBlock({
     if (!customer) {
       return (
         <Stack gap="md">
-          {/* Header with Edit button - outside the card */}
+          {/* Header with View and Edit buttons - outside the card */}
           <Group justify="space-between" align="center">
             <Title order={3}>Customer Information</Title>
-            <Button
-              leftSection={<IconEdit size={16} />}
-              onClick={() => setIsEditing(true)}
-            >
-              Edit
-            </Button>
+            <Group gap="xs">
+              <Button
+                leftSection={<IconEye size={16} />}
+                onClick={handleViewCustomer}
+                disabled={!customer}
+                variant="outline"
+              >
+                View
+              </Button>
+              <Button
+                leftSection={<IconEdit size={16} />}
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </Button>
+            </Group>
           </Group>
 
           <Card withBorder>
@@ -207,15 +231,25 @@ export function CustomerBlock({
 
     return (
       <Stack gap="md">
-        {/* Header with Edit button - outside the card */}
+        {/* Header with View and Edit buttons - outside the card */}
         <Group justify="space-between" align="center">
           <Title order={3}>Customer Information</Title>
-          <Button
-            leftSection={<IconEdit size={16} />}
-            onClick={() => setIsEditing(true)}
-          >
-            Edit
-          </Button>
+          <Group gap="xs">
+            <Button
+              leftSection={<IconEye size={16} />}
+              onClick={handleViewCustomer}
+              disabled={!customer}
+              variant="outline"
+            >
+              View
+            </Button>
+            <Button
+              leftSection={<IconEdit size={16} />}
+              onClick={() => setIsEditing(true)}
+            >
+              Edit
+            </Button>
+          </Group>
         </Group>
 
         <Grid>
