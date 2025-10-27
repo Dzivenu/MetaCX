@@ -233,7 +233,17 @@ export function CustomerBlock({
       <Stack gap="md">
         {/* Header with View and Edit buttons - outside the card */}
         <Group justify="space-between" align="center">
-          <Title order={3}>Customer Information</Title>
+          <Group gap="xs" align="center">
+            <Title order={3}>Customer Information</Title>
+            {customer && (
+              <>
+                <Text size="lg" c="dimmed">•</Text>
+                <Text size="lg" fw={500}>
+                  {customer.firstName} {customer.lastName}
+                </Text>
+              </>
+            )}
+          </Group>
           <Group gap="xs">
             <Button
               leftSection={<IconEye size={16} />}

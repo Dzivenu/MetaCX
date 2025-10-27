@@ -115,7 +115,28 @@ export const getOrgNotesByEntitySimple = query({
 
     console.log("🔍 Simple query - filtered results:", filteredNotes.length);
 
-    return filteredNotes.sort((a, b) => b.createdAt - a.createdAt);
+    // Fetch user information for each note
+    const notesWithUsers = await Promise.all(
+      filteredNotes.map(async (note) => {
+        let creatorName = undefined;
+        if (note.createdBy) {
+          try {
+            const user = await ctx.db.get(note.createdBy as any);
+            if (user && 'email' in user) {
+              creatorName = (user as any).name || (user as any).email || "Unknown User";
+            }
+          } catch (error) {
+            console.error("Error fetching user:", error);
+          }
+        }
+        return {
+          ...note,
+          creatorName,
+        };
+      })
+    );
+
+    return notesWithUsers.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
 

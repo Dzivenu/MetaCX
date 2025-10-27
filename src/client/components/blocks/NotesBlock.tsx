@@ -243,11 +243,29 @@ export function NotesBlock({
                 bullet={<IconNote size={compact ? 10 : 12} />}
                 title={
                   <Group justify="space-between" align="center">
-                    <Group gap="xs">
+                    <Group gap="xs" align="center">
                       {note.title && (
-                        <Text fw={600} size="sm">
-                          {note.title}
-                        </Text>
+                        <>
+                          <Text fw={600} size="sm">
+                            {note.title}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            •
+                          </Text>
+                        </>
+                      )}
+                      <Text size="xs" c="dimmed">
+                        {new Date(note.createdAt).toLocaleString()}
+                      </Text>
+                      {note.creatorName && (
+                        <>
+                          <Text size="xs" c="dimmed">
+                            •
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            by {note.creatorName}
+                          </Text>
+                        </>
                       )}
                       {note.resolvable && (
                         <Badge
@@ -298,11 +316,8 @@ export function NotesBlock({
                 <Text size="sm" mt="xs">
                   {note.message}
                 </Text>
-                <Text size="xs" c="dimmed" mt="xs">
-                  {new Date(note.createdAt).toLocaleString()}
-                </Text>
                 {note.resolved && note.resolvedAt && (
-                  <Text size="xs" c="green" mt="xs">
+                  <Text size="xs" c="green" mt="4px">
                     Resolved on {new Date(note.resolvedAt).toLocaleString()}
                   </Text>
                 )}

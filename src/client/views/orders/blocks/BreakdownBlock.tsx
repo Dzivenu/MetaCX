@@ -203,9 +203,9 @@ export function BreakdownBlock({
         <Table striped>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Denomination</Table.Th>
-              <Table.Th>Count</Table.Th>
-              <Table.Th>Subtotal</Table.Th>
+              <Table.Th style={{ width: "33.33%" }}>Denomination</Table.Th>
+              <Table.Th style={{ width: "33.33%" }}>Count</Table.Th>
+              <Table.Th style={{ width: "33.33%" }}>Subtotal</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -246,6 +246,12 @@ export function BreakdownBlock({
   const hasOutbound = outboundBreakdowns.length > 0;
   const hasAny = hasInbound || hasOutbound;
 
+  // Check if order expects inbound/outbound based on sums
+  const inboundSum = Number(order.inboundSum) || 0;
+  const outboundSum = Number(order.outboundSum) || 0;
+  const expectsInbound = inboundSum > 0 && order.inboundTicker;
+  const expectsOutbound = outboundSum > 0 && order.outboundTicker;
+
   return (
     <Stack gap="md">
       {/* Header with Edit button - outside the card */}
@@ -259,23 +265,57 @@ export function BreakdownBlock({
         </Button>
       </Group>
 
-      <Card withBorder>
-        {!breakdowns || breakdowns.length === 0 ? (
+      {!hasAny && !expectsInbound && !expectsOutbound ? (
+        <Card withBorder>
           <Text c="dimmed" size="sm">
             No breakdowns have been created for this order yet.
           </Text>
-        ) : (
-          // Always show side by side layout when breakdowns exist
-          <Grid>
-            <Grid.Col span={6}>
-              {renderBreakdownGroup(inboundBreakdowns, "INBOUND", true)}
+        </Card>
+      ) : (
+        <Grid>
+          {/* Inbound Breakdown Card */}
+          {expectsInbound && (
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Card withBorder h="100%">
+                {hasInbound ? (
+                  renderBreakdownGroup(inboundBreakdowns, "INBOUND", false)
+                ) : (
+                  <Stack gap="sm">
+                    <Group gap="sm">
+                      <IconArrowDown size={16} color="green" />
+                      <Title order={5}>INBOUND Breakdown</Title>
+                    </Group>
+                    <Text c="dimmed" size="sm">
+                      No inbound breakdowns created yet.
+                    </Text>
+                  </Stack>
+                )}
+              </Card>
             </Grid.Col>
-            <Grid.Col span={6}>
-              {renderBreakdownGroup(outboundBreakdowns, "OUTBOUND", true)}
+          )}
+
+          {/* Outbound Breakdown Card */}
+          {expectsOutbound && (
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Card withBorder h="100%">
+                {hasOutbound ? (
+                  renderBreakdownGroup(outboundBreakdowns, "OUTBOUND", false)
+                ) : (
+                  <Stack gap="sm">
+                    <Group gap="sm">
+                      <IconArrowUp size={16} color="red" />
+                      <Title order={5}>OUTBOUND Breakdown</Title>
+                    </Group>
+                    <Text c="dimmed" size="sm">
+                      No outbound breakdowns created yet.
+                    </Text>
+                  </Stack>
+                )}
+              </Card>
             </Grid.Col>
-          </Grid>
-        )}
-      </Card>
+          )}
+        </Grid>
+      )}
     </Stack>
   );
 }
