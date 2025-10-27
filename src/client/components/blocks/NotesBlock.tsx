@@ -8,12 +8,10 @@ import {
   Stack,
   Group,
   Button,
-  Textarea,
-  TextInput,
   Badge,
   ActionIcon,
-  Checkbox,
   Timeline,
+  Modal,
 } from "@mantine/core";
 import {
   IconPlus,
@@ -21,11 +19,13 @@ import {
   IconX,
   IconTrash,
   IconNote,
+  IconEdit,
 } from "@tabler/icons-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { useAuth } from "@clerk/nextjs";
+import { NoteForm, type NoteFormData } from "./NoteForm";
 
 export type NoteType = "ORDER" | "SESSION" | "CUSTOMER" | "REPOSITORY" | "CURRENCY";
 
@@ -65,9 +65,8 @@ export function NotesBlock({
   compact = false,
 }: NotesBlockProps) {
   const [isAdding, setIsAdding] = useState(false);
-  const [newNoteTitle, setNewNoteTitle] = useState("");
-  const [newNoteMessage, setNewNoteMessage] = useState("");
-  const [newNoteResolvable, setNewNoteResolvable] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [deleteConfirmNoteId, setDeleteConfirmNoteId] = useState<string | null>(null);
 
   const { orgId } = useAuth();
 
@@ -87,6 +86,9 @@ export function NotesBlock({
   const createNoteMutation = useMutation(
     (api.functions as any).orgNotes?.createOrgNote
   );
+  const updateNoteMutation = useMutation(
+    (api.functions as any).orgNotes?.updateOrgNote
+  );
   const resolveNoteMutation = useMutation(
     (api.functions as any).orgNotes?.resolveOrgNote
   );
@@ -94,28 +96,36 @@ export function NotesBlock({
     (api.functions as any).orgNotes?.deleteOrgNote
   );
 
-  const handleAddNote = async () => {
-    if (!newNoteMessage.trim() || !orgId) {
-      return;
-    }
+  const handleCreateNote = async (data: NoteFormData) => {
+    if (!orgId) return;
 
     try {
       await createNoteMutation({
         noteType,
         entityId,
-        title: newNoteTitle.trim() || undefined,
-        message: newNoteMessage.trim(),
-        resolvable: showResolveOption ? newNoteResolvable : false,
+        title: data.title,
+        message: data.message,
+        resolvable: data.resolvable,
         clerkOrganizationId: orgId,
       });
-
-      // Reset form
-      setNewNoteTitle("");
-      setNewNoteMessage("");
-      setNewNoteResolvable(false);
       setIsAdding(false);
     } catch (error) {
       console.error("Failed to create note:", error);
+      throw error;
+    }
+  };
+
+  const handleUpdateNote = async (noteId: string, data: NoteFormData) => {
+    try {
+      await updateNoteMutation({
+        noteId: noteId as Id<"org_notes">,
+        title: data.title,
+        message: data.message,
+      });
+      setEditingNoteId(null);
+    } catch (error) {
+      console.error("Failed to update note:", error);
+      throw error;
     }
   };
 
@@ -130,11 +140,12 @@ export function NotesBlock({
     }
   };
 
-  const handleDeleteNote = async (noteId: Id<"org_notes">) => {
-    if (!confirm("Are you sure you want to delete this note?")) return;
+  const handleDeleteNote = async () => {
+    if (!deleteConfirmNoteId) return;
 
     try {
-      await deleteNoteMutation({ noteId });
+      await deleteNoteMutation({ noteId: deleteConfirmNoteId as Id<"org_notes"> });
+      setDeleteConfirmNoteId(null);
     } catch (error) {
       console.error("Failed to delete note:", error);
     }
@@ -179,50 +190,13 @@ export function NotesBlock({
 
       {/* Add Note Form */}
       {isAdding && showAddButton && (
-        <Card withBorder>
-          <Stack gap="md">
-            <TextInput
-              label="Title (Optional)"
-              placeholder="Note title"
-              value={newNoteTitle}
-              onChange={(e) => setNewNoteTitle(e.target.value)}
-              size={compact ? "sm" : "md"}
-            />
-            <Textarea
-              label="Message"
-              placeholder="Enter note message..."
-              required
-              minRows={compact ? 2 : 3}
-              value={newNoteMessage}
-              onChange={(e) => setNewNoteMessage(e.target.value)}
-              size={compact ? "sm" : "md"}
-            />
-            {showResolveOption && (
-              <Checkbox
-                label="This note requires resolution"
-                checked={newNoteResolvable}
-                onChange={(e) => setNewNoteResolvable(e.currentTarget.checked)}
-                size={compact ? "sm" : "md"}
-              />
-            )}
-            <Group justify="flex-end">
-              <Button 
-                variant="outline" 
-                onClick={() => setIsAdding(false)}
-                size={compact ? "compact-sm" : "sm"}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleAddNote} 
-                disabled={!newNoteMessage.trim()}
-                size={compact ? "compact-sm" : "sm"}
-              >
-                Add Note
-              </Button>
-            </Group>
-          </Stack>
-        </Card>
+        <NoteForm
+          onSubmit={handleCreateNote}
+          onCancel={() => setIsAdding(false)}
+          submitLabel="Add Note"
+          showResolveOption={showResolveOption}
+          compact={compact}
+        />
       )}
 
       {/* Notes List */}
@@ -303,8 +277,17 @@ export function NotesBlock({
                       <ActionIcon
                         size="sm"
                         variant="light"
+                        color="blue"
+                        onClick={() => setEditingNoteId(note._id)}
+                        title="Edit note"
+                      >
+                        <IconEdit size={14} />
+                      </ActionIcon>
+                      <ActionIcon
+                        size="sm"
+                        variant="light"
                         color="red"
-                        onClick={() => handleDeleteNote(note._id)}
+                        onClick={() => setDeleteConfirmNoteId(note._id)}
                         title="Delete note"
                       >
                         <IconTrash size={14} />
@@ -326,6 +309,61 @@ export function NotesBlock({
           </Timeline>
         )}
       </Card>
+
+      {/* Edit Note Modal */}
+      <Modal
+        opened={!!editingNoteId}
+        onClose={() => setEditingNoteId(null)}
+        title="Edit Note"
+        size="md"
+      >
+        {editingNoteId && (() => {
+          const note = notes?.find((n: any) => n._id === editingNoteId);
+          if (!note) return null;
+          return (
+            <NoteForm
+              initialData={{
+                title: note.title,
+                message: note.message,
+                resolvable: note.resolvable,
+              }}
+              onSubmit={(data) => handleUpdateNote(editingNoteId, data)}
+              onCancel={() => setEditingNoteId(null)}
+              submitLabel="Update Note"
+              showResolveOption={false}
+              compact={compact}
+            />
+          );
+        })()}
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={!!deleteConfirmNoteId}
+        onClose={() => setDeleteConfirmNoteId(null)}
+        title="Delete Note"
+        size="sm"
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            Are you sure you want to delete this note? This action cannot be undone.
+          </Text>
+          <Group justify="flex-end">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteConfirmNoteId(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              onClick={handleDeleteNote}
+            >
+              Delete
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   );
 }
