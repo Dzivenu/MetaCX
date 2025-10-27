@@ -24,6 +24,7 @@ import type * as functions_orgCurrencies from "../functions/orgCurrencies.js";
 import type * as functions_orgCustomers from "../functions/orgCustomers.js";
 import type * as functions_orgCxSessions from "../functions/orgCxSessions.js";
 import type * as functions_orgFloat from "../functions/orgFloat.js";
+import type * as functions_orgFloatTransfers from "../functions/orgFloatTransfers.js";
 import type * as functions_orgIdentifications from "../functions/orgIdentifications.js";
 import type * as functions_orgMemberships from "../functions/orgMemberships.js";
 import type * as functions_orgNotes from "../functions/orgNotes.js";
@@ -76,6 +77,7 @@ declare const fullApi: ApiFromModules<{
   "functions/orgCustomers": typeof functions_orgCustomers;
   "functions/orgCxSessions": typeof functions_orgCxSessions;
   "functions/orgFloat": typeof functions_orgFloat;
+  "functions/orgFloatTransfers": typeof functions_orgFloatTransfers;
   "functions/orgIdentifications": typeof functions_orgIdentifications;
   "functions/orgMemberships": typeof functions_orgMemberships;
   "functions/orgNotes": typeof functions_orgNotes;
