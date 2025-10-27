@@ -8,6 +8,7 @@ import { OrderProvider } from "@/client/providers/order-provider";
 import { QuoteBlock } from "@/client/views/orders/blocks/QuoteBlock";
 import { CustomerBlock } from "@/client/views/orders/blocks/CustomerBlock";
 import { BreakdownBlock } from "@/client/views/orders/blocks/BreakdownBlock";
+import { NotesBlock } from "@/client/views/orders/blocks/NotesBlock";
 import { useShortId } from "@/client/hooks/useShortId";
 
 interface OrderDetailViewProps {
@@ -47,6 +48,9 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
           {/* Breakdown - Full width */}
           <BreakdownBlock orderId={orderId} mode="preview" />
+
+          {/* Notes - Full width */}
+          <NotesBlock orderId={orderId} />
         </Stack>
       </Container>
     </OrderProvider>
