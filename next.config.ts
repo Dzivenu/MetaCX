@@ -2,12 +2,10 @@ import type { NextConfig } from "next";
 import { env } from "./src/shared/config/env";
 
 const nextConfig: NextConfig = {
-  /* Turbo compiler configuration */
+  /* Turbopack configuration */
+  turbopack: {},
+
   experimental: {
-    // Enable Turbo compiler optimizations
-    turbo: {
-      // Remove the problematic rules configuration
-    },
     // Enable tree shaking for heavy packages
     optimizePackageImports: [
       "@mantine/core",

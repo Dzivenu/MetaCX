@@ -11,8 +11,8 @@
     "build:turbo": "node -r ./polyfill.js ./node_modules/next/dist/bin/next build --turbo",
     "start": "next start -p 4000",
     "start:turbo": "next start --turbo -p 4000",
-    "lint": "next lint",
-    "lint:turbo": "next lint --turbo",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "db:reset-convex": "npx tsx scripts/reset-convex-database.ts",
     "db:stats-convex": "npx tsx scripts/convex-database-stats.ts"
   },
