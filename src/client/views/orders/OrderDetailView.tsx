@@ -28,7 +28,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
       <Container size="xl" py="xl">
         {/* Header */}
         <Group justify="space-between" align="center" mb="xl">
-          <Title order={1}>Order {shortOrderId}</Title>
+          <Title order={1}>Order {shortOrderId || orderId}</Title>
           <Button
             variant="outline"
             leftSection={<IconArrowLeft size={16} />}
