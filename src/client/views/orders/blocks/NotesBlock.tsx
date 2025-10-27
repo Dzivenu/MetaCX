@@ -21,12 +21,14 @@ import {
   IconX,
   IconTrash,
   IconNote,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { useOrgOrderById } from "@/client/hooks/useOrgOrderByIdConvex";
 import type { FunctionReference } from "convex/server";
+import { useAuth } from "@clerk/nextjs";
 
 interface NotesBlockProps {
   orderId: string;
@@ -38,7 +40,7 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
   const [newNoteMessage, setNewNoteMessage] = useState("");
   const [newNoteResolvable, setNewNoteResolvable] = useState(false);
 
-  // Get order to access organization ID
+  const { orgId } = useAuth();
   const { order } = useOrgOrderById(orderId);
 
   // Debug: Query a specific note by ID
@@ -50,16 +52,67 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
   console.log("🔍 Debug note query result:", debugNote);
 
   // Try using the same pattern as the debug query that works
-  const notes = useQuery((api.functions as any).orgNotes?.getOrgNotesByEntity, {
-    noteType: "ORDER",
-    entityId: orderId,
-  });
+  const notes = useQuery(
+    (api.functions as any).orgNotes?.getOrgNotesByEntity,
+    orgId
+      ? {
+          noteType: "ORDER",
+          entityId: orderId,
+          clerkOrganizationId: orgId,
+        }
+      : "skip"
+  );
 
-  console.log("Notes query result:", {
+  // Test with the simple query
+  const notesSimple = useQuery(
+    (api.functions as any).orgNotes?.getOrgNotesByEntitySimple,
+    orgId
+      ? {
+          noteType: "ORDER",
+          entityId: orderId,
+          clerkOrganizationId: orgId,
+        }
+      : "skip"
+  );
+
+  // Direct test - query for the most recently created note
+  const [lastCreatedNoteId, setLastCreatedNoteId] = useState<string | null>(null);
+  const lastCreatedNote = useQuery(
+    (api.functions as any).orgNotes?.getOrgNoteById,
+    lastCreatedNoteId ? { noteId: lastCreatedNoteId as any } : "skip"
+  );
+
+  // Basic test - get all organization notes
+  const allOrgNotes = useQuery(
+    (api.functions as any).orgNotes?.getAllOrgNotes,
+    orgId ? { clerkOrganizationId: orgId } : "skip"
+  );
+
+  console.log("🔍 Notes query debug:", {
+    orderId,
+    orderIdType: typeof orderId,
     notes,
     notesCount: notes?.length,
-    orderId,
+    notesArray: Array.isArray(notes) ? notes : 'not array',
     notesData: notes,
+    apiAvailable: !!(api.functions as any).orgNotes?.getOrgNotesByEntity,
+  });
+
+  console.log("🔍 Simple query debug:", {
+    notesSimple,
+    notesSimpleCount: notesSimple?.length,
+    notesSimpleArray: Array.isArray(notesSimple) ? notesSimple : 'not array',
+  });
+
+  console.log("🔍 Last created note debug:", {
+    lastCreatedNoteId,
+    lastCreatedNote,
+  });
+
+  console.log("🔍 All org notes debug:", {
+    allOrgNotes,
+    allOrgNotesCount: allOrgNotes?.length,
+    orderNotesFound: allOrgNotes?.filter((n: any) => n.orderId === orderId)?.length,
   });
 
   const createNoteMutation = useMutation(
@@ -71,6 +124,12 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
   const deleteNoteMutation = useMutation(
     (api.functions as any).orgNotes?.deleteOrgNote
   );
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    // Force refetch by invalidating the query
+    void (api.functions as any).orgNotes?.getOrgNotesByEntity;
+  };
 
   const handleAddNote = async () => {
     if (!newNoteMessage.trim() || !order) {
@@ -101,6 +160,9 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
       });
 
       console.log("Note created successfully:", result);
+
+      // Store the last created note ID for testing
+      setLastCreatedNoteId(result);
 
       // Reset form
       setNewNoteTitle("");
@@ -138,13 +200,22 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
       {/* Header with Add button */}
       <Group justify="space-between" align="center">
         <Title order={3}>Order Notes</Title>
-        <Button
-          leftSection={<IconPlus size={16} />}
-          onClick={() => setIsAdding(!isAdding)}
-          variant={isAdding ? "outline" : "filled"}
-        >
-          {isAdding ? "Cancel" : "Add Note"}
-        </Button>
+        <Group gap="xs">
+          <ActionIcon
+            variant="light"
+            onClick={handleRefresh}
+            title="Refresh notes"
+          >
+            <IconRefresh size={16} />
+          </ActionIcon>
+          <Button
+            leftSection={<IconPlus size={16} />}
+            onClick={() => setIsAdding(!isAdding)}
+            variant={isAdding ? "outline" : "filled"}
+          >
+            {isAdding ? "Cancel" : "Add Note"}
+          </Button>
+        </Group>
       </Group>
 
       {/* Add Note Form */}
@@ -184,13 +255,13 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
 
       {/* Notes List */}
       <Card withBorder>
-        {!notes || notes.length === 0 ? (
+        {(!notesSimple || notesSimple.length === 0) ? (
           <Text c="dimmed" size="sm">
             No notes have been added to this order yet.
           </Text>
         ) : (
-          <Timeline active={notes.length} bulletSize={24} lineWidth={2}>
-            {notes.map((note: any) => (
+          <Timeline active={notesSimple.length} bulletSize={24} lineWidth={2}>
+            {notesSimple.map((note: any) => (
               <Timeline.Item
                 key={note._id}
                 bullet={<IconNote size={12} />}

@@ -13,11 +13,10 @@ export const getOrgNoteById = query({
   },
 });
 
-// Get notes for a specific entity
-export const getOrgNotesByEntity = query({
+// Get all notes for organization (basic test)
+export const getAllOrgNotes = query({
   args: {
-    noteType: v.string(),
-    entityId: v.string(),
+    clerkOrganizationId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -26,7 +25,116 @@ export const getOrgNotesByEntity = query({
     }
 
     const orgId =
-      typeof identity.org_id === "string" ? identity.org_id : undefined;
+      args.clerkOrganizationId ||
+      (typeof identity.org_id === "string" ? identity.org_id : undefined);
+    if (!orgId) {
+      return [];
+    }
+
+    console.log("🔍 Basic query - getting all notes for org:", orgId);
+
+    const allNotes = await ctx.db
+      .query("org_notes")
+      .withIndex("by_organization", (q) =>
+        q.eq("clerkOrganizationId", orgId)
+      )
+      .collect();
+
+    console.log("🔍 Basic query - found notes:", allNotes.length);
+    
+    if (allNotes.length > 0) {
+      console.log("🔍 Basic query - sample note org ID:", allNotes[0].clerkOrganizationId);
+    }
+
+    return allNotes;
+  },
+});
+
+// Get notes for a specific entity (simplified version for debugging)
+export const getOrgNotesByEntitySimple = query({
+  args: {
+    noteType: v.string(),
+    entityId: v.string(),
+    clerkOrganizationId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const orgId =
+      args.clerkOrganizationId ||
+      (typeof identity.org_id === "string" ? identity.org_id : undefined);
+    if (!orgId) {
+      return [];
+    }
+
+    console.log("🔍 Simple query - fetching all notes for org:", orgId);
+
+    // Get ALL notes for this organization first
+    const allOrgNotes = await ctx.db
+      .query("org_notes")
+      .withIndex("by_organization", (q) =>
+        q.eq("clerkOrganizationId", orgId)
+      )
+      .collect();
+
+    console.log("🔍 Simple query - total org notes:", allOrgNotes.length);
+
+    // Filter in JavaScript instead of Convex query
+    const filteredNotes = allOrgNotes.filter((note) => {
+      const matchesType = note.noteType === args.noteType;
+      let matchesEntity = false;
+      
+      switch (args.noteType) {
+        case "ORDER":
+          matchesEntity = note.orderId === args.entityId;
+          break;
+        case "CUSTOMER":
+          matchesEntity = note.customerId === args.entityId;
+          break;
+        case "SESSION":
+          matchesEntity = note.sessionId === args.entityId;
+          break;
+        default:
+          matchesEntity = false;
+      }
+
+      console.log("🔍 Simple query - note check:", {
+        noteId: note._id,
+        noteType: note.noteType,
+        matchesType,
+        entityId: note.orderId || note.customerId || note.sessionId,
+        targetEntityId: args.entityId,
+        matchesEntity
+      });
+
+      return matchesType && matchesEntity;
+    });
+
+    console.log("🔍 Simple query - filtered results:", filteredNotes.length);
+
+    return filteredNotes.sort((a, b) => b.createdAt - a.createdAt);
+  },
+});
+
+// Get notes for a specific entity
+export const getOrgNotesByEntity = query({
+  args: {
+    noteType: v.string(),
+    entityId: v.string(),
+    clerkOrganizationId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const orgId =
+      args.clerkOrganizationId ||
+      (typeof identity.org_id === "string" ? identity.org_id : undefined);
     if (!orgId) {
       return [];
     }
@@ -42,23 +150,7 @@ export const getOrgNotesByEntity = query({
     let notes: any[] = [];
     switch (args.noteType) {
       case "ORDER":
-        // Query all notes for this org first to debug
-        const allOrgNotes = await ctx.db
-          .query("org_notes")
-          .withIndex("by_organization", (q) =>
-            q.eq("clerkOrganizationId", orgId)
-          )
-          .collect();
-        console.log("🔍 All org notes:", allOrgNotes.length);
-        if (allOrgNotes.length > 0) {
-          console.log("🔍 Sample note:", {
-            id: allOrgNotes[0]._id,
-            orderId: allOrgNotes[0].orderId,
-            orderIdType: typeof allOrgNotes[0].orderId,
-          });
-        }
-
-        // Query by organization and filter by orderId (orderId is stored as string)
+        // Query by organization and orderId directly
         notes = await ctx.db
           .query("org_notes")
           .withIndex("by_organization", (q) =>
@@ -72,12 +164,37 @@ export const getOrgNotesByEntity = query({
           )
           .order("desc")
           .collect();
+        
         console.log(
-          "🔍 Found ORDER notes:",
-          notes.length,
-          "for orderId:",
-          args.entityId
+          "🔍 ORDER query details:",
+          "orgId:",
+          orgId,
+          "entityId:",
+          args.entityId,
+          "found:",
+          notes.length
         );
+        
+        // Debug: show what we're filtering for
+        if (notes.length === 0) {
+          const allOrgNotes = await ctx.db
+            .query("org_notes")
+            .withIndex("by_organization", (q) =>
+              q.eq("clerkOrganizationId", orgId)
+            )
+            .collect();
+          
+          const orderNotes = allOrgNotes.filter(n => n.noteType === "ORDER");
+          console.log(
+            "🔍 Debug - all ORDER notes for org:",
+            orderNotes.map(n => ({
+              id: n._id,
+              orderId: n.orderId,
+              targetOrderId: args.entityId,
+              matches: n.orderId === args.entityId
+            }))
+          );
+        }
         break;
       case "CUSTOMER":
         notes = await ctx.db
@@ -191,6 +308,22 @@ export const createOrgNote = mutation({
 
     const noteId = await ctx.db.insert("org_notes", noteData);
     console.log("Note created with ID:", noteId);
+    
+    // Debug: Immediately query to verify the note was inserted correctly
+    const insertedNote = await ctx.db.get(noteId);
+    console.log("🔍 Verification - inserted note:", JSON.stringify(insertedNote, null, 2));
+    
+    // Debug: Query for all ORDER notes for this org to see if our note appears
+    const allOrderNotes = await ctx.db
+      .query("org_notes")
+      .withIndex("by_organization", (q) =>
+        q.eq("clerkOrganizationId", orgId)
+      )
+      .filter((q) => q.eq(q.field("noteType"), "ORDER"))
+      .collect();
+    console.log("🔍 All ORDER notes after creation:", allOrderNotes.length);
+    console.log("🔍 Our note in the list:", allOrderNotes.find(n => n._id === noteId));
+    
     return noteId;
   },
 });
