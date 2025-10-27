@@ -21,10 +21,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Disable ESLint during build to avoid compatibility issues with Next.js 15
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // ESLint configuration moved to eslint.config.mjs in Next.js 16
 
   // Compiler optimizations
   compiler: {
