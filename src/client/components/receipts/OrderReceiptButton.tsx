@@ -100,8 +100,8 @@ export default function OrderReceiptButton({
       }
 
       const contentElement = contentRef.current;
-      const hasTextContent = contentElement.textContent?.trim()?.length > 0;
-      const hasHtmlContent = contentElement.innerHTML?.trim()?.length > 0;
+      const hasTextContent = contentElement?.textContent?.trim()?.length ?? 0 > 0;
+      const hasHtmlContent = contentElement?.innerHTML?.trim()?.length ?? 0 > 0;
 
       if (!hasTextContent || !hasHtmlContent) {
         notifications.show({
@@ -126,11 +126,6 @@ export default function OrderReceiptButton({
 
   const handleUSBPrint = useReactToPrint({
     contentRef,
-    onBeforeGetContent: () => {
-      if (!validateReceiptData(order)) {
-        throw new Error("Invalid receipt data");
-      }
-    },
     onAfterPrint: () => {
       notifications.show({
         title: "Receipt Printed",

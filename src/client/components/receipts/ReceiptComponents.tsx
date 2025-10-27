@@ -7,13 +7,14 @@ interface TextProps {
   children: ReactNode;
   margin?: string;
   center?: boolean;
+  padded?: boolean;
 }
 
-export const Text = ({ fontSize, bold, children, margin, center }: TextProps) => {
+export const Text = ({ fontSize, bold, children, margin, center, padded }: TextProps) => {
   const style: CSSProperties = {
     fontWeight: bold ? "bold" : "normal",
     fontSize: fontSize ? `${fontSize}em` : "100%",
-    margin: margin,
+    margin: margin || (padded ? "0.5em 0" : undefined),
     textAlign: center ? "center" : "left",
   };
 

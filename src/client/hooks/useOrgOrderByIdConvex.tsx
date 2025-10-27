@@ -7,6 +7,8 @@ import type { Id } from "../../../convex/_generated/dataModel";
 
 export interface OrgOrderById {
   id: string;
+  _id: string;
+  displayId?: string;
   inboundSum?: string;
   inboundTicker?: string;
   inboundType?: string;
@@ -29,6 +31,19 @@ export interface OrgOrderById {
   updatedAt: string;
   openDt?: string;
   closeDt?: string;
+  outboundCryptoAddress?: string;
+  batchedStatus?: string;
+  customer?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  breakdowns?: Array<{
+    direction: string;
+    count: number;
+    denomination: {
+      value: number;
+    };
+  }>;
 }
 
 export function useOrgOrderById(orderId?: string) {
@@ -43,6 +58,8 @@ export function useOrgOrderById(orderId?: string) {
     if (!data) return null;
     return {
       id: data._id,
+      _id: data._id,
+      displayId: (data as any).displayId,
       inboundSum: data.inboundSum,
       inboundTicker: data.inboundTicker,
       inboundType: data.inboundType,
@@ -65,6 +82,10 @@ export function useOrgOrderById(orderId?: string) {
       updatedAt: new Date(data.updatedAt).toISOString(),
       openDt: data.openDt ? new Date(data.openDt).toISOString() : undefined,
       closeDt: data.closeDt ? new Date(data.closeDt).toISOString() : undefined,
+      outboundCryptoAddress: (data as any).outboundCryptoAddress,
+      batchedStatus: (data as any).batchedStatus,
+      customer: (data as any).customer,
+      breakdowns: (data as any).breakdowns,
     };
   }, [data]);
 
