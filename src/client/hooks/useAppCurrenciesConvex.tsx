@@ -73,9 +73,6 @@ export function useAppCurrencies(): UseAppCurrenciesResult {
   useEffect(() => {
     if (appCurrenciesData === undefined) {
       const timer = setTimeout(() => {
-        console.log(
-          "🔍 useAppCurrencies - Convex query timed out, assuming no data available"
-        );
         setHasTimedOut(true);
       }, 5000); // 5 second timeout
 
@@ -99,7 +96,6 @@ export function useAppCurrencies(): UseAppCurrenciesResult {
 
       try {
         const result = await refreshAction();
-        console.log("App currencies refreshed successfully:", result);
         return result;
       } catch (err) {
         const errorMessage =

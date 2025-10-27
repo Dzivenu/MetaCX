@@ -19,16 +19,7 @@ export default function ManageRepositoriesTab({
     useRepositories();
   const { currencies } = useCurrencies();
 
-  console.log(
-    "🔍 ManageRepositoriesTab - loading:",
-    loading,
-    "error:",
-    error,
-    "repositories:",
-    repositories,
-    "currencies:",
-    currencies
-  );
+  const [editingRepository, setEditingRepository] = useState<Repository | null>(null);
 
   // Refresh when tab becomes active
   useEffect(() => {

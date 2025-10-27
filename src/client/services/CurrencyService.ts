@@ -163,7 +163,6 @@ export class CurrencyService {
       }
 
       const data = await response.json();
-      console.log("Currency rates refresh enqueued");
       return data;
     } catch (error) {
       console.error("Error refreshing currency rates:", error);
@@ -315,6 +314,5 @@ export class MockCurrencyService extends CurrencyService {
 
   async refreshCurrencyRates(): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Mock: Currency rates refresh enqueued");
   }
 }

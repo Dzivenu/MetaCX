@@ -144,7 +144,6 @@ export function useRepositories(): UseRepositoriesResult {
   const createRepository = useCallback(
     async (data: CreateRepositoryData): Promise<string | null> => {
       setError(null);
-      console.log("🔍 useRepositories - createRepository called with:", data);
 
       try {
         // Add timeout to prevent hanging forever
@@ -175,7 +174,6 @@ export function useRepositories(): UseRepositoriesResult {
           ),
         ]);
 
-        console.log("🔍 useRepositories - createRepository success:", result);
         return result as string;
       } catch (err) {
         const errorMessage =
@@ -395,12 +393,8 @@ export function useCreateRepository() {
   const createRepository = useCallback(
     async (data: CreateRepositoryData) => {
       setError(null);
-      console.log(
-        "🔍 useCreateRepository - createRepository called with:",
-        data
-      );
 
-      try {
+      try{
         // Add timeout to prevent hanging forever
         const result = await Promise.race([
           createRepositoryMutation({
@@ -428,10 +422,6 @@ export function useCreateRepository() {
           ),
         ]);
 
-        console.log(
-          "🔍 useCreateRepository - createRepository success:",
-          result
-        );
         return result;
       } catch (err) {
         const errorMessage =

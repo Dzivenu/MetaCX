@@ -70,14 +70,12 @@ export default function OrganizationPage() {
 
         // Fetch organization by slug from Clerk
         const orgData = await getOrganizationBySlug({ slug });
-        console.log("Organization loaded:", orgData);
         setOrganization(orgData);
 
         // Fetch organization memberships
         const membershipData = await getOrganizationMemberships({
           organizationId: orgData.id,
         });
-        console.log("Memberships loaded:", membershipData);
         setMembers(membershipData);
       } catch (error) {
         console.error("Failed to load organization:", error);
@@ -189,7 +187,6 @@ export default function OrganizationPage() {
     });
   };
 
-  console.log("DEBUG members:", members);
   const pendingInvitations: any[] = []; // TODO: Implement invitations fetching from Clerk API
 
   return (

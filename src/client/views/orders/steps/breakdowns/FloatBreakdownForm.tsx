@@ -272,10 +272,6 @@ export function FloatBreakdownForm({
   // Handle breakdown submission
   const handleSubmitBreakdown = useCallback(async () => {
     if (!isBreakdownValid || !effectiveOrderId) {
-      console.log("Cannot submit - invalid breakdown or no order ID:", {
-        isBreakdownValid,
-        orderId: effectiveOrderId,
-      });
       return;
     }
 
@@ -289,15 +285,11 @@ export function FloatBreakdownForm({
         status: "ACTIVE",
       }));
 
-    console.log("Submitting breakdown data:", breakdownData);
-
     try {
       const result = await saveBreakdowns(breakdownData);
-      console.log("Breakdown save result:", result);
 
       if (result?.success !== false) {
         setBreakdownCompleted(true);
-        console.log("Breakdown submitted successfully");
 
         if (onBreakdownChange) {
           onBreakdownChange(breakdownData, true);
@@ -316,22 +308,6 @@ export function FloatBreakdownForm({
     saveBreakdowns,
     onBreakdownChange,
   ]);
-
-  // Debug logging
-  console.log("🔍 FloatBreakdownForm Debug:", {
-    direction,
-    ticker,
-    targetSum,
-    activeSessionId: activeSession?._id,
-    floatLoading,
-    floatError,
-    floatData,
-    rawRepositories: rawRepositories?.length,
-    repositories: repositories.length,
-    selectedRepository,
-    floatStacks: floatStacks.length,
-    currentRepoFloatStacks: currentRepoFloatStacks.length,
-  });
 
   if (floatLoading) {
     return (

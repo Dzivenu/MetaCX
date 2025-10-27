@@ -175,7 +175,6 @@ export default function OrganizationsPage() {
                           color="red"
                           onClick={() => {
                             // Handle delete - you may want to implement this
-                            console.log("Delete organization", org.id);
                           }}
                         >
                           Delete

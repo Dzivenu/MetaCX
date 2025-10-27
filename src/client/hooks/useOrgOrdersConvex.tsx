@@ -83,19 +83,6 @@ export function useOrgOrders(
     ? activeSession?._id
     : orgSessionId;
 
-  console.log(
-    "🔍 useOrgOrders - orgId:",
-    orgId,
-    "originalSessionId:",
-    orgSessionId,
-    "effectiveSessionId:",
-    effectiveSessionId,
-    "status:",
-    status,
-    "useActiveSessionFilter:",
-    useActiveSessionFilter
-  );
-
   // Use different queries based on parameters
   const ordersByStatus = useQuery(
     api.functions.orgOrders.getOrgOrdersByStatus,
@@ -113,8 +100,6 @@ export function useOrgOrders(
 
   // Use the appropriate data source
   const ordersData = status ? ordersByStatus : ordersQuery;
-
-  console.log("🔍 useOrgOrders - ordersData:", ordersData);
 
   // Mutations
   const createOrgOrderMutation = useMutation(
@@ -167,9 +152,6 @@ export function useOrgOrders(
       orgSessionId || status || (!orgSessionId && !status);
     if (shouldWaitForData && ordersData === undefined) {
       const timer = setTimeout(() => {
-        console.log(
-          "🔍 useOrgOrders - Convex query timed out, assuming no data available"
-        );
         setHasTimedOut(true);
       }, 5000);
 
@@ -183,15 +165,6 @@ export function useOrgOrders(
     ordersData === undefined &&
     (!!orgSessionId || !!status || (!orgSessionId && !status)) &&
     !hasTimedOut;
-
-  console.log(
-    "🔍 useOrgOrders - isLoading:",
-    isLoading,
-    "orders count:",
-    orgOrders.length,
-    "hasTimedOut:",
-    hasTimedOut
-  );
 
   const createOrgOrder = useCallback(
     async (data: CreateOrgOrderData): Promise<OrgOrder | null> => {

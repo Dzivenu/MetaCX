@@ -82,18 +82,6 @@ export const CurrencyPanel: React.FC<CurrencyPanelProps> = ({
   isDebugMode = false,
   embedded = false,
 }) => {
-  // Debug logging for currency panel
-  console.log(`💱 CurrencyPanel ${currencyObj.ticker}:`, {
-    floatState,
-    disableEdit,
-    floatStacksCount: currencyObj.floatStacks.length,
-    floatStacks: currencyObj.floatStacks.map((s) => ({
-      id: s.id.substring(0, 8),
-      denomination: s.denomination.name,
-      openCount: s.openCount,
-      closeCount: s.closeCount,
-    })),
-  });
   const {
     buildCurrencyPanelState,
     areFloatStacksConfirmed,

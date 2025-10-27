@@ -78,7 +78,6 @@ export default function CreateRepositoryTab({
   }));
 
   const handleSubmit = async (values: CreateRepositoryFormData) => {
-    console.log("🔍 CreateRepositoryTab - handleSubmit called with:", values);
     setSubmitting(true);
     try {
       const result = await Promise.race([
@@ -106,8 +105,6 @@ export default function CreateRepositoryTab({
         ),
       ]);
 
-      console.log("🔍 CreateRepositoryTab - createRepository result:", result);
-
       notifications.show({
         title: "Success",
         message: "Repository created successfully",
@@ -131,9 +128,6 @@ export default function CreateRepositoryTab({
         icon: <IconAlertCircle size={16} />,
       });
     } finally {
-      console.log(
-        "🔍 CreateRepositoryTab - finally block, setting submitting to false"
-      );
       setSubmitting(false);
     }
   };

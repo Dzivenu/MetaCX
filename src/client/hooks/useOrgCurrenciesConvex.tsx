@@ -59,15 +59,11 @@ export function useOrgCurrencies(): UseOrgCurrenciesResult {
   const { orgId } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
-  console.log("🔍 useOrgCurrencies - orgId:", orgId);
-
   // Use Convex query to get org currencies
   const orgCurrenciesData = useQuery(
     api.functions.orgCurrencies.getOrgCurrencies,
     orgId ? { clerkOrganizationId: orgId } : "skip"
   );
-
-  console.log("🔍 useOrgCurrencies - orgCurrenciesData:", orgCurrenciesData);
 
   // Mutations
   const createOrgCurrencyMutation = useMutation(
@@ -107,9 +103,6 @@ export function useOrgCurrencies(): UseOrgCurrenciesResult {
   useEffect(() => {
     if (orgId && orgCurrenciesData === undefined) {
       const timer = setTimeout(() => {
-        console.log(
-          "🔍 useOrgCurrencies - Convex query timed out, assuming no data available"
-        );
         setHasTimedOut(true);
       }, 5000);
 
@@ -120,15 +113,6 @@ export function useOrgCurrencies(): UseOrgCurrenciesResult {
   }, [orgId, orgCurrenciesData]);
 
   const isLoading = orgCurrenciesData === undefined && !!orgId && !hasTimedOut;
-
-  console.log(
-    "🔍 useOrgCurrencies - isLoading:",
-    isLoading,
-    "currencies count:",
-    orgCurrencies.length,
-    "hasTimedOut:",
-    hasTimedOut
-  );
 
   const createOrgCurrency = useCallback(
     async (data: CreateOrgCurrencyData): Promise<OrgCurrency | null> => {

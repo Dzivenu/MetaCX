@@ -64,10 +64,8 @@ export const AddressList: React.FC<AddressListProps> = ({
   });
 
   const handleAddAddress = () => {
-    console.log("Add Address clicked", { parentType, parentId, isFormOpen });
     setEditingAddress(null);
     setIsFormOpen(true);
-    console.log("Modal should open, isFormOpen set to:", true);
   };
 
   const handleEditAddress = (address: OrgAddress) => {
@@ -99,32 +97,24 @@ export const AddressList: React.FC<AddressListProps> = ({
   };
 
   const handleFormSubmit = async (data: any) => {
-    console.log("🚀 Form submit called with data:", data);
     try {
       if (editingAddress) {
-        console.log("📝 Updating existing address:", editingAddress._id);
-        // Update existing address
         await updateAddress({
           addressId: editingAddress._id,
           ...data,
         });
-        console.log("✅ Address updated successfully");
       } else {
-        console.log("🆕 Creating new address for:", { parentType, parentId });
-        // Create new address
         if (!parentId) {
           throw new Error("Parent ID is required to create an address");
         }
-        const result = await createAddress({
+        await createAddress({
           parentType,
           parentId,
           ...data,
         });
-        console.log("✅ Address created successfully:", result);
       }
       setIsFormOpen(false);
       setEditingAddress(null);
-      console.log("🔄 Modal closed, form reset");
     } catch (error) {
       console.error("❌ Failed to save address:", error);
       throw error;

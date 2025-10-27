@@ -49,8 +49,6 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
     noteId: debugNoteId,
   });
 
-  console.log("🔍 Debug note query result:", debugNote);
-
   // Try using the same pattern as the debug query that works
   const notes = useQuery(
     (api.functions as any).orgNotes?.getOrgNotesByEntity,
@@ -88,33 +86,6 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
     orgId ? { clerkOrganizationId: orgId } : "skip"
   );
 
-  console.log("🔍 Notes query debug:", {
-    orderId,
-    orderIdType: typeof orderId,
-    notes,
-    notesCount: notes?.length,
-    notesArray: Array.isArray(notes) ? notes : 'not array',
-    notesData: notes,
-    apiAvailable: !!(api.functions as any).orgNotes?.getOrgNotesByEntity,
-  });
-
-  console.log("🔍 Simple query debug:", {
-    notesSimple,
-    notesSimpleCount: notesSimple?.length,
-    notesSimpleArray: Array.isArray(notesSimple) ? notesSimple : 'not array',
-  });
-
-  console.log("🔍 Last created note debug:", {
-    lastCreatedNoteId,
-    lastCreatedNote,
-  });
-
-  console.log("🔍 All org notes debug:", {
-    allOrgNotes,
-    allOrgNotesCount: allOrgNotes?.length,
-    orderNotesFound: allOrgNotes?.filter((n: any) => n.orderId === orderId)?.length,
-  });
-
   const createNoteMutation = useMutation(
     (api.functions as any).orgNotes?.createOrgNote
   );
@@ -133,21 +104,8 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
 
   const handleAddNote = async () => {
     if (!newNoteMessage.trim() || !order) {
-      console.log("Cannot add note:", {
-        hasMessage: !!newNoteMessage.trim(),
-        hasOrder: !!order,
-      });
       return;
     }
-
-    console.log("Creating note:", {
-      noteType: "ORDER",
-      entityId: orderId,
-      title: newNoteTitle.trim() || undefined,
-      message: newNoteMessage.trim(),
-      resolvable: newNoteResolvable,
-      clerkOrganizationId: order.clerkOrganizationId,
-    });
 
     try {
       const result = await createNoteMutation({
@@ -158,8 +116,6 @@ export function NotesBlock({ orderId }: NotesBlockProps) {
         resolvable: newNoteResolvable,
         clerkOrganizationId: order.clerkOrganizationId,
       });
-
-      console.log("Note created successfully:", result);
 
       // Store the last created note ID for testing
       setLastCreatedNoteId(result);

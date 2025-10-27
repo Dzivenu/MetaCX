@@ -40,13 +40,6 @@ export function CustomerStep() {
 
   const handleCustomerSelected = useCallback(
     async (customer: Customer) => {
-      console.log("🚀 CUSTOMER SELECTION TRIGGERED!", customer);
-      console.log("🔍 CustomerStep - Customer selected:", {
-        customerId: customer.id,
-        customerName: `${customer.firstName} ${customer.lastName}`,
-        orderId: quoteState.orderId,
-      });
-
       // Set the customer ID immediately in local state for instant UI update
       setLocalSelectedCustomerId(customer.id);
 
@@ -56,18 +49,9 @@ export function CustomerStep() {
       // If we have an order ID, immediately save the customer to the database
       if (quoteState.orderId) {
         try {
-          console.log(
-            "🔍 CustomerStep - Calling updateQuote with customerId:",
-            customer.id
-          );
           const success = await updateQuote();
-          console.log("🔍 CustomerStep - updateQuote result:", success);
 
           if (success) {
-            console.log(
-              "✅ Customer saved to order successfully:",
-              customer.id
-            );
             // Small delay to allow Convex to propagate the update
             await new Promise((resolve) => setTimeout(resolve, 100));
           } else {
@@ -76,10 +60,6 @@ export function CustomerStep() {
         } catch (error) {
           console.error("❌ Error saving customer:", error);
         }
-      } else {
-        console.log(
-          "⚠️ No order ID available, customer will be saved when order is created"
-        );
       }
     },
     [setCustomerId, updateQuote, quoteState.orderId]
@@ -93,10 +73,7 @@ export function CustomerStep() {
     // If we have an order ID, save the removal to the database
     if (quoteState.orderId) {
       try {
-        const success = await updateQuote();
-        if (success) {
-          console.log("Customer removed from order");
-        }
+        await updateQuote();
       } catch (error) {
         console.error("Error removing customer:", error);
       }

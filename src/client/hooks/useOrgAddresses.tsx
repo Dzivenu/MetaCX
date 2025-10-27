@@ -138,14 +138,6 @@ export const useOrgAddresses = ({
   const orgId = organization?.id;
   const convex = useConvex();
 
-  // Debug logging
-  console.log("useOrgAddresses hook:", {
-    parentType,
-    parentId,
-    orgId,
-    hasOrganization: !!organization,
-  });
-
   // Queries
   const addressesQuery = useQuery(
     api.functions.orgAddresses.getOrgAddressesByParent,
@@ -182,19 +174,7 @@ export const useOrgAddresses = ({
 
   // Computed values
   const addresses = useMemo(() => {
-    const result = addressesQuery || [];
-    console.log(
-      "🏠 Loaded addresses:",
-      result.map((addr) => ({
-        id: addr._id,
-        clerkOrganizationId: addr.clerkOrganizationId,
-        line1: addr.line1,
-        parentType: addr.parentType,
-        parentId: addr.parentId,
-      }))
-    );
-    console.log("🏠 Current orgId for comparison:", orgId);
-    return result;
+    return addressesQuery || [];
   }, [addressesQuery, orgId]);
 
   const loading = useMemo(() => {
@@ -204,8 +184,6 @@ export const useOrgAddresses = ({
   // Create address
   const createAddress = useCallback(
     async (data: CreateOrgAddressData): Promise<Id<"org_addresses"> | null> => {
-      console.log("🔧 createAddress called with data:", data);
-      console.log("🔧 orgId:", orgId);
       setError(null);
 
       if (!orgId) {
@@ -217,7 +195,6 @@ export const useOrgAddresses = ({
       }
 
       try {
-        console.log("📡 Calling createAddressMutation...");
         const result = await createAddressMutation({
           clerkOrganizationId: orgId,
           parentType: data.parentType,
@@ -243,7 +220,6 @@ export const useOrgAddresses = ({
           addressFull: data.addressFull,
         });
 
-        console.log("✅ createAddressMutation returned:", result);
         return result;
       } catch (err) {
         const errorMessage =
@@ -259,8 +235,6 @@ export const useOrgAddresses = ({
   // Update address
   const updateAddress = useCallback(
     async (data: UpdateOrgAddressData): Promise<boolean> => {
-      console.log("🔧 updateAddress called with data:", data);
-      console.log("🔧 Current orgId:", orgId);
       setError(null);
 
       if (!orgId) {
@@ -272,19 +246,15 @@ export const useOrgAddresses = ({
       }
 
       try {
-        console.log("📡 Calling updateAddressMutation...");
         const result = await updateAddressMutation({
           ...data,
           clerkOrganizationId: orgId, // Explicitly pass organization ID
         });
-        console.log("✅ updateAddressMutation returned:", result);
         return result;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to update address";
         console.error("❌ Error updating address:", err);
-        console.error("❌ Update data was:", data);
-        console.error("❌ Current orgId:", orgId);
         setError(errorMessage);
         return false;
       }

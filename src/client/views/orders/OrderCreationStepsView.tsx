@@ -39,11 +39,6 @@ export function OrderCreationStepsView() {
 
     // For steps beyond quote, require order ID to exist
     if (!quoteState.orderId) {
-      console.warn(
-        "Cannot show step",
-        currentStep,
-        "without order ID - returning to quote step"
-      );
       return <QuoteStep />;
     }
 
@@ -66,7 +61,6 @@ export function OrderCreationStepsView() {
         if (currentStep === 0) {
           try {
             // Generate the quote first and get the result
-            console.log("Generating quote...");
             const generatedQuote = await generateQuote();
 
             if (!generatedQuote) {
@@ -74,17 +68,13 @@ export function OrderCreationStepsView() {
               return;
             }
 
-            console.log("Quote generated successfully:", generatedQuote);
-
             // Check if order already exists - create new or update existing
             let success = false;
             if (quoteState.orderId) {
               // Update existing order
-              console.log("Updating existing order:", quoteState.orderId);
               success = await updateQuote();
             } else {
               // Create new order with the generated quote
-              console.log("Creating new order with quote");
               success = await submitQuote(generatedQuote);
             }
 
@@ -92,10 +82,6 @@ export function OrderCreationStepsView() {
             if (quoteState.orderId) {
               // For updates, check success and order ID
               if (success) {
-                console.log(
-                  "Order updated successfully with ID:",
-                  quoteState.orderId
-                );
                 nextStep();
               } else {
                 console.error(
@@ -105,9 +91,6 @@ export function OrderCreationStepsView() {
             } else {
               // For new orders, success from submitQuote means order was created
               if (success) {
-                console.log(
-                  "Order created successfully, proceeding to next step"
-                );
                 nextStep();
               } else {
                 console.error(
@@ -161,7 +144,6 @@ export function OrderCreationStepsView() {
     if (currentStep > 0) {
       // If we're on a step > 0 but don't have an order ID, reset to step 0
       if (currentStep > 0 && !quoteState.orderId) {
-        console.warn("No order ID found - resetting to quote step");
         setCurrentStep(0);
       } else {
         prevStep();

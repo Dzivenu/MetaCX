@@ -146,15 +146,6 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
         ? true
         : !expandCurrencyPanel;
 
-  // Debug logging for currency edit logic
-  console.log(`🔧 ${repository.name} edit logic:`, {
-    repositoryState: repository.state,
-    activeSessionStatus: activeSession?.status,
-    expandCurrencyPanel,
-    disableCurrencyEdit,
-    floatCount: repository.float.length,
-  });
-
   const isUserAuthorized = useMemo(() => {
     // Since the user can access the float page, they're likely authorized
     // More sophisticated auth would require current user context

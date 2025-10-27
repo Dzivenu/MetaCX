@@ -50,15 +50,6 @@ export default function OrdersPage() {
     direction: "desc",
   });
 
-  // Debug logging
-  console.log("Orders page:", {
-    orgOrders,
-    loading,
-    error,
-    count: orgOrders?.length,
-    activeSessionId: activeSession?._id,
-  });
-
   // Filter and sort orders - MUST be before conditional returns (Rules of Hooks)
   const filteredOrders = useMemo(() => {
     let filtered = [...orgOrders];

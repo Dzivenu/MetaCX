@@ -232,7 +232,7 @@ export function CollapsibleRowTableExample() {
   };
 
   const handleRefresh = () => {
-    console.log("Refreshing data...");
+    // Refresh logic would go here
   };
 
   return (

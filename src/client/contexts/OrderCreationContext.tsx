@@ -498,13 +498,6 @@ export function OrderCreationProvider({
       if (!quote || !quoteState.orderId)
         throw new Error("No quote or order ID to update");
 
-      console.log("🔍 updateQuote - Called with:", {
-        orderId: quoteState.orderId,
-        customerId,
-        inboundSum: form.inboundSum,
-        outboundSum: quote.outboundSum ?? form.outboundSum,
-      });
-
       setLoadingQuote(true);
       setError(null);
 
@@ -520,8 +513,6 @@ export function OrderCreationProvider({
         status: "QUOTE",
         orgCustomerId: customerId ? (customerId as any) : undefined,
       });
-
-      console.log("✅ updateQuote - Order updated successfully");
 
       setQuoteState((prev) => ({ ...prev, mode: "view" }));
       return true;

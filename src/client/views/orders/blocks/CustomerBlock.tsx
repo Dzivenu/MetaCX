@@ -54,14 +54,12 @@ export function CustomerBlock({
   const handleCustomerSelected = useCallback(
     async (customer: Customer) => {
       if (!order) return;
-      console.log("🔍 CustomerBlock - Customer selected:", customer.id);
       try {
         await updateOrderMutation({
           orderId: order.id as Id<"org_orders">,
           orgCustomerId: customer.id as Id<"org_customers">,
         });
         setIsEditing(false);
-        console.log("✅ Customer updated successfully");
       } catch (error) {
         console.error("❌ Error updating customer:", error);
       }
@@ -72,7 +70,6 @@ export function CustomerBlock({
   const handleCreateCustomer = useCallback(
     async (values: CustomerFormValues) => {
       if (!order) return;
-      console.log("🔍 CustomerBlock - Creating customer:", values);
       try {
         // Create customer via Convex
         const customerId = await createCustomerMutation({
@@ -95,7 +92,6 @@ export function CustomerBlock({
         });
 
         setIsEditing(false);
-        console.log("✅ Customer created and attached successfully");
       } catch (error) {
         console.error("❌ Error creating customer:", error);
         throw error;
@@ -116,15 +112,6 @@ export function CustomerBlock({
   if (isLoading) return <div>Loading customer…</div>;
   if (!order) return <div>No order</div>;
 
-  // Debug logging
-  console.log("🔍 CustomerBlock Debug:", {
-    orderId,
-    isLoading,
-    order,
-    orgCustomerId: order?.orgCustomerId,
-    customersLoaded: orgCustomers?.length,
-  });
-
   // Convert OrgCustomer to Customer for the table component
   const customers: Customer[] = (orgCustomers || []).map((c) => ({
     id: c.id,
@@ -140,12 +127,6 @@ export function CustomerBlock({
   }));
 
   const customer = orgCustomers.find((c) => c.id === order.orgCustomerId);
-
-  console.log(
-    "🔍 CustomerBlock - Found customer:",
-    customer?.firstName,
-    customer?.lastName
-  );
 
   // Show edit mode with customer search/create tabs
   if (isEditing) {
@@ -200,17 +181,6 @@ export function CustomerBlock({
   // Preview mode
   if (mode === "preview") {
     if (!customer) {
-      console.log("❌ CustomerBlock - No customer found:", {
-        order_orgCustomerId: order.orgCustomerId,
-        message: order.orgCustomerId
-          ? "Customer not found in list"
-          : "No customer selected in order",
-        availableCustomers: orgCustomers?.map((c) => ({
-          id: c.id,
-          name: `${c.firstName} ${c.lastName}`,
-        })),
-      });
-
       return (
         <Stack gap="md">
           {/* Header with Edit button - outside the card */}
@@ -253,8 +223,7 @@ export function CustomerBlock({
             <CustomerBioCard
               customer={customer}
               showTitle={false}
-              onCustomerUpdate={(updatedCustomer) => {
-                console.log("Customer updated in order view:", updatedCustomer);
+              onCustomerUpdate={() => {
                 // The customer data will be refreshed automatically by the Convex query
               }}
             />

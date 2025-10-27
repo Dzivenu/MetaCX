@@ -140,7 +140,6 @@ const SessionStats: React.FC<{
   const handleExit = () => {
     if (activeSession?.status === "FLOAT_CLOSE_COMPLETE") {
       // In a real app, this would clear session and redirect
-      console.log("Session completed, clearing data...");
       window.location.reload();
     } else {
       onClose();
@@ -360,7 +359,6 @@ export default function FloatPage() {
 
   const handleBypassFloat = async () => {
     // Debug function to skip float
-    console.log("Bypassing float...");
     notifications.show({
       title: "Debug",
       message: "Float bypassed",

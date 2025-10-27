@@ -212,14 +212,11 @@ export const AddressForm: React.FC<AddressFormProps> = ({
   }, [watchedCountryCode, form]);
 
   const handleFormSubmit = async (values: any) => {
-    console.log("📋 AddressForm handleFormSubmit called with values:", values);
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
-      console.log("📤 Calling onSubmit with values:", values);
       await onSubmit(values);
-      console.log("✅ onSubmit completed successfully");
     } catch (error) {
       console.error("❌ Form submission error:", error);
       setSubmitError(
@@ -227,7 +224,6 @@ export const AddressForm: React.FC<AddressFormProps> = ({
       );
     } finally {
       setIsSubmitting(false);
-      console.log("🏁 Form submission finished, isSubmitting set to false");
     }
   };
 

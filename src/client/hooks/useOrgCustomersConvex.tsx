@@ -63,8 +63,6 @@ export function useOrgCustomers(
   const convex = useConvex();
   const [error, setError] = useState<string | null>(null);
 
-  console.log("🔍 useOrgCustomers - orgId:", orgId);
-
   // Set error if no organization is active
   React.useEffect(() => {
     if (orgId === undefined || orgId === null) {
@@ -87,8 +85,6 @@ export function useOrgCustomers(
         }
       : "skip"
   );
-
-  console.log("🔍 useOrgCustomers - customersData:", customersData);
 
   // Mutations
   const createOrgCustomerMutation = useMutation(
@@ -130,9 +126,6 @@ export function useOrgCustomers(
   useEffect(() => {
     if (orgId && customersData === undefined) {
       const timer = setTimeout(() => {
-        console.log(
-          "🔍 useOrgCustomers - Convex query timed out, assuming no data available"
-        );
         setHasTimedOut(true);
       }, 5000);
 
@@ -143,15 +136,6 @@ export function useOrgCustomers(
   }, [orgId, customersData]);
 
   const isLoading = customersData === undefined && !!orgId && !hasTimedOut;
-
-  console.log(
-    "🔍 useOrgCustomers - isLoading:",
-    isLoading,
-    "customers count:",
-    orgCustomers.length,
-    "hasTimedOut:",
-    hasTimedOut
-  );
 
   const createOrgCustomer = useCallback(
     async (data: CreateOrgCustomerData): Promise<OrgCustomer | null> => {

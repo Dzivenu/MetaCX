@@ -96,7 +96,6 @@ export function PortalSessionManager() {
       };
 
       await createSession(sessionData);
-      // Ensure the creator is reflected as joined/active locally
       await refreshActiveSession();
       closeCreateModal();
       refresh();
@@ -140,21 +139,12 @@ export function PortalSessionManager() {
   // Handle joining a session
   const handleJoinSession = useCallback(
     async (sessionId: string) => {
-      console.log("🔄 Attempting to join session:", sessionId);
       try {
-        console.log("🔄 Calling joinSession mutation...");
         await joinSession(sessionId);
-        console.log("✅ Successfully joined session:", sessionId);
-        // Refresh the active session context
-        console.log("🔄 Refreshing active session...");
         refreshActiveSession();
-        // Refresh the sessions list to update UI
-        console.log("🔄 Refreshing sessions list...");
         refresh();
-        console.log("✅ Join process completed");
       } catch (error) {
         console.error("Failed to join session:", error);
-        console.error("❌ Join error details:", error);
       }
     },
     [joinSession, refreshActiveSession, refresh]
@@ -463,13 +453,7 @@ export function PortalSessionManager() {
                               <Button
                                 variant="outline"
                                 size="xs"
-                                onClick={() => {
-                                  console.log(
-                                    "🔘 Join button clicked for session:",
-                                    session.id
-                                  );
-                                  handleJoinSession(session.id);
-                                }}
+                                onClick={() => handleJoinSession(session.id)}
                                 loading={isMutationLoading}
                               >
                                 Join
@@ -659,9 +643,8 @@ export function PortalSessionManager() {
               <Text fw={600}>Status</Text>
               <Select
                 value={selectedSession.status || ""}
-                onChange={(value) => {
+                onChange={() => {
                   // This would need to be connected to an update API
-                  console.log("Update status to:", value);
                 }}
                 data={[
                   { value: "DORMANT", label: "Dormant" },

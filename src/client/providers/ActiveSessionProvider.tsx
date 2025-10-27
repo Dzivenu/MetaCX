@@ -113,7 +113,6 @@ export function ActiveSessionProvider({
 
   const refreshActiveSession = useCallback(async () => {
     // Force re-fetch of active sessions by changing the refresh trigger
-    console.log("🔄 ActiveSessionProvider: Forcing refresh of active sessions");
     setRefreshTrigger((prev) => prev + 1);
     setError(null);
   }, []);

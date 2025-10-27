@@ -82,10 +82,6 @@ export function BreakdownBlock({
 
   if (isLoading || !order) return <div>Loading breakdowns…</div>;
 
-  // Debug: Log breakdowns data
-  console.log("🔍 BreakdownBlock - All breakdowns:", breakdowns);
-  console.log("🔍 BreakdownBlock - Breakdowns count:", breakdowns?.length);
-
   // Handlers for breakdown completion
   const handleInboundComplete = (breakdowns: any[], isValid: boolean) => {
     if (isValid) {
@@ -159,9 +155,6 @@ export function BreakdownBlock({
   const outboundBreakdowns = (breakdowns || []).filter(
     (b) => b.direction === "OUTBOUND"
   );
-
-  console.log("🔍 BreakdownBlock - Inbound breakdowns:", inboundBreakdowns);
-  console.log("🔍 BreakdownBlock - Outbound breakdowns:", outboundBreakdowns);
 
   const renderBreakdownGroup = (
     items: any[],

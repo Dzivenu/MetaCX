@@ -69,15 +69,6 @@ export function useOrgAddresses(
   const { orgId } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
-  console.log(
-    "🔍 useOrgAddresses - orgId:",
-    orgId,
-    "parentType:",
-    parentType,
-    "parentId:",
-    parentId
-  );
-
   // Use Convex query to get org addresses
   const addressesData = useQuery(
     api.functions.orgAddresses.getOrgAddressesByParent,
@@ -89,8 +80,6 @@ export function useOrgAddresses(
         }
       : "skip"
   );
-
-  console.log("🔍 useOrgAddresses - addressesData:", addressesData);
 
   // Mutations
   const createOrgAddressMutation = useMutation(
@@ -135,9 +124,6 @@ export function useOrgAddresses(
   useEffect(() => {
     if (orgId && parentType && parentId && addressesData === undefined) {
       const timer = setTimeout(() => {
-        console.log(
-          "🔍 useOrgAddresses - Convex query timed out, assuming no data available"
-        );
         setHasTimedOut(true);
       }, 5000);
 
@@ -153,15 +139,6 @@ export function useOrgAddresses(
     !!parentType &&
     !!parentId &&
     !hasTimedOut;
-
-  console.log(
-    "🔍 useOrgAddresses - isLoading:",
-    isLoading,
-    "addresses count:",
-    orgAddresses.length,
-    "hasTimedOut:",
-    hasTimedOut
-  );
 
   const createOrgAddress = useCallback(
     async (data: CreateOrgAddressData): Promise<OrgAddress | null> => {

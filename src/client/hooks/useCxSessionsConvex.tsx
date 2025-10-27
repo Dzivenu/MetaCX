@@ -368,16 +368,12 @@ export function useCxSessionMutations(): CxSessionMutations {
 
   const joinSession = useCallback(
     async (id: string) => {
-      console.log("🔧 useCxSessionMutations.joinSession called with id:", id);
-      console.log("🔧 orgId:", orgId);
       setError(null);
       try {
-        console.log("🔧 Calling joinSessionMutation...");
         const result = await joinSessionMutation({
           sessionId: id as Id<"org_cx_sessions">,
           clerkOrganizationId: orgId || undefined,
         });
-        console.log("🔧 joinSessionMutation result:", result);
         return {
           ...result,
           id: result.id,
