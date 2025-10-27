@@ -17,6 +17,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { useAuth } from "@clerk/nextjs";
+import { OrderReceiptButton } from "@/client/components/receipts";
 
 interface OrderDetailViewProps {
   orderId: string;
@@ -104,14 +105,42 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
           <Paper withBorder p="md">
             <Group justify="space-between" align="center">
               <Title order={3}>Order actions</Title>
-              <Button
-                leftSection={<IconNotes size={16} />}
-                variant="outline"
-                disabled={!order?.orgCustomerId}
-                onClick={() => setCustomerNotesModalOpen(true)}
-              >
-                Customer Notes
-              </Button>
+              <Group gap="sm">
+                {order && (
+                  <OrderReceiptButton
+                    order={{
+                      _id: order._id,
+                      displayId: order.displayId,
+                      createdAt: order.createdAt,
+                      inboundTicker: order.inboundTicker,
+                      inboundSum: order.inboundSum,
+                      outboundTicker: order.outboundTicker,
+                      outboundSum: order.outboundSum,
+                      inboundType: order.inboundType,
+                      outboundType: order.outboundType,
+                      finalRate: order.finalRate,
+                      fee: order.fee,
+                      networkFee: order.networkFee,
+                      outboundCryptoAddress: order.outboundCryptoAddress,
+                      batchedStatus: order.batchedStatus,
+                      customer: order.customer ? {
+                        firstName: order.customer.firstName,
+                        lastName: order.customer.lastName,
+                      } : undefined,
+                      breakdowns: order.breakdowns,
+                    }}
+                    disabled={!order}
+                  />
+                )}
+                <Button
+                  leftSection={<IconNotes size={16} />}
+                  variant="outline"
+                  disabled={!order?.orgCustomerId}
+                  onClick={() => setCustomerNotesModalOpen(true)}
+                >
+                  Customer Notes
+                </Button>
+              </Group>
             </Group>
           </Paper>
 

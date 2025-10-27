@@ -28,6 +28,7 @@ import type * as functions_orgIdentifications from "../functions/orgIdentificati
 import type * as functions_orgMemberships from "../functions/orgMemberships.js";
 import type * as functions_orgNotes from "../functions/orgNotes.js";
 import type * as functions_orgOrders from "../functions/orgOrders.js";
+import type * as functions_orgSettings from "../functions/orgSettings.js";
 import type * as functions_organizations from "../functions/organizations.js";
 import type * as functions_repositories from "../functions/repositories.js";
 import type * as functions_users from "../functions/users.js";
@@ -50,6 +51,7 @@ import type * as schema_orgNotes from "../schema/orgNotes.js";
 import type * as schema_orgOrders from "../schema/orgOrders.js";
 import type * as schema_orgRepositories from "../schema/orgRepositories.js";
 import type * as schema_orgRepositoryAccessLogs from "../schema/orgRepositoryAccessLogs.js";
+import type * as schema_orgSettings from "../schema/orgSettings.js";
 import type * as schema_organizations from "../schema/organizations.js";
 import type * as schema_userPreferences from "../schema/userPreferences.js";
 import type * as schema_users from "../schema/users.js";
@@ -78,6 +80,7 @@ declare const fullApi: ApiFromModules<{
   "functions/orgMemberships": typeof functions_orgMemberships;
   "functions/orgNotes": typeof functions_orgNotes;
   "functions/orgOrders": typeof functions_orgOrders;
+  "functions/orgSettings": typeof functions_orgSettings;
   "functions/organizations": typeof functions_organizations;
   "functions/repositories": typeof functions_repositories;
   "functions/users": typeof functions_users;
@@ -100,6 +103,7 @@ declare const fullApi: ApiFromModules<{
   "schema/orgOrders": typeof schema_orgOrders;
   "schema/orgRepositories": typeof schema_orgRepositories;
   "schema/orgRepositoryAccessLogs": typeof schema_orgRepositoryAccessLogs;
+  "schema/orgSettings": typeof schema_orgSettings;
   "schema/organizations": typeof schema_organizations;
   "schema/userPreferences": typeof schema_userPreferences;
   "schema/users": typeof schema_users;

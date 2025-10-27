@@ -1,0 +1,56 @@
+@media screen {
+  .show-only-print {
+    display: none;
+  }
+
+  .print-preview {
+    width: 15rem;
+  }
+}
+
+@media print {
+  * {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: black !important;
+  }
+  
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .show-only-print {
+    display: block !important;
+  }
+  
+  .print-preview {
+    display: block !important;
+    width: auto !important;
+  }
+}
+
+.thermal-printer-container {
+  overflow-wrap: break-word;
+  margin: 0;
+  padding: 0;
+  text-align: left !important;
+  letter-spacing: 0px !important;
+  word-spacing: -1px !important;
+  overflow-wrap: break-word !important;
+}
+
+.thermal-receipt-wrapper {
+  margin: 0;
+  padding: 0;
+}
+
+@media print {
+  .thermal-receipt-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+  }
+}

@@ -28,6 +28,7 @@ import {
 } from "./schema/orgCxSessions";
 import { org_memberships, orgInvitations } from "./schema/orgMemberships";
 import { org_notes } from "./schema/orgNotes";
+import { org_settings } from "./schema/orgSettings";
 
 export default defineSchema({
   // Existing tables
@@ -57,4 +58,5 @@ export default defineSchema({
   org_memberships,
   orgInvitations,
   org_notes,
+  org_settings,
 });
