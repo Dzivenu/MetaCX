@@ -5,28 +5,34 @@ A modern web application for currency exchange management built with Next.js 16,
 ## Tech Stack
 
 ### Core Framework
+
 - **Next.js 16.0.0**: React framework with App Router, Server Components, and Turbopack
 - **React 19.2.0**: Latest React with improved concurrent features
 - **TypeScript 5**: Type-safe development
 
 ### Backend & Database
+
 - **Convex 1.25.4**: Real-time backend platform with automatic reactivity, serverless functions, and built-in authentication integration
 
 ### Authentication
+
 - **Clerk 6.31.3**: Modern authentication with email/password, social logins, organization management, and user profiles
 
 ### UI Components & Styling
+
 - **Mantine 8.1.3**: Comprehensive React component library including forms, modals, notifications, data tables, charts, and rich text editor
 - **Tabler Icons 3.34.0**: Beautiful icon library
 - **Recharts 3.1.0**: Composable charting library
 
 ### State Management & Data
+
 - **Redux Toolkit 2.6.1**: Predictable state management
 - **React Query (TanStack) 5.76.1**: Server state management and caching
 - **React Hook Form 7.56.4**: Performant form management
 - **Zod 3.25.76**: TypeScript-first schema validation
 
 ### Development Tools
+
 - **ESLint 9**: Code linting with flat config
 - **T3 Env**: Type-safe environment variables
 - **Hono 4.6.11**: Ultrafast web framework for API routes
@@ -181,16 +187,19 @@ metacx/
 ## Key Architecture
 
 ### Multi-tenant System
+
 - Organizations operate independently with isolated data
 - Role-based access control (Admin, Member, Owner)
 - Per-organization currencies, customers, and repositories
 
 ### Real-time Backend
+
 - Convex provides automatic data synchronization
 - Serverless functions for business logic
 - Built-in authentication integration
 
 ### Modern Frontend
+
 - Next.js 16 with App Router and Server Components
 - Turbopack for fast development builds
 - Mantine components for consistent UI
@@ -218,6 +227,7 @@ yarn start
 ### Environment Variables for Production
 
 Ensure all environment variables are configured in your hosting platform:
+
 - Next.js: Vercel/Netlify environment variables
 - Convex: Dashboard → Environment settings
 
@@ -226,6 +236,7 @@ Ensure all environment variables are configured in your hosting platform:
 ### Common Issues
 
 **Port 4000 in use:**
+
 ```bash
 # Windows
 netstat -ano | findstr :4000
@@ -233,17 +244,20 @@ taskkill /PID <PID> /F
 ```
 
 **Convex connection issues:**
+
 ```bash
 npx convex login
 npx convex dev
 ```
 
 **TypeScript errors:**
+
 ```bash
 yarn type:check
 ```
 
 **ESLint issues:**
+
 ```bash
 yarn lint:fix
 ```
