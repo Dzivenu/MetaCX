@@ -18,6 +18,7 @@ import { org_contacts } from "./schema/orgContacts";
 import { org_addresses } from "./schema/orgAddresses";
 import { org_repositories } from "./schema/orgRepositories";
 import { org_float_transfers } from "./schema/orgFloatTransfers";
+import { org_currency_swaps } from "./schema/orgCurrencySwaps";
 import { org_float_stacks } from "./schema/orgFloatStacks";
 import { org_float_snapshots } from "./schema/orgFloatSnapshots";
 import { org_repository_access_logs } from "./schema/orgRepositoryAccessLogs";
@@ -49,6 +50,7 @@ export default defineSchema({
   org_addresses,
   org_repositories,
   org_float_transfers,
+  org_currency_swaps,
   org_float_stacks,
   org_float_snapshots,
   org_repository_access_logs,
