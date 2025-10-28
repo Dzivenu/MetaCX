@@ -84,11 +84,6 @@ Edit `.env.local` with your credentials:
 
 ```bash
 # App Configuration
-NEXT_PUBLIC_APP_URL=http://localhost:4000
-NEXT_PUBLIC_APP_NAME=MetaCX
-NEXT_PUBLIC_APP_DESCRIPTION=A modern web application for currency exchange management
-
-# Environment
 NEXT_PUBLIC_NODE_ENV=development
 NODE_ENV=development
 
