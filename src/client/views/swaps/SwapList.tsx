@@ -17,15 +17,21 @@ import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { formatCurrency } from "@/client/utils/formatters";
 
 export default function SwapList({ swaps, loading }: any) {
-  const [selectedCurrency, setSelectedCurrency] = useState<string | null>("all");
-  const [selectedInboundRepo, setSelectedInboundRepo] = useState<string | null>("all");
-  const [selectedOutboundRepo, setSelectedOutboundRepo] = useState<string | null>("all");
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(
+    "all"
+  );
+  const [selectedInboundRepo, setSelectedInboundRepo] = useState<string | null>(
+    "all"
+  );
+  const [selectedOutboundRepo, setSelectedOutboundRepo] = useState<
+    string | null
+  >("all");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const currencyOptions = useMemo(() => {
     const uniqueCurrencies = [
       ...new Set(swaps.map((s: any) => s.inboundTicker)),
-    ].filter(Boolean);
+    ].filter(Boolean) as string[];
     return [
       { value: "all", label: "All Currencies" },
       ...uniqueCurrencies.map((ticker: string) => ({
@@ -54,11 +60,13 @@ export default function SwapList({ swaps, loading }: any) {
   const filteredSwaps = useMemo(() => {
     return swaps.filter((swap: any) => {
       const currencyMatch =
-        selectedCurrency === "all" ||
-        swap.inboundTicker === selectedCurrency;
+        selectedCurrency === "all" || swap.inboundTicker === selectedCurrency;
       const inboundMatch =
-        selectedInboundRepo === "all" || swap.inboundRepositoryName === selectedInboundRepo;
-      const outboundMatch = selectedOutboundRepo === "all" || swap.outboundRepositoryName === selectedOutboundRepo;
+        selectedInboundRepo === "all" ||
+        swap.inboundRepositoryName === selectedInboundRepo;
+      const outboundMatch =
+        selectedOutboundRepo === "all" ||
+        swap.outboundRepositoryName === selectedOutboundRepo;
 
       return currencyMatch && inboundMatch && outboundMatch;
     });
@@ -171,9 +179,7 @@ export default function SwapList({ swaps, loading }: any) {
                     </Table.Td>
                     <Table.Td>
                       <Badge
-                        color={
-                          swap.status === "COMPLETED" ? "green" : "gray"
-                        }
+                        color={swap.status === "COMPLETED" ? "green" : "gray"}
                       >
                         {swap.status}
                       </Badge>
@@ -199,8 +205,7 @@ export default function SwapList({ swaps, loading }: any) {
                           <Text fw={500} mb="sm">
                             Breakdown Details
                           </Text>
-                          {swap.breakdowns &&
-                          swap.breakdowns.length > 0 ? (
+                          {swap.breakdowns && swap.breakdowns.length > 0 ? (
                             <Table>
                               <Table.Thead>
                                 <Table.Tr>
@@ -227,7 +232,9 @@ export default function SwapList({ swaps, loading }: any) {
                                       </Table.Td>
                                       <Table.Td>
                                         {formatCurrency(
-                                          parseFloat(breakdown.denominationValue || "0"),
+                                          parseFloat(
+                                            breakdown.denominationValue || "0"
+                                          ),
                                           swap.inboundTicker
                                         )}
                                       </Table.Td>

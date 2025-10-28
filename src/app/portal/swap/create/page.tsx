@@ -4,14 +4,14 @@ import { Stack, Title } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useActiveSession } from "@/client/hooks/useActiveSession";
 import { useSwap } from "@/client/hooks/useSwap";
-import { useCurrencies } from "@/client/hooks/useCurrencies";
+import { useCurrencies } from "@/client/hooks/useCurrenciesConvex";
 import { useRepositories } from "@/client/hooks/useRepositories";
 import CreateSwapForm from "@/client/views/swaps/CreateSwapForm";
 
 export default function CreateSwapPage() {
   const router = useRouter();
   const { activeSession } = useActiveSession();
-  const { createSwap } = useSwap(activeSession?._id);
+  const { createSwap } = useSwap(activeSession?._id as any);
   const { currencies } = useCurrencies();
   const { repositories } = useRepositories();
 
@@ -32,7 +32,7 @@ export default function CreateSwapPage() {
     <Stack gap="md">
       <Title order={2}>Create Currency Swap</Title>
       <CreateSwapForm
-        sessionId={activeSession._id}
+        sessionId={activeSession._id as any}
         currencies={currencies}
         repositories={repositories}
         onSubmit={handleSubmit}

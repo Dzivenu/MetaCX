@@ -11,7 +11,7 @@ import TransferList from "@/client/views/transfers/TransferList";
 export default function TransfersPage() {
   const router = useRouter();
   const { activeSession } = useActiveSession();
-  const { transfers, isLoading } = useTransfers(activeSession?._id);
+  const { transfers, isLoading } = useTransfers(activeSession?._id as any);
 
   const handleCreateTransfer = () => {
     router.push("/portal/transfers/create");

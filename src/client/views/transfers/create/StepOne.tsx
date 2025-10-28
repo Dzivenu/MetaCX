@@ -10,8 +10,10 @@ export default function TransferStepOne({
   repositories,
 }: any) {
   const currencyTypeOptions = useMemo(() => {
-    const types = [...new Set(repositories.map((r: any) => r.type_of_currencies))];
-    return types.map((type) => ({
+    const types = [
+      ...new Set(repositories.map((r: any) => r.type_of_currencies)),
+    ] as string[];
+    return types.map((type: string) => ({
       value: type,
       label: type.charAt(0).toUpperCase() + type.slice(1),
     }));
@@ -55,11 +57,7 @@ export default function TransferStepOne({
       value: ticker,
       label: ticker,
     }));
-  }, [
-    repositories,
-    transferData.sourceRepoId,
-    transferData.targetRepoId,
-  ]);
+  }, [repositories, transferData.sourceRepoId, transferData.targetRepoId]);
 
   const handleCurrencyTypeChange = (value: string | null) => {
     setTransferData({
@@ -106,7 +104,7 @@ export default function TransferStepOne({
       <Select
         label="Currency Type"
         placeholder="Select currency type"
-        data={currencyTypeOptions}
+        data={currencyTypeOptions as any}
         value={transferData.currencyType}
         onChange={handleCurrencyTypeChange}
         required

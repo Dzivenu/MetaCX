@@ -15,6 +15,9 @@ export const env = createEnv({
     CLERK_JWT_ISSUER_DOMAIN: z.string().url(),
     // Convex Configuration
     CONVEX_DEPLOYMENT: z.string().min(1),
+    // API Configuration
+    OPEN_EXCHANGE_RATE_APP_ID: z.string().min(1),
+    APP_METALS_API: z.string().min(1),
     // S3 Configuration
     S3_ENDPOINT: z.string().url().optional(),
     S3_REGION: z.string().min(1).optional(),
@@ -32,8 +35,6 @@ export const env = createEnv({
     NEXT_PUBLIC_NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    NEXT_PUBLIC_APP_NAME: z.string().min(1),
-    NEXT_PUBLIC_APP_DESCRIPTION: z.string().min(1),
     // Clerk Configuration
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
     // Convex Configuration
@@ -54,11 +55,12 @@ export const env = createEnv({
     // Convex Configuration
     CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
+    // API Configuration
+    OPEN_EXCHANGE_RATE_APP_ID: process.env.OPEN_EXCHANGE_RATE_APP_ID,
+    APP_METALS_API: process.env.APP_METALS_API,
     // App Configuration
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_NODE_ENV: process.env.NEXT_PUBLIC_NODE_ENV,
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-    NEXT_PUBLIC_APP_DESCRIPTION: process.env.NEXT_PUBLIC_APP_DESCRIPTION,
     // S3 Configuration
     S3_ENDPOINT: process.env.S3_ENDPOINT,
     S3_REGION: process.env.S3_REGION,

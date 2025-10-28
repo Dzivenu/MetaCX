@@ -5,17 +5,18 @@ import { useRouter } from "next/navigation";
 import { Stack, Title, Stepper, Button, Group } from "@mantine/core";
 import { useActiveSession } from "@/client/hooks/useActiveSession";
 import { useTransfers } from "@/client/hooks/useTransfers";
-import { useOrgFloatConvex } from "@/client/hooks/useOrgFloatConvex";
+import { useOrgFloat } from "@/client/hooks/useOrgFloatConvex";
 import TransferStepOne from "@/client/views/transfers/create/StepOne";
 import TransferStepTwo from "@/client/views/transfers/create/StepTwo";
 import TransferStepThree from "@/client/views/transfers/create/StepThree";
-import type { Id } from "../../../../convex/_generated/dataModel";
+import type { Id } from "@/../../convex/_generated/dataModel";
 
 export default function CreateTransferPage() {
   const router = useRouter();
   const { activeSession } = useActiveSession();
-  const { createTransfer } = useTransfers(activeSession?._id);
-  const { repositories } = useOrgFloatConvex(activeSession?._id);
+  const { createTransfer } = useTransfers(activeSession?._id as any);
+  const { orgFloat } = useOrgFloat(activeSession?._id);
+  const repositories = orgFloat?.repositories || [];
 
   const [active, setActive] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -39,16 +40,22 @@ export default function CreateTransferPage() {
   };
 
   const handleSubmit = async () => {
-    if (!activeSession || !transferData.sourceRepoId || !transferData.targetRepoId) {
+    if (
+      !activeSession ||
+      !transferData.sourceRepoId ||
+      !transferData.targetRepoId
+    ) {
       return;
     }
 
     setSubmitting(true);
     try {
       await createTransfer({
-        sessionId: activeSession._id,
-        outboundRepositoryId: transferData.sourceRepoId as Id<"org_repositories">,
-        inboundRepositoryId: transferData.targetRepoId as Id<"org_repositories">,
+        sessionId: activeSession._id as any,
+        outboundRepositoryId:
+          transferData.sourceRepoId as Id<"org_repositories">,
+        inboundRepositoryId:
+          transferData.targetRepoId as Id<"org_repositories">,
         outboundTicker: transferData.ticker,
         inboundTicker: transferData.ticker,
         outboundSum: transferData.sum,
@@ -75,7 +82,8 @@ export default function CreateTransferPage() {
     transferData.sum !== "" &&
     parseFloat(transferData.sum) > 0;
 
-  const canProceed = active === 0 ? step0Valid : active === 1 ? step1Valid : true;
+  const canProceed =
+    active === 0 ? step0Valid : active === 1 ? step1Valid : true;
 
   return (
     <Stack gap="md">

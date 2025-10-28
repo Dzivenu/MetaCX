@@ -9,7 +9,7 @@ import SwapList from "@/client/views/swaps/SwapList";
 export default function SwapPage() {
   const router = useRouter();
   const { activeSession } = useActiveSession();
-  const { swaps, isLoading } = useSwap(activeSession?._id);
+  const { swaps, isLoading } = useSwap(activeSession?._id as any);
 
   return (
     <Stack gap="md">

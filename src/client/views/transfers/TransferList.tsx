@@ -17,15 +17,19 @@ import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { formatCurrency } from "@/client/utils/formatters";
 
 export default function TransferList({ transfers, loading }: any) {
-  const [selectedCurrency, setSelectedCurrency] = useState<string | null>("all");
-  const [selectedFromRepo, setSelectedFromRepo] = useState<string | null>("all");
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(
+    "all"
+  );
+  const [selectedFromRepo, setSelectedFromRepo] = useState<string | null>(
+    "all"
+  );
   const [selectedToRepo, setSelectedToRepo] = useState<string | null>("all");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const currencyOptions = useMemo(() => {
     const uniqueCurrencies = [
       ...new Set(transfers.map((t: any) => t.inboundTicker)),
-    ].filter(Boolean);
+    ].filter(Boolean) as string[];
     return [
       { value: "all", label: "All Currencies" },
       ...uniqueCurrencies.map((ticker: string) => ({
@@ -58,7 +62,8 @@ export default function TransferList({ transfers, loading }: any) {
         transfer.inboundTicker === selectedCurrency;
       const fromMatch =
         selectedFromRepo === "all" || transfer.from === selectedFromRepo;
-      const toMatch = selectedToRepo === "all" || transfer.to === selectedToRepo;
+      const toMatch =
+        selectedToRepo === "all" || transfer.to === selectedToRepo;
 
       return currencyMatch && fromMatch && toMatch;
     });
