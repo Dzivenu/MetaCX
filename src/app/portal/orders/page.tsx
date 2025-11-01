@@ -14,6 +14,7 @@ import {
   Select,
   Stack,
   Box,
+  Modal,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
@@ -25,18 +26,20 @@ import {
   IconArrowRight,
   IconClock,
   IconUser,
+  IconCircleX,
 } from "@tabler/icons-react";
 import { useOrgOrders } from "@/client/hooks/useOrgOrdersConvex";
 import { useShortId } from "@/client/hooks/useShortId";
 import { useActiveSession } from "@/client/hooks/useActiveSession";
 import { useRouter } from "next/navigation";
+import { notifications } from "@mantine/notifications";
 
 export default function OrdersPage() {
   const router = useRouter();
   const { activeSession } = useActiveSession();
 
   // Show orders for current organization and active session (filtered in Convex)
-  const { orgOrders, loading, error } = useOrgOrders(
+  const { orgOrders, loading, error, cancelAllUncompletedOrders } = useOrgOrders(
     undefined, // orgSessionId
     undefined, // status
     true // useActiveSessionFilter
@@ -49,6 +52,10 @@ export default function OrdersPage() {
     columnAccessor: "openDt",
     direction: "desc",
   });
+
+  // Modal state
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // Filter and sort orders - MUST be before conditional returns (Rules of Hooks)
   const filteredOrders = useMemo(() => {
@@ -175,6 +182,34 @@ export default function OrdersPage() {
     return `${numAmount.toFixed(decimals)} ${ticker}`;
   };
 
+  // Handle cancel all uncompleted orders
+  const handleCancelAll = async () => {
+    setIsCancelling(true);
+    try {
+      const result = await cancelAllUncompletedOrders();
+      setCancelModalOpen(false);
+      
+      notifications.show({
+        title: "Orders Cancelled",
+        message: result.message,
+        color: "green",
+      });
+    } catch (err) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to cancel orders",
+        color: "red",
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  // Count uncompleted orders
+  const uncompletedCount = orgOrders.filter(
+    (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED"
+  ).length;
+
   if (!activeSession) {
     return (
       <Container size="lg" py="xl">
@@ -240,14 +275,27 @@ export default function OrdersPage() {
               {searchQuery || statusFilter ? " (filtered)" : ""}
             </Text>
           </Box>
-          <Button
-            component={Link}
-            href="/portal/orders/create"
-            leftSection={<IconArrowRight size={16} />}
-            size="md"
-          >
-            Create Order
-          </Button>
+          <Group gap="md">
+            {uncompletedCount > 0 && (
+              <Button
+                variant="outline"
+                color="red"
+                leftSection={<IconCircleX size={16} />}
+                onClick={() => setCancelModalOpen(true)}
+                size="md"
+              >
+                Cancel All ({uncompletedCount})
+              </Button>
+            )}
+            <Button
+              component={Link}
+              href="/portal/orders/create"
+              leftSection={<IconArrowRight size={16} />}
+              size="md"
+            >
+              Create Order
+            </Button>
+          </Group>
         </Group>
 
         {/* Filters */}
@@ -467,6 +515,40 @@ export default function OrdersPage() {
           />
         </Card>
       </Stack>
+
+      {/* Cancel All Orders Modal */}
+      <Modal
+        opened={cancelModalOpen}
+        onClose={() => setCancelModalOpen(false)}
+        title="Cancel All Uncompleted Orders"
+        centered
+      >
+        <Stack gap="md">
+          <Text>
+            Are you sure you want to cancel all <strong>{uncompletedCount}</strong> uncompleted orders?
+          </Text>
+          <Text c="dimmed" size="sm">
+            This action will change the status of all orders that are not completed or already cancelled to "CANCELLED".
+            This cannot be undone.
+          </Text>
+          <Group gap="sm" justify="flex-end" mt="md">
+            <Button
+              variant="light"
+              onClick={() => setCancelModalOpen(false)}
+              disabled={isCancelling}
+            >
+              No, Keep Orders
+            </Button>
+            <Button
+              color="red"
+              onClick={handleCancelAll}
+              loading={isCancelling}
+            >
+              Yes, Cancel All Orders
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Container>
   );
 }

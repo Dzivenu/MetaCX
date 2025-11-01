@@ -295,6 +295,76 @@ export const updateOrgOrder = mutation({
   },
 });
 
+// Cancel all uncompleted orders for organization
+export const cancelAllUncompletedOrders = mutation({
+  args: {
+    clerkOrganizationId: v.optional(v.string()),
+    orgSessionId: v.optional(v.id("org_cx_sessions")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    // Get organization ID from JWT or args
+    const orgId =
+      args.clerkOrganizationId ||
+      (typeof identity.org_id === "string" ? identity.org_id : undefined);
+    if (!orgId) {
+      throw new Error("No active organization selected");
+    }
+
+    // Get organization record
+    const organization = await ctx.db
+      .query("organizations")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkOrganizationId", orgId))
+      .first();
+    if (!organization) {
+      throw new Error("Organization not found in database");
+    }
+
+    // Build query for uncompleted orders
+    let ordersQuery = ctx.db
+      .query("org_orders")
+      .withIndex("by_clerk_org_id", (q) => q.eq("clerk_org_id", orgId));
+
+    // Filter by session if provided
+    if (args.orgSessionId) {
+      ordersQuery = ctx.db
+        .query("org_orders")
+        .withIndex("by_org_session", (q) =>
+          q.eq("orgSessionId", args.orgSessionId)
+        );
+    }
+
+    // Get all orders and filter for uncompleted ones
+    const allOrders = await ordersQuery.collect();
+    const uncompletedOrders = allOrders.filter(
+      (order) => order.status !== "COMPLETED" && order.status !== "CANCELLED"
+    );
+
+    if (uncompletedOrders.length === 0) {
+      return { cancelledCount: 0, message: "No uncompleted orders found" };
+    }
+
+    // Update all uncompleted orders to CANCELLED
+    const now = Date.now();
+    for (const order of uncompletedOrders) {
+      await ctx.db.patch(order._id, {
+        status: "CANCELLED",
+        updatedAt: now,
+        closeDt: now,
+      });
+    }
+
+    return {
+      cancelledCount: uncompletedOrders.length,
+      message: `Cancelled ${uncompletedOrders.length} orders`,
+    };
+  },
+});
+
 // Delete org order
 export const deleteOrgOrder = mutation({
   args: {

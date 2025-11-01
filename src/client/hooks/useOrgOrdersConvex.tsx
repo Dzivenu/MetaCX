@@ -64,6 +64,7 @@ interface UseOrgOrdersResult {
   ) => Promise<OrgOrder | null>;
   createOrgOrder: (data: CreateOrgOrderData) => Promise<OrgOrder | null>;
   deleteOrgOrder: (id: string) => Promise<boolean>;
+  cancelAllUncompletedOrders: () => Promise<{ cancelledCount: number; message: string }>;
   getOrgOrdersBySession: (orgSessionId: string) => Promise<OrgOrder[]>;
   getOrgOrdersByStatus: (status: string) => Promise<OrgOrder[]>;
 }
@@ -110,6 +111,9 @@ export function useOrgOrders(
   );
   const deleteOrgOrderMutation = useMutation(
     api.functions.orgOrders.deleteOrgOrder
+  );
+  const cancelAllUncompletedOrdersMutation = useMutation(
+    api.functions.orgOrders.cancelAllUncompletedOrders
   );
 
   const orgOrders = useMemo(() => {
@@ -299,6 +303,26 @@ export function useOrgOrders(
     [orgOrders]
   );
 
+  const cancelAllUncompletedOrders = useCallback(async (): Promise<{
+    cancelledCount: number;
+    message: string;
+  }> => {
+    setError(null);
+    try {
+      const result = await cancelAllUncompletedOrdersMutation({
+        clerkOrganizationId: orgId || undefined,
+        orgSessionId: effectiveSessionId as Id<"org_cx_sessions"> | undefined,
+      });
+      return result;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to cancel orders";
+      setError(errorMessage);
+      console.error("Error cancelling orders:", err);
+      throw err;
+    }
+  }, [cancelAllUncompletedOrdersMutation, orgId, effectiveSessionId]);
+
   const refresh = useCallback(async () => {
     // Convex automatically refreshes, but we can reset error state
     setError(null);
@@ -312,6 +336,7 @@ export function useOrgOrders(
     updateOrgOrder,
     createOrgOrder,
     deleteOrgOrder,
+    cancelAllUncompletedOrders,
     getOrgOrdersBySession,
     getOrgOrdersByStatus,
   };

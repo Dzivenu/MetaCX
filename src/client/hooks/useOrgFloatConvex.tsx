@@ -25,6 +25,7 @@ export interface OrgFloatCurrency {
 export interface OrgFloatRepository {
   id: string;
   name: string;
+  type_of_currencies: string; // Add currency type field
   currencies: OrgFloatCurrency[];
 }
 
@@ -95,6 +96,7 @@ export function useOrgFloat(
         repositories: (floatData.repositories || []).map((repo: any) => ({
           id: repo.id,
           name: repo.name,
+          type_of_currencies: repo.type_of_currencies, // Add currency type field
           currencies: (repo.currencies || [])
             .filter(
               (curr: any) => !filterTicker || curr.ticker === filterTicker

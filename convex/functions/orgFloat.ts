@@ -197,6 +197,7 @@ export const getSessionFloat = query({
       return {
         id: repo._id,
         name: repo.name,
+        type_of_currencies: repo.currencyType || repo.typeOf || "currency", // Add currency type field
         floatCountRequired: repo.floatCountRequired || false,
         active: repo.active !== false,
         state,
