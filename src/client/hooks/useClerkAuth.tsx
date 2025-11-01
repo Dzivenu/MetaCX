@@ -49,16 +49,9 @@ export function useAuth() {
     },
   });
 
-  // Get user data from Convex - handle case when Convex is not available
-  let convexUser = null;
-  let syncUser = null;
-  try {
-    convexUser = useQuery(api.functions.auth.getCurrentUser);
-    syncUser = useMutation(api.functions.auth.syncCurrentUser);
-  } catch (error) {
-    // Convex not available, continue without it
-    console.warn("Convex not available, using Clerk-only auth:", error);
-  }
+  // Always call Convex hooks - handle unavailability in error boundaries or component logic
+  const convexUser = useQuery(api.functions.auth.getCurrentUser);
+  const syncUser = useMutation(api.functions.auth.syncCurrentUser);
 
   // Auto-sync user data to Convex when Clerk user loads
   useEffect(() => {

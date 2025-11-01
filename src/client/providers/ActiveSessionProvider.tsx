@@ -70,6 +70,15 @@ interface ActiveSessionProviderProps {
   children: React.ReactNode;
 }
 
+// Check if Convex is available - this should be stable
+const isConvexAvailable = (() => {
+  try {
+    return typeof api !== 'undefined' && !!api.functions;
+  } catch {
+    return false;
+  }
+})();
+
 export function ActiveSessionProvider({
   children,
 }: ActiveSessionProviderProps) {
@@ -83,50 +92,44 @@ export function ActiveSessionProvider({
   // Use state to control when to re-fetch active sessions
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Always call Convex hooks - they handle the "skip" case properly
   const activeSessions = useQuery(
     api.functions.orgCxSessions.getActiveSessions,
-    canQuery && activeOrganization?.id
-      ? {
-          clerkOrganizationId: activeOrganization.id,
-          _refreshTrigger: refreshTrigger, // This will force re-fetch when changed
-        }
-      : "skip"
+    isConvexAvailable && canQuery ? {
+      clerkOrganizationId: activeOrganization!.id,
+      _refreshTrigger: refreshTrigger,
+    } : "skip"
   );
+
+  const closeSession = useMutation(api.functions.orgCxSessions.closeSession as any);
 
   // Reset refresh trigger when organization changes
   useEffect(() => {
-    if (activeOrganization?.id) {
+    if (activeOrganization?.id && isConvexAvailable) {
       setRefreshTrigger(0);
     }
-  }, [activeOrganization?.id]);
-
-  // Mutation to close active session
-  // Note: Type error will resolve once Convex regenerates the API types
-  const closeSession = useMutation(
-    api.functions.orgCxSessions.closeSession as any
-  );
+  }, [activeOrganization?.id, isConvexAvailable]);
 
   // Get the first active session (most recent)
   const activeSession =
     activeSessions && activeSessions.length > 0 ? activeSessions[0] : null;
-  const loading = activeSessions === undefined && canQuery;
+  const loading = activeSessions === undefined && canQuery && isConvexAvailable;
 
   const refreshActiveSession = useCallback(async () => {
-    // Force re-fetch of active sessions by changing the refresh trigger
-    setRefreshTrigger((prev) => prev + 1);
+    if (isConvexAvailable) {
+      setRefreshTrigger((prev) => prev + 1);
+    }
     setError(null);
-  }, []);
+  }, [isConvexAvailable]);
 
   const setActiveSession = (session: CxSession | null) => {
-    // In Convex, we don't manually set sessions - they're managed by mutations
-    // This function is kept for backward compatibility
     console.warn(
       "setActiveSession is deprecated - use Convex mutations instead"
     );
   };
 
   const clearActiveSession = useCallback(async () => {
-    if (activeSession) {
+    if (activeSession && isConvexAvailable) {
       try {
         await closeSession({ sessionId: activeSession._id });
         setError(null);
@@ -137,10 +140,10 @@ export function ActiveSessionProvider({
         );
       }
     }
-  }, [activeSession, closeSession]);
+  }, [activeSession, closeSession, isConvexAvailable]);
 
   const value: ActiveSessionContextType = {
-    activeSession: activeSession as any, // TODO: Fix type mismatch between Convex and CxSession
+    activeSession: activeSession as any,
     loading,
     error,
     setActiveSession,

@@ -137,8 +137,6 @@ export default function TransferStepTwo({
       breakdowns: newBreakdowns,
     });
 
-    console.log("StepTwo - newBreakdowns created:", newBreakdowns);
-    console.log("StepTwo - calculated sum:", newSum);
   };
 
   // Auto-breakdown functionality

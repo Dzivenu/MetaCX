@@ -201,12 +201,12 @@ export default function SwapList({ swaps, loading }: any) {
                   <Table.Tr>
                     <Table.Td colSpan={8} p={0}>
                       <Collapse in={expandedRows.has(swap._id)}>
-                        <Box p="md" bg="gray.0">
+                        <Box p="md">
                           <Text fw={500} mb="sm">
                             Breakdown Details
                           </Text>
                           {swap.breakdowns && swap.breakdowns.length > 0 ? (
-                            <Table>
+                            <Table striped={false} highlightOnHover={false}>
                               <Table.Thead>
                                 <Table.Tr>
                                   <Table.Th>Direction</Table.Th>

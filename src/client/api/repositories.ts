@@ -1,21 +1,25 @@
-// Types
+// Types - updated to match Convex schema
 export interface Repository {
-  id: string;
+  _id: string; // Convex uses _id instead of id
   name: string;
   typeOf?: string | null;
-  organizationId?: number | null;
-  createdAt: Date;
-  updatedAt: Date;
+  clerkOrganizationId: string; // Required field from schema
+  clerk_org_id: string; // Required field from schema
+  org_id: string; // Convex ID reference
+  createdAt: number; // Convex uses numbers for timestamps
+  updatedAt: number;
   currencyType?: string | null;
   form?: string | null;
   uid?: number | null;
   key: string;
   currencyTickers?: string[];
   displayOrderId?: number | null;
-  floatThresholdBottom?: number | null;
-  floatThresholdTop?: number | null;
+  floatThresholdBottom?: string | null; // Stored as string in Convex
+  floatThresholdTop?: string | null; // Stored as string in Convex
   floatCountRequired?: boolean | null;
   active?: boolean | null;
+  authorizedUserIds?: string | null; // JSON string
+  createdBy: string; // Convex ID reference
 }
 
 export interface RepositoryListResponse {

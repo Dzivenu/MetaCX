@@ -44,9 +44,6 @@ export default function CreateTransferPage() {
 
     setSubmitting(true);
     try {
-      console.log("Creating transfer with data:", transferData);
-      console.log("Breakdowns being sent:", transferData.breakdowns);
-
       await createTransfer({
         sessionId: activeSession._id as any,
         outboundRepositoryId:
@@ -58,6 +55,7 @@ export default function CreateTransferPage() {
         outboundSum: transferData.sum,
         inboundSum: transferData.sum,
         breakdowns: transferData.breakdowns,
+      });
       });
 
       router.push("/portal/transfers");
