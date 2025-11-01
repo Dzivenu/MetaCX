@@ -636,7 +636,123 @@ export const leaveSession = mutation({
   },
 });
 
-// Close session (similar to legacy closeSession)
+// Validate session can be closed (checks orders and repository floats)
+export const validateSessionCanClose = query({
+  args: { sessionId: v.id("org_cx_sessions") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+
+    const userOrgClerkId =
+      typeof identity.org_id === "string" ? identity.org_id : undefined;
+    const currentOrg = userOrgClerkId
+      ? await ctx.db
+          .query("organizations")
+          .withIndex("by_clerk_id", (q) =>
+            q.eq("clerkOrganizationId", userOrgClerkId)
+          )
+          .first()
+      : null;
+    if (!currentOrg || session.org_id !== currentOrg._id) {
+      throw new Error(
+        "Unauthorized: Session belongs to a different organization"
+      );
+    }
+
+    // Check session status - must be FLOAT_CLOSE_COMPLETE to close
+    if (session.status === "CLOSED" || session.status === "CANCELLED") {
+      return {
+        canClose: false,
+        error: "This session is already closed or cancelled",
+        blockingItems: [],
+      };
+    }
+
+    if (session.status !== "FLOAT_CLOSE_COMPLETE") {
+      return {
+        canClose: false,
+        error: `Session must be in FLOAT_CLOSE_COMPLETE state to close. Current state: ${session.status}`,
+        blockingItems: [{ type: "session", id: session._id, status: session.status }],
+      };
+    }
+
+    // Check all orders are completed or cancelled
+    const orders = await ctx.db
+      .query("org_orders")
+      .withIndex("by_org_session", (q) => 
+        q.eq("orgSessionId", args.sessionId)
+      )
+      .collect();
+
+    const incompleteOrders = orders.filter(order => 
+      order.status !== "COMPLETED" && order.status !== "CANCELLED"
+    );
+
+    if (incompleteOrders.length > 0) {
+      const orderIds = incompleteOrders.map(o => o._id).join(", ");
+      return {
+        canClose: false,
+        error: `Cannot close session: ${incompleteOrders.length} order(s) are not completed or cancelled. Order IDs: ${orderIds}`,
+        blockingItems: incompleteOrders.map(o => ({ type: "order", id: o._id, status: o.status })),
+      };
+    }
+
+    // Check repository floats are confirmed
+    const repositoryLogs = await ctx.db
+      .query("org_repository_access_logs")
+      .withIndex("by_org_session", (q) => 
+        q.eq("orgSessionId", args.sessionId)
+      )
+      .collect();
+
+    // Get repositories that require float counting
+    const repositories = await ctx.db
+      .query("org_repositories")
+      .withIndex("by_org_id", (q) => q.eq("org_id", session.org_id))
+      .filter((q) => q.eq(q.field("floatCountRequired"), true))
+      .collect();
+
+    const unconfirmedRepositories = [];
+    for (const repository of repositories) {
+      const log = repositoryLogs.find(l => l.orgRepositoryId === repository._id);
+      if (!log || !log.closeConfirmDt) {
+        unconfirmedRepositories.push(repository);
+      }
+    }
+
+    if (unconfirmedRepositories.length > 0) {
+      const repositoryNames = unconfirmedRepositories.map(r => r.name).join(", ");
+      return {
+        canClose: false,
+        error: `Cannot close session: ${unconfirmedRepositories.length} repository(s) are not confirmed. Repository names: ${repositoryNames}`,
+        blockingItems: unconfirmedRepositories.map(r => ({ type: "repository", id: r._id, name: r.name })),
+      };
+    }
+
+    return {
+      canClose: true,
+      error: null,
+      blockingItems: [],
+    };
+  },
+});
+
+// Close session (with validation and proper status change)
 export const closeSession = mutation({
   args: { sessionId: v.id("org_cx_sessions") },
   handler: async (ctx, args) => {
@@ -674,25 +790,77 @@ export const closeSession = mutation({
       );
     }
 
-    const now = Date.now();
-
-    if (session.status === "open") {
-      await ctx.db.patch(args.sessionId, {
-        status: "pending_close",
-        closeStartUserId: user._id,
-        closeStartDt: now,
-        updatedAt: now,
-      });
+    // Check session status - must be FLOAT_CLOSE_COMPLETE to close
+    if (session.status === "CLOSED" || session.status === "CANCELLED") {
+      throw new Error("This session is already closed or cancelled");
     }
 
+    if (session.status !== "FLOAT_CLOSE_COMPLETE") {
+      throw new Error(
+        `Session must be in FLOAT_CLOSE_COMPLETE state to close. Current state: ${session.status}`
+      );
+    }
+
+    // Check all orders are completed or cancelled
+    const orders = await ctx.db
+      .query("org_orders")
+      .withIndex("by_org_session", (q) => 
+        q.eq("orgSessionId", args.sessionId)
+      )
+      .collect();
+
+    const incompleteOrders = orders.filter(order => 
+      order.status !== "COMPLETED" && order.status !== "CANCELLED"
+    );
+
+    if (incompleteOrders.length > 0) {
+      const orderIds = incompleteOrders.map(o => o._id).join(", ");
+      throw new Error(
+        `Cannot close session: ${incompleteOrders.length} order(s) are not completed or cancelled. Order IDs: ${orderIds}`
+      );
+    }
+
+    // Check repository floats are confirmed
+    const repositoryLogs = await ctx.db
+      .query("org_repository_access_logs")
+      .withIndex("by_org_session", (q) => 
+        q.eq("orgSessionId", args.sessionId)
+      )
+      .collect();
+
+    // Get repositories that require float counting
+    const repositories = await ctx.db
+      .query("org_repositories")
+      .withIndex("by_org_id", (q) => q.eq("org_id", session.org_id))
+      .filter((q) => q.eq(q.field("floatCountRequired"), true))
+      .collect();
+
+    const unconfirmedRepositories = [];
+    for (const repository of repositories) {
+      const log = repositoryLogs.find(l => l.orgRepositoryId === repository._id);
+      if (!log || !log.closeConfirmDt) {
+        unconfirmedRepositories.push(repository);
+      }
+    }
+
+    if (unconfirmedRepositories.length > 0) {
+      const repositoryNames = unconfirmedRepositories.map(r => r.name).join(", ");
+      throw new Error(
+        `Cannot close session: ${unconfirmedRepositories.length} repository(s) are not confirmed. Repository names: ${repositoryNames}`
+      );
+    }
+
+    const now = Date.now();
+
+    // Close the session
     await ctx.db.patch(args.sessionId, {
-      status: "closed",
-      closeConfirmUserId: user._id,
+      status: "CLOSED",
       closeConfirmDt: now,
+      closeConfirmUserId: user._id,
       updatedAt: now,
     });
 
-    return true;
+    return { success: true, message: "Session closed successfully" };
   },
 });
 

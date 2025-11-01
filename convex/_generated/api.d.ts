@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as actions_currencies from "../actions/currencies.js";
 import type * as actions_organizations from "../actions/organizations.js";
+import type * as client from "../client.js";
 import type * as functions_appCurrencies from "../functions/appCurrencies.js";
 import type * as functions_auth from "../functions/auth.js";
 import type * as functions_database from "../functions/database.js";
@@ -70,6 +71,7 @@ import type * as schema_users from "../schema/users.js";
 declare const fullApi: ApiFromModules<{
   "actions/currencies": typeof actions_currencies;
   "actions/organizations": typeof actions_organizations;
+  client: typeof client;
   "functions/appCurrencies": typeof functions_appCurrencies;
   "functions/auth": typeof functions_auth;
   "functions/database": typeof functions_database;

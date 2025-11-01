@@ -20,8 +20,10 @@ import { useDisclosure } from "@mantine/hooks";
 import { useFloat } from "@/client/hooks/use-float-convex";
 import { useFloatCalculations } from "@/client/hooks/use-float-calculations";
 import { RepositoryCard } from "@/client/components/float/RepositoryCard";
+import { CloseSessionValidation } from "@/client/components/float/CloseSessionValidation";
 import { useActiveSession } from "@/client/hooks/useActiveSession";
 import { useActiveSessionContext } from "@/client/providers/ActiveSessionProvider";
+import { useCxSessions } from "@/client/hooks/useCxSessionsConvex";
 
 const FloatHeader: React.FC<{
   activeSession: any;
@@ -173,7 +175,18 @@ export default function FloatPage() {
     showSessionStats,
     { open: openSessionStats, close: closeSessionStats },
   ] = useDisclosure(false);
+  const [
+    showCloseValidation,
+    { open: openCloseValidation, close: closeCloseValidation },
+  ] = useDisclosure(false);
   const [startingCloseOrOpen, setStartingCloseOrOpen] = useState(false);
+  const sessionHooks = useCxSessions();
+  const { closeSession, validateSessionCanClose } = sessionHooks;
+
+  // Debug logging
+  console.log('Session hooks:', sessionHooks);
+  console.log('validateSessionCanClose:', validateSessionCanClose);
+  console.log('validateSessionCanClose type:', typeof validateSessionCanClose);
 
   const {
     floatData,
@@ -234,6 +247,7 @@ export default function FloatPage() {
         color: "green",
       });
     } catch (error) {
+      console.error("Start float error:", error);
       notifications.show({
         title: "Error",
         message: "Failed to start float opening",
@@ -258,6 +272,7 @@ export default function FloatPage() {
         color: "green",
       });
     } catch (error) {
+      console.error("Confirm float error:", error);
       notifications.show({
         title: "Error",
         message: "Failed to confirm float opening",
@@ -282,6 +297,7 @@ export default function FloatPage() {
         color: "green",
       });
     } catch (error) {
+      console.error("Close float error:", error);
       notifications.show({
         title: "Error",
         message: "Failed to start float closing",
@@ -293,7 +309,62 @@ export default function FloatPage() {
   };
 
   const handleCloseSession = () => {
-    openSessionStats();
+    if (!activeSession?._id) {
+      const error = "No active session found";
+      console.error("Close session error:", error);
+      notifications.show({
+        title: "Error",
+        message: error,
+        color: "red",
+      });
+      return;
+    }
+    openCloseValidation();
+  };
+
+  const handleConfirmCloseSession = async () => {
+    if (!activeSession?._id) return;
+
+    setStartingCloseOrOpen(true);
+    try {
+      const result = await closeSession(activeSession._id);
+      
+      if (result.success) {
+        notifications.show({
+          title: "Success",
+          message: result.message || "Session closed successfully",
+          color: "green",
+        });
+        
+        closeCloseValidation();
+        
+        // Refresh the active session to get updated status
+        await refreshActiveSession();
+        // Refresh float data to show updated repository states
+        await refetch();
+        
+        // Show session stats modal
+        openSessionStats();
+      } else {
+        const error = result.message || "Failed to close session";
+        console.error("Close session failed:", error);
+        notifications.show({
+          title: "Error",
+          message: error,
+          color: "red",
+        });
+      }
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to close session";
+      console.error("Close session error:", error);
+      notifications.show({
+        title: "Error",
+        message: errorMessage,
+        color: "red",
+      });
+    } finally {
+      setStartingCloseOrOpen(false);
+    }
   };
 
   const handleCancelClose = async () => {
@@ -424,6 +495,17 @@ export default function FloatPage() {
         <SessionStats
           activeSession={activeSession}
           onClose={closeSessionStats}
+        />
+      )}
+
+      {showCloseValidation && (
+        <CloseSessionValidation
+          opened={showCloseValidation}
+          onClose={closeCloseValidation}
+          onConfirm={handleConfirmCloseSession}
+          sessionId={activeSession?._id || ""}
+          loading={startingCloseOrOpen}
+          validateSession={validateSessionCanClose || (async () => ({ canClose: false, error: "Validation function not available", blockingItems: [] }))}
         />
       )}
 

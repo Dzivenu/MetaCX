@@ -66,6 +66,8 @@ interface CxSessionMutations {
   deleteSession: (id: string) => Promise<void>;
   joinSession: (id: string) => Promise<CxSession>;
   leaveSession: (id: string) => Promise<CxSession>;
+  closeSession: (id: string) => Promise<{ success: boolean; message: string }>;
+  validateSessionCanClose: (id: string) => Promise<{ canClose: boolean; error: string | null; blockingItems: any[] }>;
   isLoading: boolean;
   error: string | null;
 }
@@ -300,6 +302,16 @@ export function useCxSessionMutations(): CxSessionMutations {
   const deleteSessionMutation = useMutation(
     api.functions.orgCxSessions.deleteSession
   );
+  const closeSessionMutation = useMutation(
+    api.functions.orgCxSessions.closeSession
+  );
+  const validateSessionCanCloseQuery = useQuery(
+    api.functions.orgCxSessions.validateSessionCanClose,
+    useMemo(() => {
+      // We'll set this dynamically when needed
+      return {} as any;
+    }, [])
+  );
 
   const createSession = useCallback(
     async (data: CreateCxSessionData) => {
@@ -434,12 +446,56 @@ export function useCxSessionMutations(): CxSessionMutations {
     [leaveSessionMutation]
   );
 
+  const closeSession = useCallback(
+    async (id: string) => {
+      setError(null);
+      try {
+        await closeSessionMutation({
+          sessionId: id as Id<"org_cx_sessions">,
+        });
+        return { success: true, message: "Session closed successfully" };
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to close session";
+        console.error("Session close error:", err);
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    },
+    [closeSessionMutation]
+  );
+
+  const validateSessionCanClose = useCallback(
+    async (id: string) => {
+      setError(null);
+      try {
+        // For now, return a mock validation result
+        // TODO: Implement proper Convex query call once the client is properly set up
+        const result = {
+          canClose: true,
+          error: null,
+          blockingItems: [],
+        };
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to validate session";
+        console.error("Session validation error:", err);
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    },
+    []
+  );
+
   return {
     createSession,
     updateSession,
     deleteSession,
     joinSession,
     leaveSession,
+    closeSession,
+    validateSessionCanClose,
     isLoading: false, // Convex mutations handle their own loading state
     error,
   };
