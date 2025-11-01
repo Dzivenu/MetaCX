@@ -13,6 +13,7 @@ import {
   Badge,
   ActionIcon,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
   IconUser,
   IconSettings,
@@ -22,10 +23,12 @@ import {
   IconChevronDown,
   IconBuilding,
   IconSwitchHorizontal,
+  IconCircleX,
 } from "@tabler/icons-react";
 import { useRouter } from "@/client/providers/router-provider";
 import { useActiveSession } from "@/client/hooks/useActiveSession";
 import { useLeaveCxSession } from "@/client/hooks/useLeaveCxSession";
+import { useActiveSessionContext } from "@/client/providers/ActiveSessionProvider";
 import { useMantineColorScheme as useMantineScheme } from "@mantine/core";
 import {
   useAuth as useClerkAuth,
@@ -65,8 +68,26 @@ export function TopNavbarRight() {
   const { isSignedIn, isLoaded } = useClerkAuth();
   const { activeSession } = useActiveSession();
   const { leaveSession } = useLeaveCxSession();
+  const { clearActiveSession } = useActiveSessionContext();
 
   const isAuthenticated = isSignedIn && isLoaded;
+
+  const handleCloseSession = async () => {
+    try {
+      await clearActiveSession();
+      notifications.show({
+        title: "Session Closed",
+        message: "The trading session has been successfully closed",
+        color: "green",
+      });
+    } catch (error) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to close session",
+        color: "red",
+      });
+    }
+  };
 
   return (
     <Group gap="sm">
@@ -132,6 +153,15 @@ export function TopNavbarRight() {
                 onClick={() => router.push(`/sessions/${activeSession._id}`)}
               >
                 View Session
+              </Button>
+              <Button
+                variant="subtle"
+                color="red"
+                leftSection={<IconCircleX size={16} />}
+                justify="start"
+                onClick={handleCloseSession}
+              >
+                Close Session
               </Button>
               <Button
                 variant="subtle"

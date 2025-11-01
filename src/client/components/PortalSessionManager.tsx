@@ -26,6 +26,7 @@ import {
   IconEdit,
   IconTrash,
   IconEye,
+  IconCircleX,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -43,7 +44,7 @@ import { useActiveSession } from "@/client/hooks/useActiveSession";
 export function PortalSessionManager() {
   const { activeOrganization } = useActiveOrganization();
   const { activeSession } = useActiveSession();
-  const { refreshActiveSession } = useActiveSessionContext();
+  const { refreshActiveSession, clearActiveSession } = useActiveSessionContext();
   const {
     joinSession,
     leaveSession,
@@ -164,6 +165,30 @@ export function PortalSessionManager() {
       }
     },
     [leaveSession, refreshActiveSession, refresh]
+  );
+
+  // Handle closing a session
+  const handleCloseSession = useCallback(
+    async (sessionId: string) => {
+      try {
+        await clearActiveSession();
+        notifications.show({
+          title: "Success",
+          message: "Session closed successfully",
+          color: "green",
+        });
+        refresh();
+        refreshActiveSession();
+      } catch (error) {
+        console.error("Failed to close session:", error);
+        notifications.show({
+          title: "Error",
+          message: "Failed to close session",
+          color: "red",
+        });
+      }
+    },
+    [clearActiveSession, refresh, refreshActiveSession]
   );
 
   const [
@@ -480,6 +505,16 @@ export function PortalSessionManager() {
                             >
                               Edit
                             </Menu.Item>
+                            {session.status?.toLowerCase() !== "closed" &&
+                              session.status?.toLowerCase() !== "cancelled" && (
+                                <Menu.Item
+                                  leftSection={<IconCircleX size={16} />}
+                                  color="orange"
+                                  onClick={() => handleCloseSession(session.id)}
+                                >
+                                  Close Session
+                                </Menu.Item>
+                              )}
                             <Divider />
                             <Menu.Item
                               leftSection={<IconTrash size={16} />}
