@@ -1,10 +1,6 @@
-import { ConvexHttpClient } from "convex/browser";
+// This file is deprecated - use React ConvexProvider pattern instead
+// See src/client/providers/convex-provider.tsx for the proper implementation
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-if (!convexUrl) {
-  throw new Error("NEXT_PUBLIC_CONVEX_URL is not set");
+export function getConvex() {
+  throw new Error("Direct convex client access is deprecated. Use React hooks instead.");
 }
-
-const convex = new ConvexHttpClient(convexUrl);
-
-export { convex };
