@@ -1315,3 +1315,69 @@ export const confirmFloatClose = mutation({
     return { success: true };
   },
 });
+
+export const cancelFloatClose = mutation({
+  args: { sessionId: v.id("org_cx_sessions") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+
+    // Check authorization
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Verify user is authorized for this session
+    if (!session.authorizedUserIds?.includes(`${user._id}`)) {
+      throw new Error("User not authorized for this session");
+    }
+
+    // Can only cancel float close from FLOAT_CLOSE_START state
+    if (session.status !== "FLOAT_CLOSE_START") {
+      throw new Error(
+        `Cannot cancel float close from ${session.status} state`
+      );
+    }
+
+    await ctx.db.patch(args.sessionId, {
+      status: "FLOAT_OPEN_COMPLETE",
+      closeStartDt: undefined,
+      closeStartUserId: undefined,
+      closeConfirmDt: undefined,
+      closeConfirmUserId: undefined,
+      updatedAt: Date.now(),
+    });
+
+    // Clear close-related timestamps from repository access logs
+    {
+      const repoLogs = await ctx.db
+        .query("org_repository_access_logs")
+        .withIndex("by_org_session", (q) =>
+          q.eq("orgSessionId", args.sessionId)
+        )
+        .collect();
+      for (const log of repoLogs) {
+        if (log.closeStartDt || log.closeConfirmDt) {
+          await ctx.db.patch(log._id, {
+            closeStartDt: undefined,
+            closeConfirmDt: undefined,
+            updatedAt: Date.now(),
+          });
+        }
+      }
+    }
+
+    return { success: true };
+  },
+});

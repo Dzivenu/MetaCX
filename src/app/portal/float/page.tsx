@@ -379,6 +379,7 @@ export default function FloatPage() {
         color: "green",
       });
     } catch (error) {
+      console.error("Cancel float close error:", error);
       notifications.show({
         title: "Error",
         message: "Failed to cancel float close",

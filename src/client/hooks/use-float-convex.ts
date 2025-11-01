@@ -84,6 +84,9 @@ export const useFloat = (sessionId: string) => {
   const confirmFloatCloseMutation = useMutation(
     api.functions.orgCxSessions.confirmFloatClose
   );
+  const cancelFloatCloseMutation = useMutation(
+    api.functions.orgCxSessions.cancelFloatClose
+  );
 
   // Update repository float stacks
   const updateRepositoryFloatMutation = useMutation(
@@ -107,13 +110,12 @@ export const useFloat = (sessionId: string) => {
         case "START_CLOSE":
           return await startFloatCloseMutation({ sessionId: sessionConvexId });
         case "CANCEL_CLOSE":
-          // For now, just revert to FLOAT_OPEN_COMPLETE - you might want a separate function
-          throw new Error("Cancel close not implemented yet");
+          return await cancelFloatCloseMutation({ sessionId: sessionConvexId });
         default:
           throw new Error(`Unknown action: ${action}`);
       }
     },
-    [startFloatOpenMutation, startFloatCloseMutation, sessionConvexId]
+    [startFloatOpenMutation, startFloatCloseMutation, cancelFloatCloseMutation, sessionConvexId]
   );
 
   const confirmFloat = useCallback(
