@@ -89,7 +89,6 @@ NODE_ENV=development
 
 # Convex (auto-generated when running npx convex dev)
 NEXT_PUBLIC_CONVEX_URL=your_convex_url
-CONVEX_DEPLOYMENT=your_deployment_name
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key

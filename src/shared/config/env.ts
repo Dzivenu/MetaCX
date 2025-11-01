@@ -14,7 +14,6 @@ export const env = createEnv({
     CLERK_SECRET_KEY: z.string().min(1),
     CLERK_JWT_ISSUER_DOMAIN: z.string().url(),
     // Convex Configuration
-    CONVEX_DEPLOYMENT: z.string().min(1),
     // API Configuration
     OPEN_EXCHANGE_RATE_APP_ID: z.string().min(1),
     APP_METALS_API: z.string().min(1),
@@ -53,7 +52,6 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     // Convex Configuration
-    CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
     // API Configuration
     OPEN_EXCHANGE_RATE_APP_ID: process.env.OPEN_EXCHANGE_RATE_APP_ID,
