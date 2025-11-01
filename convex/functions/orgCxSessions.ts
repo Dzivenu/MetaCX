@@ -683,10 +683,10 @@ export const validateSessionCanClose = query({
       };
     }
 
-    if (session.status !== "FLOAT_CLOSE_COMPLETE") {
+    if (session.status !== "FLOAT_CLOSE_START" && session.status !== "FLOAT_CLOSE_COMPLETE") {
       return {
         canClose: false,
-        error: `Session must be in FLOAT_CLOSE_COMPLETE state to close. Current state: ${session.status}`,
+        error: `Session must be in FLOAT_CLOSE_START or FLOAT_CLOSE_COMPLETE state to close. Current state: ${session.status}`,
         blockingItems: [{ type: "session", id: session._id, status: session.status }],
       };
     }
@@ -774,30 +774,41 @@ export const closeSession = mutation({
       throw new Error("Session not found");
     }
 
-    const userOrgClerkId =
-      typeof identity.org_id === "string" ? identity.org_id : undefined;
-    const currentOrg = userOrgClerkId
-      ? await ctx.db
-          .query("organizations")
-          .withIndex("by_clerk_id", (q) =>
-            q.eq("clerkOrganizationId", userOrgClerkId)
-          )
-          .first()
-      : null;
-    if (!currentOrg || session.org_id !== currentOrg._id) {
+    // Get the organization from the session
+    const sessionOrg = await ctx.db.get(session.org_id);
+    if (!sessionOrg) {
+      throw new Error("Session organization not found");
+    }
+
+    // Check if user is a member of the session's organization
+    const membership = await ctx.db
+      .query("org_memberships")
+      .withIndex("by_org_user", (q) =>
+        q.eq("organizationId", session.org_id).eq("userId", user._id)
+      )
+      .first();
+    
+    console.log("🔐 Close Session Authorization check:", {
+      userId: user._id,
+      sessionOrgId: session.org_id,
+      sessionStatus: session.status,
+      hasMembership: !!membership
+    });
+    
+    if (!membership) {
       throw new Error(
-        "Unauthorized: Session belongs to a different organization"
+        `Unauthorized: You are not a member of the organization that owns this session. Session org: ${session.org_id}`
       );
     }
 
-    // Check session status - must be FLOAT_CLOSE_COMPLETE to close
+    // Check session status - must be FLOAT_CLOSE_START or FLOAT_CLOSE_COMPLETE to close
     if (session.status === "CLOSED" || session.status === "CANCELLED") {
       throw new Error("This session is already closed or cancelled");
     }
 
-    if (session.status !== "FLOAT_CLOSE_COMPLETE") {
+    if (session.status !== "FLOAT_CLOSE_START" && session.status !== "FLOAT_CLOSE_COMPLETE") {
       throw new Error(
-        `Session must be in FLOAT_CLOSE_COMPLETE state to close. Current state: ${session.status}`
+        `Session must be in FLOAT_CLOSE_START or FLOAT_CLOSE_COMPLETE state to close. Current state: ${session.status}`
       );
     }
 

@@ -49,16 +49,25 @@ export function useAuth() {
     },
   });
 
-  // Get user data from Convex
-  const convexUser = useQuery(api.functions.auth.getCurrentUser);
-
-  // Auto-sync user to Convex when they sign in
-  const syncUser = useMutation(api.functions.auth.syncCurrentUser);
+  // Get user data from Convex - handle case when Convex is not available
+  let convexUser = null;
+  let syncUser = null;
+  try {
+    convexUser = useQuery(api.functions.auth.getCurrentUser);
+    syncUser = useMutation(api.functions.auth.syncCurrentUser);
+  } catch (error) {
+    // Convex not available, continue without it
+    console.warn("Convex not available, using Clerk-only auth:", error);
+  }
 
   // Auto-sync user data to Convex when Clerk user loads
   useEffect(() => {
-    if (isSignedIn && clerkUser && !convexUser) {
-      syncUser();
+    if (isSignedIn && clerkUser && !convexUser && syncUser && typeof syncUser === 'function') {
+      try {
+        syncUser();
+      } catch (error) {
+        console.warn("Failed to sync user to Convex:", error);
+      }
     }
   }, [isSignedIn, clerkUser, convexUser, syncUser]);
 

@@ -305,13 +305,6 @@ export function useCxSessionMutations(): CxSessionMutations {
   const closeSessionMutation = useMutation(
     api.functions.orgCxSessions.closeSession
   );
-  const validateSessionCanCloseQuery = useQuery(
-    api.functions.orgCxSessions.validateSessionCanClose,
-    useMemo(() => {
-      // We'll set this dynamically when needed
-      return {} as any;
-    }, [])
-  );
 
   const createSession = useCallback(
     async (data: CreateCxSessionData) => {

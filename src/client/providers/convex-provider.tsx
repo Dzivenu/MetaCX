@@ -14,13 +14,13 @@ export function ConvexClientProvider({ children }: ConvexClientProviderProps) {
   const convex = useMemo(() => {
     // Ensure we're on the client side
     if (typeof window === 'undefined') {
-      // Return a dummy client for SSR
+      // Return a dummy client for SSR - this won't be used but prevents errors
       return null as any;
     }
     
     const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
     if (!convexUrl) {
-      console.error("NEXT_PUBLIC_CONVEX_URL is not set");
+      console.warn("NEXT_PUBLIC_CONVEX_URL not set, Convex functionality will be disabled");
       return null;
     }
     
@@ -34,6 +34,7 @@ export function ConvexClientProvider({ children }: ConvexClientProviderProps) {
 
   // If convex client is not available, render children without Convex context
   if (!convex) {
+    console.warn("Convex client not available, rendering without Convex context");
     return <>{children}</>;
   }
 

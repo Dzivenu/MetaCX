@@ -23,7 +23,7 @@ import { RepositoryCard } from "@/client/components/float/RepositoryCard";
 import { CloseSessionValidation } from "@/client/components/float/CloseSessionValidation";
 import { useActiveSession } from "@/client/hooks/useActiveSession";
 import { useActiveSessionContext } from "@/client/providers/ActiveSessionProvider";
-import { useCxSessions } from "@/client/hooks/useCxSessionsConvex";
+import { useCxSessionMutations } from "@/client/hooks/useCxSessionsConvex";
 
 const FloatHeader: React.FC<{
   activeSession: any;
@@ -180,7 +180,7 @@ export default function FloatPage() {
     { open: openCloseValidation, close: closeCloseValidation },
   ] = useDisclosure(false);
   const [startingCloseOrOpen, setStartingCloseOrOpen] = useState(false);
-  const sessionHooks = useCxSessions();
+  const sessionHooks = useCxSessionMutations();
   const { closeSession, validateSessionCanClose } = sessionHooks;
 
   // Debug logging
@@ -287,9 +287,7 @@ export default function FloatPage() {
     setStartingCloseOrOpen(true);
     try {
       await startFloat("START_CLOSE");
-      // Refresh the active session to get updated status
       await refreshActiveSession();
-      // Refresh float data to show updated repository states
       await refetch();
       notifications.show({
         title: "Success",
