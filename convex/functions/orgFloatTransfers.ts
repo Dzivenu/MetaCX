@@ -70,11 +70,11 @@ export const createTransfer = mutation({
     inboundSum: v.string(),
     breakdowns: v.array(
       v.object({
-        floatStackId: v.id("org_float_stacks"),
+        floatStackId: v.optional(v.id("org_float_stacks")), // Make optional for transfers without float
         repositoryId: v.id("org_repositories"),
         count: v.string(),
         direction: v.string(),
-        denominationId: v.id("org_denominations"),
+        denominationId: v.optional(v.id("org_denominations")), // Make optional for transfers without float
         denominationValue: v.string(),
       })
     ),
@@ -146,32 +146,36 @@ export const createTransfer = mutation({
 
     try {
       for (const breakdown of args.breakdowns) {
-        const floatStack = await ctx.db.get(breakdown.floatStackId);
-        if (!floatStack) {
-          throw new Error(`Float stack not found: ${breakdown.floatStackId}`);
+        // Only update float stack counts if floatStackId is provided
+        if (breakdown.floatStackId) {
+          const floatStack = await ctx.db.get(breakdown.floatStackId);
+          if (!floatStack) {
+            throw new Error(`Float stack not found: ${breakdown.floatStackId}`);
+          }
+
+          const count = parseFloat(breakdown.count);
+          const isOutbound = breakdown.direction === "OUTBOUND";
+
+          const currentCloseCount = floatStack.closeCount ?? 0;
+          const newCloseCount = isOutbound
+            ? currentCloseCount - count
+            : currentCloseCount + count;
+
+          await ctx.db.patch(breakdown.floatStackId, {
+            closeCount: newCloseCount,
+            updatedAt: Date.now(),
+          });
         }
 
-        const count = parseFloat(breakdown.count);
-        const isOutbound = breakdown.direction === "OUTBOUND";
-
-        const currentCloseCount = floatStack.closeCount ?? 0;
-        const newCloseCount = isOutbound
-          ? currentCloseCount - count
-          : currentCloseCount + count;
-
-        await ctx.db.patch(breakdown.floatStackId, {
-          closeCount: newCloseCount,
-          updatedAt: Date.now(),
-        });
-
+        // Create breakdown record (always, even without float stack)
         await ctx.db.insert("org_breakdowns", {
           clerkOrganizationId: organization.clerkOrganizationId,
           clerk_org_id: organization.clerk_org_id,
           org_id: session.org_id,
           breakableType: "FLOAT_TRANSFER",
           breakableId: transferId.toString(),
-          orgFloatStackId: breakdown.floatStackId,
-          orgDenominationId: breakdown.denominationId,
+          orgFloatStackId: breakdown.floatStackId, // Optional field, undefined if not provided
+          orgDenominationId: breakdown.denominationId, // Optional field, undefined if not provided
           count: breakdown.count,
           direction: breakdown.direction,
           status: "COMMITTED",

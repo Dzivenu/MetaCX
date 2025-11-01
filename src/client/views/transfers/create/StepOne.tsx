@@ -1,14 +1,22 @@
 "use client";
 
 import { useMemo } from "react";
-import { Stack, Select, TextInput } from "@mantine/core";
-import type { Id } from "../../../../../convex/_generated/dataModel";
+import {
+  Stack,
+  Select,
+  NumberInput,
+} from "@mantine/core";
+import { useCurrencies } from "@/client/hooks/useCurrenciesConvex";
 
 export default function TransferStepOne({
   transferData,
   setTransferData,
   repositories,
 }: any) {
+
+  // Get organization's currencies
+  const { currencies: orgCurrencies } = useCurrencies();
+
   const currencyTypeOptions = useMemo(() => {
     const types = [
       ...new Set(repositories.map((r: any) => r.type_of_currencies).filter(Boolean)),
@@ -19,76 +27,44 @@ export default function TransferStepOne({
     }));
   }, [repositories]);
 
+  const availableCurrencies = useMemo(() => {
+    if (!transferData.currencyType || !orgCurrencies) return [];
+
+    // Get currencies from organization that match the selected currency type
+    const currencies = orgCurrencies
+      .filter((currency: any) => {
+        // Map currency type to the expected format
+        const currencyType = currency.typeOf || currency.type_of || "fiat";
+        return currencyType.toUpperCase() === transferData.currencyType.toUpperCase();
+      })
+      .map((currency: any) => ({
+        value: currency.ticker,
+        label: currency.ticker,
+      }));
+
+    return currencies;
+  }, [orgCurrencies, transferData.currencyType]);
+
   const filteredRepos = useMemo(() => {
     if (!transferData.currencyType) return [];
     return repositories.filter(
-      (r: any) => r.type_of_currencies === transferData.currencyType
+      (repo: any) => repo.type_of_currencies === transferData.currencyType
     );
   }, [repositories, transferData.currencyType]);
 
   const repoOptions = filteredRepos
-    .filter((r: any) => r._id) // Ensure repository has an ID
+    .filter((r: any) => r.id) // Ensure repository has an ID
     .map((r: any) => ({
-      value: r._id,
+      value: r.id,
       label: r.name,
     }));
-
-  const availableTickers = useMemo(() => {
-    if (!transferData.sourceRepoId || !transferData.targetRepoId) return [];
-
-    const sourceRepo = repositories.find(
-      (r: any) => r._id === transferData.sourceRepoId
-    );
-    const targetRepo = repositories.find(
-      (r: any) => r._id === transferData.targetRepoId
-    );
-
-    if (!sourceRepo || !targetRepo) return [];
-
-    const sourceCurrencies = sourceRepo.float || [];
-    const targetCurrencies = targetRepo.float || [];
-
-    const sourceTickers = sourceCurrencies.map((c: any) => c.ticker);
-    const targetTickers = targetCurrencies.map((c: any) => c.ticker);
-
-    const commonTickers = sourceTickers.filter((ticker: string) =>
-      targetTickers.includes(ticker)
-    );
-
-    return commonTickers.map((ticker: string) => ({
-      value: ticker,
-      label: ticker,
-    }));
-  }, [repositories, transferData.sourceRepoId, transferData.targetRepoId]);
 
   const handleCurrencyTypeChange = (value: string | null) => {
     setTransferData({
       ...transferData,
       currencyType: value || "",
-      sourceRepoId: "",
-      targetRepoId: "",
       ticker: "",
-      sum: "",
-      breakdowns: [],
-    });
-  };
-
-  const handleSourceRepoChange = (value: string | null) => {
-    setTransferData({
-      ...transferData,
-      sourceRepoId: (value as Id<"org_repositories">) || "",
-      ticker: "",
-      sum: "",
-      breakdowns: [],
-    });
-  };
-
-  const handleTargetRepoChange = (value: string | null) => {
-    setTransferData({
-      ...transferData,
-      targetRepoId: (value as Id<"org_repositories">) || "",
-      ticker: "",
-      sum: "",
+      sum: "", // Clear sum when currency type changes
       breakdowns: [],
     });
   };
@@ -97,6 +73,25 @@ export default function TransferStepOne({
     setTransferData({
       ...transferData,
       ticker: value || "",
+      sum: "", // Clear sum when currency changes
+      breakdowns: [],
+    });
+  };
+
+  const handleSourceRepoChange = (value: string | null) => {
+    setTransferData({
+      ...transferData,
+      sourceRepoId: value || "",
+      // Keep sum when changing repositories
+      breakdowns: [],
+    });
+  };
+
+  const handleTargetRepoChange = (value: string | null) => {
+    setTransferData({
+      ...transferData,
+      targetRepoId: value || "",
+      // Keep sum when changing repositories
       breakdowns: [],
     });
   };
@@ -109,6 +104,16 @@ export default function TransferStepOne({
         data={currencyTypeOptions as any}
         value={transferData.currencyType}
         onChange={handleCurrencyTypeChange}
+        required
+      />
+
+      <Select
+        label="Currency"
+        placeholder="Select currency"
+        data={availableCurrencies}
+        value={transferData.ticker}
+        onChange={handleTickerChange}
+        disabled={!transferData.currencyType}
         required
       />
 
@@ -132,13 +137,21 @@ export default function TransferStepOne({
         required
       />
 
-      <Select
-        label="Currency"
-        placeholder="Select currency"
-        data={availableTickers}
-        value={transferData.ticker}
-        onChange={handleTickerChange}
-        disabled={!transferData.sourceRepoId || !transferData.targetRepoId}
+      <NumberInput
+        label={`Transfer Amount (${transferData.ticker || 'Currency'})`}
+        placeholder="Enter transfer amount"
+        value={parseFloat(transferData.sum) || ""}
+        onChange={(value) => {
+          const numValue = typeof value === "number" ? value : parseFloat(value?.toString() || "0") || 0;
+          setTransferData({
+            ...transferData,
+            sum: numValue.toString(),
+            breakdowns: [], // Clear breakdowns when amount changes
+          });
+        }}
+        min={0}
+        decimalScale={2}
+        disabled={!transferData.ticker}
         required
       />
     </Stack>

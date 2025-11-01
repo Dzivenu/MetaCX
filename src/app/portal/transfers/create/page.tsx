@@ -23,8 +23,8 @@ export default function CreateTransferPage() {
 
   const [transferData, setTransferData] = useState({
     currencyType: "",
-    sourceRepoId: "" as Id<"org_repositories"> | "",
-    targetRepoId: "" as Id<"org_repositories"> | "",
+    sourceRepoId: "",
+    targetRepoId: "",
     ticker: "",
     sum: "",
     breakdowns: [] as any[],
@@ -40,16 +40,13 @@ export default function CreateTransferPage() {
   };
 
   const handleSubmit = async () => {
-    if (
-      !activeSession ||
-      !transferData.sourceRepoId ||
-      !transferData.targetRepoId
-    ) {
-      return;
-    }
+    if (!activeSession) return;
 
     setSubmitting(true);
     try {
+      console.log("Creating transfer with data:", transferData);
+      console.log("Breakdowns being sent:", transferData.breakdowns);
+
       await createTransfer({
         sessionId: activeSession._id as any,
         outboundRepositoryId:
@@ -62,6 +59,7 @@ export default function CreateTransferPage() {
         inboundSum: transferData.sum,
         breakdowns: transferData.breakdowns,
       });
+
       router.push("/portal/transfers");
     } catch (error) {
       console.error("Failed to create transfer:", error);
@@ -75,12 +73,12 @@ export default function CreateTransferPage() {
     transferData.sourceRepoId !== "" &&
     transferData.targetRepoId !== "" &&
     transferData.ticker !== "" &&
+    transferData.sum !== "" &&
+    parseFloat(transferData.sum) > 0 &&
     transferData.sourceRepoId !== transferData.targetRepoId;
 
   const step1Valid =
-    transferData.breakdowns.length > 0 &&
-    transferData.sum !== "" &&
-    parseFloat(transferData.sum) > 0;
+    true; // Step 1 (breakdown) is now optional
 
   const canProceed =
     active === 0 ? step0Valid : active === 1 ? step1Valid : true;
@@ -90,7 +88,7 @@ export default function CreateTransferPage() {
       <Title order={2}>Create Transfer</Title>
 
       <Stepper active={active} onStepClick={setActive}>
-        <Stepper.Step label="Basic Information" description="Enter details">
+        <Stepper.Step label="Basic Information" description="Enter amount and details">
           <TransferStepOne
             transferData={transferData}
             setTransferData={setTransferData}
@@ -98,7 +96,7 @@ export default function CreateTransferPage() {
           />
         </Stepper.Step>
 
-        <Stepper.Step label="Breakdown" description="Enter sum and breakdown">
+        <Stepper.Step label="Breakdown (Optional)" description="Specify denominations">
           <TransferStepTwo
             transferData={transferData}
             setTransferData={setTransferData}
