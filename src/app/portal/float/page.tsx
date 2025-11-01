@@ -427,12 +427,39 @@ export default function FloatPage() {
   };
 
   const handleBypassFloat = async () => {
-    // Debug function to skip float
-    notifications.show({
-      title: "Debug",
-      message: "Float bypassed",
-      color: "orange",
-    });
+    if (!activeSession?._id) return;
+
+    setStartingCloseOrOpen(true);
+    try {
+      let action: "CONFIRM_OPEN" | "CONFIRM_CLOSE";
+
+      if (activeSession.status === "FLOAT_OPEN_START") {
+        action = "CONFIRM_OPEN";
+      } else if (activeSession.status === "FLOAT_CLOSE_START") {
+        action = "CONFIRM_CLOSE";
+      } else {
+        throw new Error(`Cannot bypass float from ${activeSession.status} state`);
+      }
+
+      await confirmFloat(action);
+      await refreshActiveSession();
+      await refetch();
+
+      notifications.show({
+        title: "Success",
+        message: "Float bypassed successfully",
+        color: "green",
+      });
+    } catch (error) {
+      console.error("Bypass float error:", error);
+      notifications.show({
+        title: "Error",
+        message: "Failed to bypass float",
+        color: "red",
+      });
+    } finally {
+      setStartingCloseOrOpen(false);
+    }
   };
 
   // Show loading state when active session is loading
