@@ -11,7 +11,7 @@ export default function TransferStepOne({
 }: any) {
   const currencyTypeOptions = useMemo(() => {
     const types = [
-      ...new Set(repositories.map((r: any) => r.type_of_currencies)),
+      ...new Set(repositories.map((r: any) => r.type_of_currencies).filter(Boolean)),
     ] as string[];
     return types.map((type: string) => ({
       value: type,
@@ -26,10 +26,12 @@ export default function TransferStepOne({
     );
   }, [repositories, transferData.currencyType]);
 
-  const repoOptions = filteredRepos.map((r: any) => ({
-    value: r._id,
-    label: r.name,
-  }));
+  const repoOptions = filteredRepos
+    .filter((r: any) => r._id) // Ensure repository has an ID
+    .map((r: any) => ({
+      value: r._id,
+      label: r.name,
+    }));
 
   const availableTickers = useMemo(() => {
     if (!transferData.sourceRepoId || !transferData.targetRepoId) return [];
@@ -43,8 +45,8 @@ export default function TransferStepOne({
 
     if (!sourceRepo || !targetRepo) return [];
 
-    const sourceCurrencies = sourceRepo.currencies || [];
-    const targetCurrencies = targetRepo.currencies || [];
+    const sourceCurrencies = sourceRepo.float || [];
+    const targetCurrencies = targetRepo.float || [];
 
     const sourceTickers = sourceCurrencies.map((c: any) => c.ticker);
     const targetTickers = targetCurrencies.map((c: any) => c.ticker);
